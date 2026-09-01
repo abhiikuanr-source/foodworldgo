@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>FoodWorld - Order Food Online</title>
+
+  <!-- Tailwind CSS & FontAwesome Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Firebase Compat SDKs (App, Auth, Database) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff7ed', 100: '#ffedd5', 500: '#f97316',
+              600: '#ea580c', 700: '#c2410c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    @media (max-width: 640px) { input, select, textarea { font-size: 16px !important; } }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 9999px; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .pb-safe { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
+    .bottom-safe { bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)); }
+
+    @keyframes toastSlideDown {
+      0% { transform: translate(-50%, -100%) scale(0.9); opacity: 0; }
+      60% { transform: translate(-50%, 10px) scale(1.02); opacity: 1; }
+      100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+    }
+    @keyframes toastSlideUp {
+      0% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -100%) scale(0.9); opacity: 0; }
+    }
+    .toast-enter { animation: toastSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .toast-exit { animation: toastSlideUp 0.3s ease-in forwards; }
+
+    .veg-icon {
+      width: 14px; height: 14px;
+      border: 1.5px solid #16a34a; border-radius: 3px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: white;
+    }
+    .veg-icon::after {
+      content: ''; width: 6px; height: 6px;
+      background: #16a34a; border-radius: 50%;
+    }
+    .nonveg-icon {
+      width: 14px; height: 14px;
+      border: 1.5px solid #dc2626; border-radius: 3px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: white;
+    }
+    .nonveg-icon::after {
+      content: ''; width: 0; height: 0;
+      border-left: 4px solid transparent; border-right: 4px solid transparent;
+      border-bottom: 7px solid #dc2626;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
+
+  <!-- ================= INITIAL SPLASH SCREEN ================= -->
+  <div id="splashScreen" class="fixed inset-0 z-[100] bg-gradient-to-br from-brand-600 to-orange-500 flex flex-col items-center justify-center text-white">
+    <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-3xl shadow-xl mb-3 animate-pulse">
+      <i class="fa-solid fa-bowl-food"></i>
+    </div>
+    <h2 class="text-2xl font-black">FoodWorld</h2>
+    <div class="flex items-center gap-2 mt-4 text-xs text-white/90 font-semibold">
+      <i class="fa-solid fa-spinner fa-spin"></i> Loading delicious food...
+    </div>
+  </div>
+
+  <!-- ================= MODERN FLOATING TOAST ================= -->
+  <div id="modernFloatingToast" class="hidden fixed top-3 left-1/2 -translate-x-1/2 z-[90] w-[92%] max-w-md">
+    <div class="bg-slate-900/95 backdrop-blur-xl border border-white/15 text-white p-3.5 rounded-3xl shadow-2xl flex items-center gap-3">
+      <div id="toastIconBox" class="w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-base flex-shrink-0">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between">
+          <span id="toastTag" class="text-[10px] font-black uppercase tracking-wider text-brand-400">Notice</span>
+          <span class="text-[9px] text-slate-400 font-mono">Just now</span>
+        </div>
+        <p id="toastBody" class="text-xs font-semibold text-slate-100 truncate mt-0.5">Notification text goes here...</p>
+      </div>
+      <button onclick="dismissFloatingToast()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-400 hover:text-white transition flex-shrink-0 text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= NOTIFICATION CENTER DRAWER ================= -->
+  <div id="notifCenterDrawer" class="hidden fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-xs flex items-end justify-center">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-bell"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm text-slate-900">FoodWorld Announcements</h3>
+            <p class="text-[10px] text-slate-400">Broadcast notices & updates</p>
+          </div>
+        </div>
+        <button onclick="toggleNotifCenter(false)" class="w-8 h-8 rounded-full bg-slate-200/70 hover:bg-slate-200 flex items-center justify-center text-slate-600 text-xs">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div id="notifCenterList" class="p-4 space-y-2.5 overflow-y-auto custom-scrollbar flex-1">
+        <div class="p-8 text-center text-slate-400 text-xs">No announcements yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 1. FORGOT PASSWORD MODAL ================= -->
+  <div id="customerForgotModal" class="hidden fixed inset-0 z-[98] bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-lg shadow-inner">
+            <i class="fa-solid fa-key"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-slate-900 text-sm">Account Recovery</h3>
+            <p class="text-[10px] text-slate-400">FoodWorld Password Reset</p>
+          </div>
+        </div>
+        <button onclick="closeCustomerForgotModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+      
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Apna registered email address enter karein. Hum aapke email par password reset link bhejenge.
+      </p>
+
+      <form onsubmit="handleCustomerPasswordReset(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Customer Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="email" id="custResetEmail" required class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="you@example.com">
+          </div>
+        </div>
+
+        <div id="custResetError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium"></div>
+
+        <div class="flex gap-2 pt-1">
+          <button type="button" onclick="closeCustomerForgotModal()" class="flex-1 min-h-[42px] py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs active:scale-95 transition">Cancel</button>
+          <button type="submit" id="custResetBtn" class="flex-1 min-h-[42px] py-2 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-black rounded-xl text-xs shadow-md transition">Send Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= 2. EMAIL SENT SUCCESS POPUP ================= -->
+  <div id="custEmailSentSuccessModal" class="hidden fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl space-y-4 text-center border border-emerald-200">
+      <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
+        <i class="fa-solid fa-envelope-circle-check"></i>
+      </div>
+      <div>
+        <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">Mail Sent</span>
+        <h3 class="font-black text-slate-900 text-base mt-2">रिकवरी लिंक भेज दिया गया है!</h3>
+        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+          FoodWorld password recovery link aapke email par bhej diya gaya hai. Kripya inbox check karke password reset karein.
+        </p>
+        <p class="text-xs font-mono font-bold text-brand-600 bg-brand-50 p-2 rounded-xl mt-2.5 truncate" id="custSuccessEmailPreview">you@example.com</p>
+      </div>
+      <div class="pt-1">
+        <button onclick="closeCustEmailSuccessModal()" class="w-full min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold rounded-2xl text-xs shadow-md transition">
+          ठीक है / Got it
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 3. EXIT CONFIRMATION MODAL ================= -->
+  <div id="exitAppModal" class="hidden fixed inset-0 z-[99] bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl space-y-4 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl mx-auto shadow-inner">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </div>
+      <div>
+        <h3 class="font-black text-slate-900 text-base">Exit FoodWorld App?</h3>
+        <p class="text-xs text-slate-500 mt-1">Are you sure you want to close the app?</p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="cancelExitApp()" class="min-h-[42px] py-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold rounded-xl text-xs transition">No</button>
+        <button onclick="confirmExitApp()" class="min-h-[42px] py-2 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-bold rounded-xl text-xs shadow-md transition">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= AUTH VIEW (LOGIN / SIGNUP) ================= -->
+  <div id="authView" class="hidden min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-brand-600 to-orange-500">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
+      
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 text-2xl shadow-inner mb-2">
+          <i class="fa-solid fa-bowl-food"></i>
+        </div>
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">FoodWorld</h1>
+        <p class="text-xs text-slate-500 mt-0.5">Delicious meals delivered to your doorstep</p>
+      </div>
+
+      <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl mb-5 text-xs font-bold">
+        <button type="button" onclick="toggleAuthMode('login')" id="authTabLogin" class="min-h-[40px] rounded-lg bg-white shadow-sm text-brand-600 transition active:scale-95">Sign In</button>
+        <button type="button" onclick="toggleAuthMode('signup')" id="authTabSignup" class="min-h-[40px] rounded-lg text-slate-500 hover:text-slate-800 transition active:scale-95">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" onsubmit="handleCustomerLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="email" id="loginEmail" required class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="you@example.com">
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-600">Password</label>
+            <button type="button" onclick="openCustomerForgotModal()" class="text-xs text-brand-600 hover:text-brand-700 font-extrabold transition">Forgot Password?</button>
+          </div>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="password" id="loginPassword" required class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="••••••••">
+          </div>
+        </div>
+        <div id="loginAuthError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
+          <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+          <span id="loginErrorMsg">Error message</span>
+        </div>
+        <button type="submit" id="loginBtn" class="w-full min-h-[48px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
+          <span>Sign In</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signupForm" onsubmit="handleCustomerSignup(event)" class="space-y-3 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
+          <input type="text" id="regName" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="John Doe">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Email</label>
+          <input type="email" id="regEmail" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="john@example.com">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Phone Number</label>
+          <input type="tel" id="regPhone" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="+91 9876543210">
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-600">Delivery Address</label>
+            <button type="button" onclick="detectLiveLocation('regAddress', 'regGpsStatus')" class="text-[11px] text-brand-600 hover:text-brand-700 font-extrabold flex items-center gap-1">
+              <i class="fa-solid fa-crosshairs text-brand-500"></i> <span id="regGpsStatus">Auto-Detect GPS</span>
+            </button>
+          </div>
+          <textarea id="regAddress" rows="2" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Flat, Street, Landmark, City..."></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Password</label>
+          <input type="password" id="regPassword" minlength="6" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Min. 6 characters">
+        </div>
+        <div id="signupAuthError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
+          <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+          <span id="signupErrorMsg">Error message</span>
+        </div>
+        <button type="submit" id="signupBtn" class="w-full min-h-[48px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
+          <span>Create Customer Account</span>
+          <i class="fa-solid fa-user-plus"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= CUSTOMER APP VIEW ================= -->
+  <div id="appView" class="hidden max-w-lg mx-auto bg-white min-h-screen relative shadow-2xl pb-safe flex flex-col">
+
+    <!-- Topbar Header with Bell Icon -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 py-3 flex items-center justify-between shadow-xs">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-9 h-9 rounded-xl bg-brand-500 text-white flex items-center justify-center font-black text-sm shadow-md shadow-brand-500/30 flex-shrink-0">
+          <i class="fa-solid fa-bowl-food"></i>
+        </div>
+        <div class="overflow-hidden">
+          <div class="flex items-center gap-1.5">
+            <i class="fa-solid fa-location-dot text-brand-600 text-xs"></i>
+            <h2 class="text-xs font-bold text-slate-800 truncate max-w-[180px]" id="topAddressPreview">Delivery Address</h2>
+          </div>
+          <p class="text-[10px] text-slate-400 font-medium truncate" id="topCustomerName">Welcome</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="toggleNotifCenter(true)" class="relative w-9 h-9 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 flex items-center justify-center text-sm transition">
+          <i class="fa-solid fa-bell"></i>
+          <span id="notifBellBadge" class="hidden absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-brand-600 text-white font-extrabold text-[9px] flex items-center justify-center border-2 border-white animate-pulse">0</span>
+        </button>
+        <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-full text-[10px] font-black">
+          <i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Verified
+        </span>
+      </div>
+    </header>
+
+    <!-- MAIN VIEWS -->
+    <main class="flex-1">
+      
+      <!-- ================= 1. HOME TAB ================= -->
+      <section id="tab-home" class="p-4 space-y-4">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+          <input type="text" id="restaurantSearchInput" onkeyup="filterApprovedRestaurants()" placeholder="Search dishes or restaurants..." class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 to-brand-900 text-white p-4 sm:p-5 shadow-md">
+          <div class="relative z-10 max-w-[70%]">
+            <span class="px-2 py-0.5 bg-brand-500/90 rounded-md text-[9px] font-extrabold uppercase tracking-wide">Instant Delivery</span>
+            <h3 class="font-extrabold text-sm sm:text-base mt-1.5 leading-tight">Pay via UPI, Cards, or Cash on Delivery</h3>
+            <p class="text-[10px] text-slate-300 mt-1">Superfast kitchen prep & live rider radar tracking.</p>
+          </div>
+          <i class="fa-solid fa-burger absolute -right-3 -bottom-3 text-7xl text-white/10 rotate-12"></i>
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-sm">Approved Kitchens</h3>
+            <p class="text-[10px] text-slate-400">Verified culinary spots near you</p>
+          </div>
+          <span id="restaurantsCountBadge" class="text-[10px] font-bold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full">0 Open</span>
+        </div>
+
+        <div id="restaurantsListContainer" class="space-y-3">
+          <div class="p-8 text-center text-slate-400 text-xs">Loading restaurants near you...</div>
+        </div>
+      </section>
+
+      <!-- ================= 2. RESTAURANT MENU INTERFACE ================= -->
+      <section id="tab-menu" class="hidden min-h-screen bg-slate-50 flex flex-col pb-36">
+        
+        <div class="bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 py-3 sticky top-0 z-20 shadow-xs flex items-center justify-between">
+          <button onclick="closeRestaurantMenu()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 flex items-center justify-center text-slate-700 text-sm transition">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <div class="text-center truncate px-2">
+            <h3 class="font-black text-xs sm:text-sm text-slate-900 truncate" id="menuRestName">Restaurant</h3>
+            <p class="text-[10px] text-slate-400 font-medium truncate" id="menuRestCuisine">Dishes</p>
+          </div>
+          <button onclick="document.getElementById('menuSearchInput').focus()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 flex items-center justify-center text-slate-700 text-xs transition">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+
+        <div class="p-4 bg-white border-b border-slate-100 space-y-3">
+          <div class="flex items-start justify-between">
+            <div>
+              <h2 class="text-base sm:text-lg font-black text-slate-900 leading-tight" id="heroRestTitle">Restaurant Name</h2>
+              <p class="text-xs text-slate-500 font-medium mt-0.5" id="heroRestCuisineTag">Biryani, North Indian</p>
+              <p class="text-[11px] text-slate-400 mt-0.5 truncate" id="heroRestAddress"><i class="fa-solid fa-location-dot text-slate-300"></i> Main Road, City</p>
+            </div>
+            <div class="p-2 rounded-2xl bg-emerald-600 text-white text-center shadow-md shadow-emerald-600/20 flex-shrink-0">
+              <span class="block text-xs font-black">4.5 ★</span>
+              <span class="block text-[8px] uppercase tracking-wider font-bold text-white/80">Verified</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2 border-t border-slate-100 text-[11px] font-bold text-slate-600">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-brand-500"></i> 25-30 mins</span>
+            <span class="text-slate-300">•</span>
+            <span class="text-emerald-700 flex items-center gap-1"><i class="fa-solid fa-wallet"></i> UPI & COD Accepted</span>
+          </div>
+        </div>
+
+        <div class="px-4 py-3 bg-white border-b border-slate-100 space-y-2.5 sticky top-[57px] z-10 shadow-xs">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+            <input type="text" id="menuSearchInput" onkeyup="filterMenuDishes()" placeholder="Search dishes in menu..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
+          </div>
+          
+          <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 text-xs font-bold whitespace-nowrap">
+            <button onclick="toggleVegFilter('ALL')" id="filterBtn-all" class="px-3 py-1 rounded-xl bg-slate-900 text-white text-[11px] shadow-xs active:scale-95 transition font-bold">All Dishes</button>
+            <button onclick="toggleVegFilter('VEG')" id="filterBtn-veg" class="px-3 py-1 rounded-xl bg-slate-100 text-emerald-700 border border-emerald-200 text-[11px] flex items-center gap-1.5 active:scale-95 transition">
+              <span class="veg-icon"></span> Veg Only
+            </button>
+            <button onclick="toggleVegFilter('NONVEG')" id="filterBtn-nonveg" class="px-3 py-1 rounded-xl bg-slate-100 text-rose-700 border border-rose-200 text-[11px] flex items-center gap-1.5 active:scale-95 transition">
+              <span class="nonveg-icon"></span> Non-Veg
+            </button>
+          </div>
+        </div>
+
+        <div class="p-4 space-y-3 flex-1">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Recommended Menu Dishes</h4>
+            <span class="text-[10px] font-bold text-slate-400" id="dishCountBadge">0 Dishes</span>
+          </div>
+
+          <div id="menuItemsContainer" class="space-y-3">
+            <p class="text-xs text-slate-400 text-center py-8">Loading dishes...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. ORDERS TRACKING & HISTORY ================= -->
+      <section id="tab-orders" class="hidden p-4 space-y-5">
+        <div>
+          <h3 class="font-extrabold text-slate-900 text-base">Your Orders</h3>
+          <p class="text-[11px] text-slate-400">Live order status, rider GPS tracking & cancellation</p>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-brand-600 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span> Live Ongoing Orders
+          </h4>
+          <div id="activeOrdersList" class="space-y-3">
+            <p class="text-xs text-slate-400 bg-white p-4 rounded-2xl text-center border border-slate-200">No ongoing orders.</p>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Past Orders</h4>
+          <div id="pastOrdersList" class="space-y-3">
+            <p class="text-xs text-slate-400 bg-white p-4 rounded-2xl text-center border border-slate-200">No past order history.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. CUSTOMER SUPPORT & HELPDESK TAB ================= -->
+      <section id="tab-support" class="hidden p-4 space-y-4">
+        <div>
+          <h3 class="font-extrabold text-slate-900 text-base">24/7 Customer Helpdesk</h3>
+          <p class="text-[11px] text-slate-400">Instant support for food, delivery & payment assistance</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-slate-900 via-stone-900 to-brand-900 text-white p-5 rounded-3xl shadow-xl space-y-4">
+          <div class="flex items-start gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-brand-500 text-white flex items-center justify-center text-xl flex-shrink-0 shadow-lg shadow-brand-500/40">
+              <i class="fa-solid fa-headset"></i>
+            </div>
+            <div>
+              <span class="px-2 py-0.5 rounded bg-brand-500/80 text-[9px] font-black uppercase tracking-wider">FoodWorld Official Helpdesk</span>
+              <h4 class="font-extrabold text-sm sm:text-base mt-1" id="custSupportHours">24/7 Live Support</h4>
+              <p class="text-[11px] text-slate-300 mt-1 leading-relaxed" id="custSupportDesc">
+                Have a question about your order, food quality, refund, or delivery? FoodWorld Helpdesk is here for you 24/7. Connect directly with our team or raise a ticket below for instant resolution!
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5 pt-1">
+            <a id="custSupportCallLink" href="tel:+919876543210" class="min-h-[44px] py-2.5 px-3 bg-white hover:bg-slate-100 active:scale-95 text-slate-900 font-extrabold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md transition">
+              <i class="fa-solid fa-phone text-brand-600"></i>
+              <span id="custSupportPhoneText">Call Support</span>
+            </a>
+            <a id="custSupportWaLink" href="https://wa.me/919876543210" target="_blank" class="min-h-[44px] py-2.5 px-3 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-extrabold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md transition">
+              <i class="fa-brands fa-whatsapp text-base"></i>
+              <span>WhatsApp Us</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-3.5">
+          <h4 class="font-extrabold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-ticket text-brand-500"></i> Raise a Support Ticket
+          </h4>
+          
+          <form onsubmit="handleRaiseTicket(event)" class="space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Select Issue Category</label>
+              <select id="ticketCategory" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                <option value="Order Delay / Status">🛵 Order Delay / Delivery Issue</option>
+                <option value="Food Quality / Taste">🍲 Food Quality / Taste Issue</option>
+                <option value="Missing or Wrong Item">📦 Missing or Wrong Item Delivered</option>
+                <option value="Payment / UPI Query">💰 Payment / UPI / COD Query</option>
+                <option value="App Technical Problem">📱 App Technical Problem / Bug</option>
+                <option value="General Feedback">💬 General Feedback / Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Related Order ID (Optional)</label>
+              <input type="text" id="ticketOrderId" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="e.g. #AB12CD (leave blank if general issue)">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Explain Your Issue in Detail</label>
+              <textarea id="ticketMessage" rows="3" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Please describe what happened so our FoodWorld team can resolve it immediately..."></textarea>
+            </div>
+
+            <button type="submit" id="submitTicketBtn" class="w-full min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-extrabold rounded-2xl text-xs shadow-md shadow-brand-500/20 transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span>Submit Ticket to FoodWorld Support</span>
+            </button>
+          </form>
+        </div>
+
+        <div class="space-y-2.5">
+          <h4 class="font-extrabold text-xs text-slate-700 uppercase tracking-wider">My Support Requests</h4>
+          <div id="myTicketsList" class="space-y-2.5">
+            <div class="p-6 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200">No support tickets raised yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. PROFILE TAB ================= -->
+      <section id="tab-profile" class="hidden p-4 space-y-4">
+        <div>
+          <h3 class="font-extrabold text-slate-900 text-base">My Profile</h3>
+          <p class="text-[11px] text-slate-400">Manage address, GPS & contact details</p>
+        </div>
+
+        <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <form onsubmit="handleUpdateProfile(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
+              <input type="text" id="profName" required class="w-full px-3.5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Email</label>
+              <input type="email" id="profEmail" readonly class="w-full px-3.5 py-3 bg-slate-100 border border-slate-200 text-slate-500 rounded-xl text-xs cursor-not-allowed">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Phone Number</label>
+              <input type="tel" id="profPhone" required class="w-full px-3.5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-600">Default Delivery Address</label>
+                <button type="button" onclick="detectLiveLocation('profAddress', 'profGpsStatus')" class="text-[11px] text-brand-600 hover:text-brand-700 font-extrabold flex items-center gap-1">
+                  <i class="fa-solid fa-crosshairs text-brand-500"></i> <span id="profGpsStatus">Detect Live GPS</span>
+                </button>
+              </div>
+              <textarea id="profAddress" rows="3" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+            </div>
+            <button type="submit" id="saveProfBtn" class="w-full min-h-[44px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-md transition">
+              Save Changes
+            </button>
+          </form>
+        </div>
+
+        <button onclick="handleLogout()" class="w-full min-h-[44px] py-3 bg-red-50 hover:bg-red-100 text-rose-600 font-bold rounded-2xl text-xs border border-red-200 transition flex items-center justify-center gap-2 active:scale-98">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Log Out</span>
+        </button>
+      </section>
+    </main>
+
+    <!-- FLOATING CART STRIP -->
+    <div id="floatingCartBar" class="hidden fixed bottom-safe left-1/2 -translate-x-1/2 w-full max-w-md px-3 z-40">
+      <div class="bg-slate-900/95 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-2xl flex items-center justify-between border border-slate-800">
+        <div class="min-w-0 flex-1 mr-2">
+          <span class="text-[10px] font-bold text-brand-400 uppercase tracking-wider block truncate" id="floatCartRestName">Restaurant</span>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold" id="floatCartItemCount">0 items</span>
+            <span class="text-slate-500">•</span>
+            <span class="text-sm font-black text-emerald-400" id="floatCartTotal">₹0</span>
+          </div>
+        </div>
+        <button onclick="openCheckoutModal()" class="min-h-[40px] px-4 py-2 bg-brand-500 hover:bg-brand-600 active:scale-95 text-white text-xs font-extrabold rounded-xl shadow-md transition flex items-center gap-1.5 flex-shrink-0">
+          <span>Checkout</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- BOTTOM 4-TAB NAVIGATION -->
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] z-30 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+      <button onclick="switchAppTab('home')" id="navBtn-home" class="flex flex-col items-center gap-1 py-1 text-brand-600 transition flex-1 active:scale-90">
+        <i class="fa-solid fa-utensils text-base"></i>
+        <span class="text-[10px] font-bold">Food</span>
+      </button>
+      <button onclick="switchAppTab('orders')" id="navBtn-orders" class="flex flex-col items-center gap-1 py-1 text-slate-400 hover:text-slate-600 transition flex-1 active:scale-90">
+        <i class="fa-solid fa-clock-rotate-left text-base"></i>
+        <span class="text-[10px] font-bold">Orders</span>
+      </button>
+      <button onclick="switchAppTab('support')" id="navBtn-support" class="flex flex-col items-center gap-1 py-1 text-slate-400 hover:text-slate-600 transition flex-1 active:scale-90">
+        <i class="fa-solid fa-headset text-base"></i>
+        <span class="text-[10px] font-bold">Helpdesk</span>
+      </button>
+      <button onclick="switchAppTab('profile')" id="navBtn-profile" class="flex flex-col items-center gap-1 py-1 text-slate-400 hover:text-slate-600 transition flex-1 active:scale-90">
+        <i class="fa-solid fa-user text-base"></i>
+        <span class="text-[10px] font-bold">Profile</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- CHECKOUT MODAL -->
+  <div id="checkoutModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div>
+          <h3 class="font-extrabold text-sm text-slate-900">Order Checkout</h3>
+          <p class="text-[10px] text-slate-400" id="checkoutRestName">Restaurant</p>
+        </div>
+        <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-slate-200/70 hover:bg-slate-200 flex items-center justify-center text-slate-600 text-xs">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-4 space-y-3.5 overflow-y-auto custom-scrollbar flex-1">
+        <div class="space-y-1.5">
+          <h4 class="text-xs font-bold text-slate-700">Selected Dishes</h4>
+          <div id="checkoutCartItemsList" class="divide-y divide-slate-100 bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1"></div>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <i class="fa-solid fa-location-crosshairs text-brand-500"></i> Deliver To
+            </h4>
+            <button onclick="switchAppTab('profile'); closeCheckoutModal();" class="text-[10px] text-brand-600 font-bold hover:underline">Change</button>
+          </div>
+          <p class="text-xs text-slate-600 font-medium" id="checkoutAddress">Address...</p>
+          <p class="text-[11px] text-slate-500 font-mono" id="checkoutPhone">Phone: ...</p>
+        </div>
+
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold text-slate-700">Choose Payment Method</h4>
+          
+          <div class="grid grid-cols-2 gap-2">
+            <label onclick="selectPaymentMethod('COD')" id="payOptionCOD" class="p-3 rounded-2xl border-2 border-brand-500 bg-brand-50/50 cursor-pointer flex flex-col justify-between transition">
+              <div class="flex items-center justify-between">
+                <i class="fa-solid fa-hand-holding-dollar text-brand-600 text-base"></i>
+                <span id="radioCheckCOD" class="w-4 h-4 rounded-full bg-brand-600 border-2 border-white flex items-center justify-center text-[9px] text-white"><i class="fa-solid fa-check"></i></span>
+              </div>
+              <div class="mt-2">
+                <span class="block text-xs font-black text-slate-900">Cash on Delivery</span>
+                <span class="block text-[9px] text-slate-500">Pay cash upon arrival</span>
+              </div>
+            </label>
+
+            <label onclick="selectPaymentMethod('ONLINE')" id="payOptionONLINE" class="p-3 rounded-2xl border-2 border-slate-200 bg-slate-50/50 cursor-pointer flex flex-col justify-between transition">
+              <div class="flex items-center justify-between">
+                <i class="fa-brands fa-google-pay text-blue-600 text-xl"></i>
+                <span id="radioCheckONLINE" class="w-4 h-4 rounded-full border-2 border-slate-300 hidden"></span>
+              </div>
+              <div class="mt-2">
+                <span class="block text-xs font-black text-slate-900">Online UPI / App</span>
+                <span class="block text-[9px] text-slate-500">GPay, PhonePe, Paytm</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div id="onlineUpiBox" class="hidden p-3.5 bg-blue-50 border border-blue-200 rounded-2xl space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-blue-900"><i class="fa-solid fa-qrcode mr-1"></i> Scan & Pay via UPI</span>
+            <span class="text-[10px] font-mono font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded" id="upiAmountTag">₹0</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-20 h-20 bg-white p-1 rounded-xl border border-blue-200 flex items-center justify-center shadow-xs flex-shrink-0">
+              <img id="upiDynamicQr" src="" class="w-full h-full object-contain" alt="UPI QR">
+            </div>
+            <div class="min-w-0 flex-1 space-y-1.5">
+              <p class="text-[11px] text-slate-600 leading-tight">Pay instantly using any UPI app or scan the QR code.</p>
+              <a id="upiIntentBtn" href="#" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-xl text-[11px] font-black shadow-xs active:scale-95 transition">
+                <i class="fa-solid fa-mobile-screen-button"></i> Open UPI App
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5 text-xs bg-slate-50 p-3 rounded-2xl border border-slate-100">
+          <div class="flex justify-between text-slate-600">
+            <span>Item Total</span>
+            <span id="checkoutSubtotal">₹0</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Delivery Charge</span>
+            <span class="font-bold text-slate-800">₹30</span>
+          </div>
+          <div class="border-t border-slate-200 pt-1.5 flex justify-between font-black text-slate-900 text-sm">
+            <span>Grand Total</span>
+            <span class="text-emerald-700" id="checkoutGrandTotal">₹30</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-slate-100 bg-white">
+        <button onclick="placeCustomerOrder()" id="placeOrderBtn" class="w-full min-h-[48px] py-3.5 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-extrabold rounded-2xl text-xs shadow-xl shadow-brand-500/30 transition flex items-center justify-center gap-2">
+          <span>Confirm & Place Order</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RATING MODAL -->
+  <div id="ratingModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="text-center space-y-1">
+        <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center text-xl mx-auto mb-1"><i class="fa-solid fa-star"></i></div>
+        <h3 class="font-extrabold text-base text-slate-900">Rate Your Food</h3>
+        <p class="text-xs text-slate-400" id="ratingRestName">Restaurant</p>
+      </div>
+
+      <input type="hidden" id="ratingOrderId">
+      <input type="hidden" id="ratingRestId">
+
+      <div class="flex items-center justify-center gap-2 text-2xl text-amber-400 py-1">
+        <button type="button" onclick="setStarRating(1)"><i class="fa-solid fa-star" id="star-1"></i></button>
+        <button type="button" onclick="setStarRating(2)"><i class="fa-solid fa-star" id="star-2"></i></button>
+        <button type="button" onclick="setStarRating(3)"><i class="fa-solid fa-star" id="star-3"></i></button>
+        <button type="button" onclick="setStarRating(4)"><i class="fa-solid fa-star" id="star-4"></i></button>
+        <button type="button" onclick="setStarRating(5)"><i class="fa-solid fa-star" id="star-5"></i></button>
+      </div>
+
+      <textarea id="ratingReviewText" rows="2" placeholder="Write feedback..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+
+      <div class="flex gap-2">
+        <button onclick="closeRatingModal()" class="flex-1 min-h-[40px] py-2.5 bg-slate-100 active:scale-95 text-slate-700 font-bold rounded-xl text-xs transition">Cancel</button>
+        <button onclick="submitOrderRating()" class="flex-1 min-h-[40px] py-2.5 bg-brand-600 active:scale-95 text-white font-bold rounded-xl text-xs shadow-md transition">Submit</button>
+      </div>
+    </div>
+  </div>
+<!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyABmYgOsai5ppKsAqxGr212nZiMu9tsCjo",
+      authDomain: "foodworldfixed.firebaseapp.com",
+      databaseURL: "https://foodworldfixed-default-rtdb.firebaseio.com",
+      projectId: "foodworldfixed",
+      storageBucket: "foodworldfixed.firebasestorage.app",
+      messagingSenderId: "357094358614",
+      appId: "1:357094358614:web:e405d802735e15f4fbc5f7"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+    const DELIVERY_FEE = 30;
+    const OFFICIAL_UPI_ID = "sonukuanr2003-1@oksbi"; // Official UPI Handle
+
+    let currentCustomer = null, cachedRestaurants = {}, cachedMenus = {}, cachedDeliveryBoys = {}, cachedOrders = {};
+    let cachedBroadcasts = {}, cachedMyTickets = {}, cachedSupportConfig = {};
+    let activeRestaurantId = null, cart = {}, selectedRatingStars = 5, isRoleChecking = false;
+    let customerLat = null, customerLng = null;
+    let currentAppTab = 'home';
+    let currentVegFilter = 'ALL';
+    let currentPaymentMethod = 'COD';
+    let knownNotifIds = new Set();
+    let toastTimeout = null;
+    let audioCtx = null;
+
+    // ---------------- 4-DIGIT UNIQUE DELIVERY OTP GENERATOR ----------------
+    function generateDeliveryOtp() {
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      return (1000 + (array[0] % 9000)).toString(); // Generates 1000 - 9999
+    }
+
+    // ---------------- GLOBAL AUDIO UNLOCK CONTROLLER ----------------
+    function initGlobalAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+    }
+    window.addEventListener('click', initGlobalAudioContext, { once: true });
+    window.addEventListener('touchstart', initGlobalAudioContext, { once: true });
+
+    function playModernNotifChime() {
+      try {
+        initGlobalAudioContext();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1174.66, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+        
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.35);
+      } catch (e) {}
+    }
+
+    // ---------------- DYNAMIC FLOATING TOAST CONTROLLER ----------------
+    function showModernFloatingToast(title, message, iconClass = 'fa-solid fa-bell', isAlert = false) {
+      playModernNotifChime();
+      const toast = document.getElementById('modernFloatingToast');
+      const tagEl = document.getElementById('toastTag');
+      const bodyEl = document.getElementById('toastBody');
+      const iconBox = document.getElementById('toastIconBox');
+
+      tagEl.innerText = title;
+      bodyEl.innerText = message;
+      iconBox.innerHTML = `<i class="${iconClass}"></i>`;
+
+      if (isAlert) {
+        iconBox.className = "w-10 h-10 rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-base flex-shrink-0";
+      } else {
+        iconBox.className = "w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-base flex-shrink-0";
+      }
+
+      toast.classList.remove('hidden', 'toast-exit');
+      toast.classList.add('toast-enter');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        dismissFloatingToast();
+      }, 5000);
+    }
+
+    function dismissFloatingToast() {
+      const toast = document.getElementById('modernFloatingToast');
+      toast.classList.remove('toast-enter');
+      toast.classList.add('toast-exit');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 300);
+    }
+
+    // ---------------- PAYMENT METHOD SELECTOR & DYNAMIC UPI QR ----------------
+    function selectPaymentMethod(method) {
+      currentPaymentMethod = method;
+      const optCOD = document.getElementById('payOptionCOD');
+      const optONLINE = document.getElementById('payOptionONLINE');
+      const checkCOD = document.getElementById('radioCheckCOD');
+      const checkONLINE = document.getElementById('radioCheckONLINE');
+      const onlineBox = document.getElementById('onlineUpiBox');
+
+      const keys = Object.keys(cart);
+      let subtotal = 0;
+      keys.forEach(k => { subtotal += (cart[k].price * cart[k].qty); });
+      const grandTotal = subtotal + DELIVERY_FEE;
+
+      if (method === 'ONLINE') {
+        optONLINE.className = "p-3 rounded-2xl border-2 border-blue-500 bg-blue-50/50 cursor-pointer flex flex-col justify-between transition";
+        checkONLINE.className = "w-4 h-4 rounded-full bg-blue-600 border-2 border-white flex items-center justify-center text-[9px] text-white";
+        checkONLINE.innerHTML = '<i class="fa-solid fa-check"></i>';
+        
+        optCOD.className = "p-3 rounded-2xl border-2 border-slate-200 bg-slate-50/50 cursor-pointer flex flex-col justify-between transition";
+        checkCOD.className = "w-4 h-4 rounded-full border-2 border-slate-300 hidden";
+        checkCOD.innerHTML = '';
+
+        // Generate dynamic UPI intent & QR
+        document.getElementById('upiAmountTag').innerText = `₹${grandTotal}`;
+        const upiString = `upi://pay?pa=${encodeURIComponent(OFFICIAL_UPI_ID)}&pn=FoodWorld&am=${grandTotal}&cu=INR&tn=FoodWorldOrder`;
+        document.getElementById('upiDynamicQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
+        document.getElementById('upiIntentBtn').href = upiString;
+
+        onlineBox.classList.remove('hidden');
+      } else {
+        optCOD.className = "p-3 rounded-2xl border-2 border-brand-500 bg-brand-50/50 cursor-pointer flex flex-col justify-between transition";
+        checkCOD.className = "w-4 h-4 rounded-full bg-brand-600 border-2 border-white flex items-center justify-center text-[9px] text-white";
+        checkCOD.innerHTML = '<i class="fa-solid fa-check"></i>';
+        
+        optONLINE.className = "p-3 rounded-2xl border-2 border-slate-200 bg-slate-50/50 cursor-pointer flex flex-col justify-between transition";
+        checkONLINE.className = "w-4 h-4 rounded-full border-2 border-slate-300 hidden";
+        checkONLINE.innerHTML = '';
+
+        onlineBox.classList.add('hidden');
+      }
+    }
+
+    // ---------------- FORGOT PASSWORD & RECOVERY CONTROLLERS ----------------
+    function openCustomerForgotModal() {
+      const email = document.getElementById('loginEmail').value.trim();
+      if (email) document.getElementById('custResetEmail').value = email;
+      document.getElementById('custResetError').classList.add('hidden');
+      document.getElementById('customerForgotModal').classList.remove('hidden');
+    }
+
+    function closeCustomerForgotModal() {
+      document.getElementById('customerForgotModal').classList.add('hidden');
+    }
+
+    function openCustEmailSuccessModal(email) {
+      document.getElementById('custSuccessEmailPreview').innerText = email;
+      document.getElementById('custEmailSentSuccessModal').classList.remove('hidden');
+    }
+
+    function closeCustEmailSuccessModal() {
+      document.getElementById('custEmailSentSuccessModal').classList.add('hidden');
+    }
+
+    async function handleCustomerPasswordReset(e) {
+      e.preventDefault();
+      const email = document.getElementById('custResetEmail').value.trim();
+      const btn = document.getElementById('custResetBtn');
+      const errBox = document.getElementById('custResetError');
+      errBox.classList.add('hidden');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending link...';
+
+      try {
+        await auth.sendPasswordResetEmail(email);
+        closeCustomerForgotModal();
+        showModernFloatingToast("Verification Sent!", `Password recovery mail sent to: ${email}`, "fa-solid fa-envelope-circle-check");
+        openCustEmailSuccessModal(email);
+      } catch (err) {
+        errBox.innerText = err.message || "Failed to send reset link.";
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Send Link";
+      }
+    }
+
+    // ---------------- NOTIFICATION CENTER ----------------
+    function toggleNotifCenter(show) {
+      const drawer = document.getElementById('notifCenterDrawer');
+      if (show) {
+        renderNotifCenterList();
+        drawer.classList.remove('hidden');
+        document.getElementById('notifBellBadge').classList.add('hidden');
+      } else {
+        drawer.classList.add('hidden');
+      }
+    }
+
+    function renderNotifCenterList() {
+      const container = document.getElementById('notifCenterList');
+      const keys = Object.keys(cachedBroadcasts).reverse();
+
+      if (keys.length === 0) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs">No announcements yet.</div>';
+        return;
+      }
+
+      let html = '';
+      keys.forEach(id => {
+        const n = cachedBroadcasts[id];
+        if (!n) return;
+        html += `
+          <div class="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="px-2 py-0.5 rounded text-[9px] font-black bg-brand-100 text-brand-700 uppercase">FoodWorld Notice</span>
+              <span class="text-[10px] text-slate-400 font-mono">${new Date(n.createdAt || Date.now()).toLocaleTimeString()}</span>
+            </div>
+            <p class="text-xs text-slate-800 font-semibold mt-0.5">${escapeHtml(n.message || '')}</p>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    // ---------------- ANDROID HARDWARE BACK BUTTON & MODALS ----------------
+    function pushHistoryState() {
+      history.pushState({ app: 'foodworld_customer' }, null, location.href);
+    }
+    pushHistoryState();
+
+    window.addEventListener('popstate', function () {
+      pushHistoryState();
+      handleHardwareBack();
+    });
+
+    function handleHardwareBack() {
+      const emailSentM = document.getElementById('custEmailSentSuccessModal');
+      if (emailSentM && !emailSentM.classList.contains('hidden')) {
+        closeCustEmailSuccessModal();
+        return;
+      }
+
+      const forgotM = document.getElementById('customerForgotModal');
+      if (forgotM && !forgotM.classList.contains('hidden')) {
+        closeCustomerForgotModal();
+        return;
+      }
+
+      const notifD = document.getElementById('notifCenterDrawer');
+      if (notifD && !notifD.classList.contains('hidden')) {
+        toggleNotifCenter(false);
+        return;
+      }
+
+      const ratingM = document.getElementById('ratingModal');
+      if (ratingM && !ratingM.classList.contains('hidden')) {
+        closeRatingModal();
+        return;
+      }
+
+      const checkM = document.getElementById('checkoutModal');
+      if (checkM && !checkM.classList.contains('hidden')) {
+        closeCheckoutModal();
+        return;
+      }
+
+      const menuV = document.getElementById('tab-menu');
+      if (menuV && !menuV.classList.contains('hidden')) {
+        closeRestaurantMenu();
+        return;
+      }
+
+      if (currentAppTab !== 'home') {
+        switchAppTab('home');
+        return;
+      }
+
+      openExitAppModal();
+    }
+
+    function openExitAppModal() {
+      document.getElementById('exitAppModal').classList.remove('hidden');
+    }
+
+    function cancelExitApp() {
+      document.getElementById('exitAppModal').classList.add('hidden');
+      switchAppTab('home');
+    }
+
+    function confirmExitApp() {
+      if (navigator.app && navigator.app.exitApp) {
+        navigator.app.exitApp();
+      } else if (navigator.device && navigator.device.exitApp) {
+        navigator.device.exitApp();
+      } else {
+        window.close();
+      }
+    }
+
+    // ---------------- GPS GEOLOCATION DETECTOR ----------------
+    function detectLiveLocation(textareaId, statusSpanId) {
+      const statusEl = document.getElementById(statusSpanId);
+      const textarea = document.getElementById(textareaId);
+      if (!navigator.geolocation) { alert("GPS not supported on device."); return; }
+
+      statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Detecting...';
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          customerLat = position.coords.latitude;
+          customerLng = position.coords.longitude;
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${customerLat}&lon=${customerLng}`, {
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            const data = await res.json();
+            textarea.value = (data && data.display_name) ? data.display_name : `GPS: ${customerLat.toFixed(6)}, ${customerLng.toFixed(6)}`;
+            statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> GPS Set</span>';
+          } catch (e) {
+            textarea.value = `GPS Pin: ${customerLat.toFixed(6)}, ${customerLng.toFixed(6)}`;
+            statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> Location Set</span>';
+          }
+        },
+        (error) => {
+          statusEl.innerText = 'GPS Failed';
+          alert("Please enable location permissions: " + error.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+
+    function toggleAuthMode(mode) {
+      const loginForm = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+      const tabLogin = document.getElementById('authTabLogin');
+      const tabSignup = document.getElementById('authTabSignup');
+
+      if (mode === 'signup') {
+        loginForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+        tabSignup.classList.add('bg-white', 'text-brand-600', 'shadow-sm');
+        tabSignup.classList.remove('text-slate-500');
+        tabLogin.classList.remove('bg-white', 'text-brand-600', 'shadow-sm');
+        tabLogin.classList.add('text-slate-500');
+      } else {
+        signupForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+        tabLogin.classList.add('bg-white', 'text-brand-600', 'shadow-sm');
+        tabLogin.classList.remove('text-slate-500');
+        tabSignup.classList.remove('bg-white', 'text-brand-600', 'shadow-sm');
+        tabSignup.classList.add('text-slate-500');
+      }
+    }
+
+    async function handleCustomerLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const btn = document.getElementById('loginBtn');
+      document.getElementById('loginAuthError').classList.add('hidden');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in...';
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+      } catch (err) {
+        document.getElementById('loginAuthError').classList.remove('hidden');
+        document.getElementById('loginErrorMsg').innerText = err.message || 'Login failed.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Sign In</span> <i class="fa-solid fa-arrow-right"></i>';
+      }
+    }
+
+    async function handleCustomerSignup(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const address = document.getElementById('regAddress').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      const btn = document.getElementById('signupBtn');
+      document.getElementById('signupAuthError').classList.add('hidden');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
+
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        await db.ref(`customers/${userCredential.user.uid}`).set({
+          name, email, phone, address, customerLat: customerLat || null, customerLng: customerLng || null, createdAt: Date.now()
+        });
+      } catch (err) {
+        document.getElementById('signupAuthError').classList.remove('hidden');
+        document.getElementById('signupErrorMsg').innerText = err.message || 'Signup failed.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Create Customer Account</span> <i class="fa-solid fa-user-plus"></i>';
+      }
+    }
+
+    function handleLogout() { 
+      auth.signOut().catch(err => alert("Logout error: " + err.message)); 
+    }
+
+    auth.onAuthStateChanged(async (user) => {
+      const splash = document.getElementById('splashScreen');
+      if (isRoleChecking) return;
+      if (user) {
+        isRoleChecking = true;
+        try {
+          const snap = await db.ref(`customers/${user.uid}`).once('value');
+          if (!snap.exists()) {
+            await auth.signOut();
+            document.getElementById('loginAuthError').classList.remove('hidden');
+            document.getElementById('loginErrorMsg').innerText = "Access Denied: Not a registered Customer.";
+            splash.classList.add('hidden');
+            return;
+          }
+          document.getElementById('authView').classList.add('hidden');
+          document.getElementById('appView').classList.remove('hidden');
+          listenToCustomerProfile(user.uid);
+          initAppListeners();
+        } catch (err) {
+          await auth.signOut();
+        } finally {
+          isRoleChecking = false;
+          splash.classList.add('hidden');
+        }
+      } else {
+        document.getElementById('appView').classList.add('hidden');
+        document.getElementById('authView').classList.remove('hidden');
+        splash.classList.add('hidden');
+        currentCustomer = null;
+        cart = {};
+        updateCartFloatingBar();
+        detachListeners();
+      }
+    });
+
+    function detachListeners() {
+      if (currentCustomer && currentCustomer.uid) {
+        db.ref(`customers/${currentCustomer.uid}`).off();
+        db.ref('restaurants').off();
+        db.ref('deliveryPartners').off();
+        db.ref('orders').off();
+        db.ref('admin/notifications').off();
+        db.ref('settings/support').off();
+        db.ref('supportTickets').off();
+      }
+    }
+
+    function listenToCustomerProfile(uid) {
+      db.ref(`customers/${uid}`).on('value', snap => {
+        currentCustomer = snap.val() || {};
+        currentCustomer.uid = uid;
+
+        document.getElementById('topCustomerName').innerText = `Hi, ${currentCustomer.name || 'Foodie'}`;
+        document.getElementById('topAddressPreview').innerText = currentCustomer.address || 'Set address';
+
+        document.getElementById('profName').value = currentCustomer.name || '';
+        document.getElementById('profEmail').value = currentCustomer.email || auth.currentUser?.email || '';
+        document.getElementById('profPhone').value = currentCustomer.phone || '';
+        document.getElementById('profAddress').value = currentCustomer.address || '';
+        
+        if (currentCustomer.customerLat && currentCustomer.customerLng) {
+          customerLat = currentCustomer.customerLat;
+          customerLng = currentCustomer.customerLng;
+        }
+      });
+    }
+
+    function initAppListeners() {
+      db.ref('restaurants').on('value', snap => {
+        cachedRestaurants = snap.val() || {};
+        renderRestaurantsList();
+      });
+
+      db.ref('deliveryPartners').on('value', snap => {
+        cachedDeliveryBoys = snap.val() || {};
+        renderOrdersList();
+      });
+
+      db.ref('orders').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').on('value', snap => {
+        cachedOrders = snap.val() || {};
+        renderOrdersList();
+      });
+
+      db.ref('admin/notifications').on('value', snap => {
+        cachedBroadcasts = snap.val() || {};
+        const keys = Object.keys(cachedBroadcasts);
+        
+        if (keys.length > 0) {
+          const latestKey = keys[keys.length - 1];
+          const latest = cachedBroadcasts[latestKey];
+          
+          if (!knownNotifIds.has(latestKey) && latest && latest.message) {
+            showModernFloatingToast("FoodWorld Announcement", latest.message, "fa-solid fa-bullhorn");
+            document.getElementById('notifBellBadge').innerText = keys.length;
+            document.getElementById('notifBellBadge').classList.remove('hidden');
+            knownNotifIds.add(latestKey);
+          }
+        }
+      });
+
+      db.ref('settings/support').on('value', snap => {
+        cachedSupportConfig = snap.val() || {};
+        const phone = cachedSupportConfig.phone || '+91 9876543210';
+        const whatsapp = cachedSupportConfig.whatsapp || '919876543210';
+        const hours = cachedSupportConfig.hours || '24/7 Live Support';
+        const desc = cachedSupportConfig.description || 'Have an issue with your food or delivery? FoodWorld Helpdesk is here for you 24/7. Connect directly with our team or raise a ticket below for instant resolution!';
+
+        document.getElementById('custSupportHours').innerText = hours;
+        document.getElementById('custSupportDesc').innerText = desc;
+        document.getElementById('custSupportPhoneText').innerText = `Call (${phone})`;
+        document.getElementById('custSupportCallLink').href = `tel:${phone}`;
+        document.getElementById('custSupportWaLink').href = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello FoodWorld Support, I need assistance with my order.')}`;
+      });
+
+      db.ref('supportTickets').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').on('value', snap => {
+        cachedMyTickets = snap.val() || {};
+        renderMyTicketsList();
+      });
+    }
+
+    // ==========================================
+    // CUSTOMER SUPPORT TICKETING
+    // ==========================================
+    async function handleRaiseTicket(e) {
+      e.preventDefault();
+      if (!currentCustomer) return;
+
+      const category = document.getElementById('ticketCategory').value;
+      const orderId = document.getElementById('ticketOrderId').value.trim();
+      const message = document.getElementById('ticketMessage').value.trim();
+      const btn = document.getElementById('submitTicketBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting to Helpdesk...';
+
+      try {
+        await db.ref('supportTickets').push().set({
+          customerUid: currentCustomer.uid,
+          customerName: currentCustomer.name || 'Customer',
+          customerPhone: currentCustomer.phone || '',
+          customerEmail: currentCustomer.email || '',
+          category: category,
+          orderId: orderId || '',
+          message: message,
+          status: 'OPEN',
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        });
+
+        document.getElementById('ticketOrderId').value = '';
+        document.getElementById('ticketMessage').value = '';
+
+        showModernFloatingToast("Ticket Submitted", "Our FoodWorld team will review your request immediately.", "fa-solid fa-circle-check");
+      } catch (err) {
+        alert("Failed to submit ticket: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Submit Ticket to FoodWorld Support</span>';
+      }
+    }
+
+    function renderMyTicketsList() {
+      const container = document.getElementById('myTicketsList');
+      const keys = Object.keys(cachedMyTickets).reverse();
+
+      if (keys.length === 0) {
+        container.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200">No support tickets raised yet.</div>';
+        return;
+      }
+
+      let html = '';
+      keys.forEach(id => {
+        const t = cachedMyTickets[id];
+        if (!t) return;
+        const isResolved = t.status === 'RESOLVED';
+
+        html += `
+          <div class="bg-white p-3.5 rounded-2xl border ${isResolved ? 'border-slate-200 bg-slate-50/50' : 'border-amber-200 bg-amber-50/20'} shadow-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-black text-xs text-slate-800">#${id.slice(-6)}</span>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black ${isResolved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${isResolved ? 'RESOLVED' : 'IN REVIEW / PENDING'}
+                </span>
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono">${new Date(t.createdAt || Date.now()).toLocaleDateString()}</span>
+            </div>
+
+            <div class="text-xs">
+              <p class="font-bold text-slate-800"><i class="fa-solid fa-tag text-brand-500 mr-1 text-[10px]"></i> ${escapeHtml(t.category)}</p>
+              ${t.orderId ? `<p class="text-[10px] text-slate-500 font-mono mt-0.5">Order Ref: ${escapeHtml(t.orderId)}</p>` : ''}
+              <p class="text-[11px] text-slate-600 bg-slate-50 p-2 rounded-xl border border-slate-100 mt-1">${escapeHtml(t.message)}</p>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // ==========================================
+    // RESTAURANTS LIST & MENU ENGINE
+    // ==========================================
+    function renderRestaurantsList(filter = '') {
+      const container = document.getElementById('restaurantsListContainer');
+      const keys = Object.keys(cachedRestaurants);
+      let approvedCount = 0, html = '';
+
+      keys.forEach(restId => {
+        const r = cachedRestaurants[restId];
+        if (!r || r.approved !== true) return;
+        approvedCount++;
+
+        if (filter && !r.name?.toLowerCase().includes(filter.toLowerCase()) && !r.cuisine?.toLowerCase().includes(filter.toLowerCase())) return;
+
+        const photoHtml = r.imageUrl ? 
+          `<img src="${escapeHtml(r.imageUrl)}" class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border border-slate-100 flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80'">` :
+          `<div class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-brand-100 to-orange-100 text-brand-600 flex items-center justify-center text-2xl flex-shrink-0"><i class="fa-solid fa-utensils"></i></div>`;
+
+        html += `
+          <div onclick="openRestaurantMenu('${restId}')" class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs active:scale-98 transition cursor-pointer flex gap-3 items-center">
+            ${photoHtml}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <h4 class="font-extrabold text-xs sm:text-sm text-slate-800 truncate">${escapeHtml(r.name || 'Restaurant')}</h4>
+                <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-black">4.5 <i class="fa-solid fa-star text-[8px]"></i></span>
+              </div>
+              <p class="text-xs text-brand-600 font-medium truncate mt-0.5">${escapeHtml(r.cuisine || 'Fast Food')}</p>
+              <p class="text-[11px] text-slate-400 truncate"><i class="fa-solid fa-location-dot text-slate-300"></i> ${escapeHtml(r.address || 'City')}</p>
+              <div class="flex items-center gap-2 mt-1.5 text-[10px] font-bold text-slate-500">
+                <span><i class="fa-solid fa-clock text-brand-500"></i> 25-35 min</span>
+                <span>•</span>
+                <span class="text-emerald-700"><i class="fa-solid fa-wallet"></i> UPI / COD</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('restaurantsCountBadge').innerText = `${approvedCount} Open`;
+      container.innerHTML = html || `<div class="p-8 text-center text-slate-400 text-xs">No approved restaurants match search.</div>`;
+    }
+
+    function filterApprovedRestaurants() {
+      renderRestaurantsList(document.getElementById('restaurantSearchInput').value);
+    }
+
+    function openRestaurantMenu(restId) {
+      activeRestaurantId = restId;
+      const r = cachedRestaurants[restId] || {};
+      
+      document.getElementById('menuRestName').innerText = r.name || 'Menu';
+      document.getElementById('menuRestCuisine').innerText = r.cuisine || 'Dishes';
+      document.getElementById('heroRestTitle').innerText = r.name || 'Restaurant';
+      document.getElementById('heroRestCuisineTag').innerText = r.cuisine || 'Multi-Cuisine Speciality';
+      document.getElementById('heroRestAddress').innerHTML = `<i class="fa-solid fa-location-dot text-slate-300 mr-1"></i> ${escapeHtml(r.address || 'City Center')}`;
+
+      currentVegFilter = 'ALL';
+      updateFilterButtonsUI();
+
+      document.getElementById('tab-home').classList.add('hidden');
+      document.getElementById('tab-menu').classList.remove('hidden');
+
+      const menuContainer = document.getElementById('menuItemsContainer');
+      menuContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">Loading fresh menu dishes...</p>';
+
+      db.ref(`menus/${restId}`).on('value', snap => {
+        cachedMenus[restId] = snap.val() || {};
+        renderFoodWorldMenuItems(restId);
+      });
+    }
+
+    function closeRestaurantMenu() {
+      document.getElementById('tab-menu').classList.add('hidden');
+      document.getElementById('tab-home').classList.remove('hidden');
+    }
+
+    function toggleVegFilter(filterType) {
+      currentVegFilter = filterType;
+      updateFilterButtonsUI();
+      renderFoodWorldMenuItems(activeRestaurantId);
+    }
+
+    function updateFilterButtonsUI() {
+      ['all', 'veg', 'nonveg'].forEach(f => {
+        const btn = document.getElementById(`filterBtn-${f}`);
+        if (!btn) return;
+        if (f.toUpperCase() === currentVegFilter) {
+          btn.className = "px-3 py-1 rounded-xl bg-slate-900 text-white text-[11px] shadow-xs active:scale-95 transition font-bold";
+        } else {
+          btn.className = "px-3 py-1 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 text-[11px] active:scale-95 transition font-medium";
+        }
+      });
+    }
+
+    function filterMenuDishes() {
+      renderFoodWorldMenuItems(activeRestaurantId);
+    }
+
+    function renderFoodWorldMenuItems(restId) {
+      const menuContainer = document.getElementById('menuItemsContainer');
+      const items = cachedMenus[restId] || {};
+      const itemKeys = Object.keys(items);
+      const searchText = document.getElementById('menuSearchInput').value.toLowerCase();
+
+      if (itemKeys.length === 0) {
+        menuContainer.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs">No dishes listed yet.</div>';
+        document.getElementById('dishCountBadge').innerText = '0 Dishes';
+        return;
+      }
+
+      let displayedCount = 0;
+      let html = '';
+
+      itemKeys.forEach(itemId => {
+        const item = items[itemId];
+        if (!item || item.available === false) return;
+
+        const name = item.name || '';
+        const desc = item.description || '';
+        const isNonVeg = (item.foodType === 'NONVEG');
+
+        if (currentVegFilter === 'VEG' && isNonVeg) return;
+        if (currentVegFilter === 'NONVEG' && !isNonVeg) return;
+        if (searchText && !name.toLowerCase().includes(searchText) && !desc.toLowerCase().includes(searchText)) return;
+
+        displayedCount++;
+        const qty = (cart[itemId] && cart[itemId].restaurantId === restId) ? cart[itemId].qty : 0;
+        const imgUrl = item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80';
+
+        html += `
+          <!-- FOODWORLD DISH CARD -->
+          <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex justify-between gap-3 relative">
+            <div class="flex-1 min-w-0 pr-2">
+              <div class="flex items-center gap-1.5 mb-1">
+                <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'}" title="${isNonVeg ? 'Non-Vegetarian' : 'Vegetarian'}"></span>
+                <span class="px-1.5 py-0.2 rounded bg-amber-50 border border-amber-200 text-amber-800 text-[9px] font-extrabold">
+                  ★ 4.5
+                </span>
+              </div>
+
+              <h5 class="font-extrabold text-sm text-slate-900 leading-snug">${escapeHtml(name)}</h5>
+              <p class="text-xs font-black text-slate-900 mt-1">₹${item.price}</p>
+              
+              <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed font-medium">
+                ${escapeHtml(desc || 'Delicious food freshly prepared by kitchen.')}
+              </p>
+            </div>
+
+            <div class="relative flex flex-col items-center flex-shrink-0 w-28 h-28">
+              <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(name)}" class="w-full h-full rounded-2xl object-cover border border-slate-100 shadow-xs" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80'">
+              
+              <div class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 shadow-lg rounded-xl z-10">
+                ${qty === 0 ? `
+                  <button onclick="addToCart('${restId}', '${itemId}')" class="min-w-[84px] h-[34px] bg-white hover:bg-orange-50 active:scale-95 text-brand-600 border-2 border-brand-500/40 rounded-xl text-xs font-black flex items-center justify-center gap-1 shadow-md transition">
+                    <span>ADD</span>
+                    <span class="text-brand-600 text-sm font-bold leading-none">+</span>
+                  </button>
+                ` : `
+                  <div class="flex items-center min-w-[84px] h-[34px] bg-brand-600 text-white rounded-xl shadow-md text-xs font-black overflow-hidden">
+                    <button onclick="changeCartQty('${itemId}', -1)" class="w-7 h-full flex items-center justify-center hover:bg-brand-700 active:scale-90 text-sm">-</button>
+                    <span class="flex-1 text-center font-black">${qty}</span>
+                    <button onclick="changeCartQty('${itemId}', 1)" class="w-7 h-full flex items-center justify-center hover:bg-brand-700 active:scale-90 text-sm">+</button>
+                  </div>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('dishCountBadge').innerText = `${displayedCount} Dishes`;
+      menuContainer.innerHTML = html || '<div class="p-8 text-center text-slate-400 text-xs">No matching dishes found in menu.</div>';
+    }
+
+    function addToCart(restId, itemId) {
+      const currentCartKeys = Object.keys(cart);
+      if (currentCartKeys.length > 0) {
+        if (cart[currentCartKeys[0]].restaurantId !== restId) {
+          if (!confirm('Clear cart items from previous restaurant?')) return;
+          cart = {};
+        }
+      }
+
+      const item = cachedMenus[restId]?.[itemId];
+      if (!item) return;
+
+      cart[itemId] = {
+        itemId, restaurantId: restId, name: item.name, price: Number(item.price) || 0, qty: 1
+      };
+      renderFoodWorldMenuItems(restId);
+      updateCartFloatingBar();
+    }
+
+    function changeCartQty(itemId, delta) {
+      if (!cart[itemId]) return;
+      cart[itemId].qty += delta;
+      const restId = cart[itemId].restaurantId;
+      if (cart[itemId].qty <= 0) delete cart[itemId];
+      renderFoodWorldMenuItems(restId);
+      updateCartFloatingBar();
+    }
+
+    function updateCartFloatingBar() {
+      const keys = Object.keys(cart);
+      const floatBar = document.getElementById('floatingCartBar');
+      if (keys.length === 0) {
+        floatBar.classList.add('hidden');
+        return;
+      }
+
+      let totalQty = 0, totalPrice = 0;
+      const restName = cachedRestaurants[cart[keys[0]].restaurantId]?.name || 'Restaurant';
+
+      keys.forEach(k => {
+        totalQty += cart[k].qty;
+        totalPrice += (cart[k].price * cart[k].qty);
+      });
+
+      document.getElementById('floatCartRestName').innerText = restName;
+      document.getElementById('floatCartItemCount').innerText = `${totalQty} item${totalQty > 1 ? 's' : ''}`;
+      document.getElementById('floatCartTotal').innerText = `₹${totalPrice}`;
+      floatBar.classList.remove('hidden');
+    }
+
+    function openCheckoutModal() {
+      const keys = Object.keys(cart);
+      if (keys.length === 0) return;
+
+      const restId = cart[keys[0]].restaurantId;
+      document.getElementById('checkoutRestName').innerText = cachedRestaurants[restId]?.name || 'Restaurant';
+      document.getElementById('checkoutAddress').innerText = currentCustomer?.address || 'Please set address in profile.';
+      document.getElementById('checkoutPhone').innerText = `Phone: ${currentCustomer?.phone || 'N/A'}`;
+
+      const listContainer = document.getElementById('checkoutCartItemsList');
+      let subtotal = 0, html = '';
+
+      keys.forEach(k => {
+        const it = cart[k];
+        const lineTotal = it.price * it.qty;
+        subtotal += lineTotal;
+        html += `
+          <div class="flex items-center justify-between text-xs py-1">
+            <span class="font-medium text-slate-800">${escapeHtml(it.name)} <span class="text-slate-400 font-bold">x${it.qty}</span></span>
+            <span class="font-bold text-slate-800">₹${lineTotal}</span>
+          </div>
+        `;
+      });
+
+      listContainer.innerHTML = html;
+      document.getElementById('checkoutSubtotal').innerText = `₹${subtotal}`;
+      document.getElementById('checkoutGrandTotal').innerText = `₹${subtotal + DELIVERY_FEE}`;
+      
+      selectPaymentMethod('COD'); // Default method
+      document.getElementById('checkoutModal').classList.remove('hidden');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkoutModal').classList.add('hidden');
+    }
+
+    // MULTI-PATH ATOMIC ORDER PLACEMENT ENGINE
+    async function placeCustomerOrder() {
+      if (!currentCustomer?.address || !currentCustomer?.phone) {
+        alert('Please update delivery address & phone in profile.');
+        closeCheckoutModal();
+        switchAppTab('profile');
+        return;
+      }
+
+      const keys = Object.keys(cart);
+      if (keys.length === 0) return;
+
+      const restId = cart[keys[0]].restaurantId;
+      const rest = cachedRestaurants[restId] || {};
+      let calculatedItemsTotal = 0;
+      const verifiedItemsArray = [];
+
+      for (const k of keys) {
+        const cartItem = cart[k];
+        const menuItem = cachedMenus[restId]?.[cartItem.itemId];
+        const verifiedPrice = menuItem ? Number(menuItem.price) || 0 : cartItem.price;
+
+        calculatedItemsTotal += (verifiedPrice * cartItem.qty);
+        verifiedItemsArray.push({
+          itemId: cartItem.itemId,
+          name: cartItem.name,
+          price: verifiedPrice,
+          qty: cartItem.qty
+        });
+      }
+
+      const grandTotal = calculatedItemsTotal + DELIVERY_FEE;
+      const uniqueOtp = generateDeliveryOtp();
+
+      const btn = document.getElementById('placeOrderBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Placing Order...';
+
+      try {
+        const newOrderKey = db.ref('orders').push().key;
+
+        const orderData = {
+          customerUid: currentCustomer.uid,
+          restaurantId: restId,
+          deliveryUid: "",
+          items: verifiedItemsArray,
+          itemTotal: calculatedItemsTotal,
+          deliveryFee: DELIVERY_FEE,
+          totalAmount: grandTotal,
+          paymentMethod: currentPaymentMethod,
+          paymentStatus: currentPaymentMethod === 'ONLINE' ? 'PAID_ONLINE' : 'PENDING_CASH',
+          address: currentCustomer.address,
+          customerLat: customerLat || null,
+          customerLng: customerLng || null,
+          phone: currentCustomer.phone,
+          status: "PLACED",
+          locationLink: "",
+          deliveryOtp: uniqueOtp,
+          verifiedDelivery: false,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        };
+
+        const unassignedData = {
+          orderId: newOrderKey,
+          restaurantId: restId,
+          restaurantName: rest.name || 'Kitchen',
+          restaurantAddress: rest.address || 'Address',
+          customerAddress: currentCustomer.address,
+          totalAmount: grandTotal,
+          paymentMethod: currentPaymentMethod,
+          createdAt: Date.now()
+        };
+
+        const updates = {};
+        updates[`orders/${newOrderKey}`] = orderData;
+        updates[`unassignedOrders/${newOrderKey}`] = unassignedData;
+
+        await db.ref().update(updates);
+
+        cart = {};
+        updateCartFloatingBar();
+        closeCheckoutModal();
+        closeRestaurantMenu();
+        switchAppTab('orders');
+        showModernFloatingToast("Order Dispatched!", `FoodWorld Delivery OTP: ${uniqueOtp}`, "fa-solid fa-shield-halved");
+      } catch (err) {
+        alert('Order placement failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Confirm & Place Order</span> <i class="fa-solid fa-arrow-right"></i>';
+      }
+    }
+
+    async function cancelOrderByCustomer(orderId) {
+      const order = cachedOrders[orderId];
+      if (!order) return;
+
+      if (order.status !== 'PLACED') {
+        alert('Cannot cancel order: Kitchen has already accepted your dishes.');
+        return;
+      }
+
+      if (!confirm(`Are you sure you want to cancel order #${orderId.slice(-6)}?`)) {
+        return;
+      }
+
+      try {
+        const snap = await db.ref(`orders/${orderId}`).once('value');
+        const liveOrder = snap.val();
+
+        if (!liveOrder || liveOrder.status !== 'PLACED') {
+          alert('Sorry! The restaurant has just accepted your order, so it can no longer be cancelled.');
+          return;
+        }
+
+        const updates = {};
+        updates[`orders/${orderId}/status`] = 'CANCELLED';
+        updates[`orders/${orderId}/cancelledBy`] = 'CUSTOMER';
+        updates[`orders/${orderId}/cancelReason`] = 'Cancelled by customer before restaurant acceptance';
+        updates[`orders/${orderId}/updatedAt`] = Date.now();
+        updates[`unassignedOrders/${orderId}`] = null; // Clean up broadcast queue
+
+        await db.ref().update(updates);
+
+        showModernFloatingToast("Order Cancelled", `Order #${orderId.slice(-6)} was cancelled.`, "fa-solid fa-ban", true);
+      } catch (err) {
+        alert('Failed to cancel order: ' + err.message);
+      }
+    }
+
+    const STATUS_PROGRESS = {
+      PLACED: 1, ACCEPTED: 2, PREPARING: 3, READY_FOR_PICKUP: 4, PICKED_UP: 5, OUT_FOR_DELIVERY: 5, DELIVERED: 6, CANCELLED: -1
+    };
+
+    function copyOtpToClipboard(otp) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(otp);
+        showModernFloatingToast("Code Copied", `FoodWorld OTP ${otp} copied to clipboard.`, "fa-solid fa-copy");
+      } else {
+        alert(`FoodWorld Delivery Code: ${otp}`);
+      }
+    }
+
+    function renderOrdersList() {
+      const activeContainer = document.getElementById('activeOrdersList');
+      const pastContainer = document.getElementById('pastOrdersList');
+      const orderKeys = Object.keys(cachedOrders).reverse();
+
+      let activeHtml = '', pastHtml = '';
+
+      orderKeys.forEach(orderId => {
+        const o = cachedOrders[orderId];
+        if (!o) return;
+        const restName = cachedRestaurants[o.restaurantId]?.name || 'Restaurant';
+        const isClosed = o.status === 'DELIVERED' || o.status === 'CANCELLED';
+        const isOnlinePay = (o.paymentMethod === 'ONLINE');
+
+        const otpCode = o.deliveryOtp || '----';
+        const otpDisplayCard = `
+          <div class="p-3.5 bg-gradient-to-r from-orange-500/10 via-brand-500/10 to-amber-500/10 border-2 border-brand-500/30 rounded-2xl space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5 text-xs font-black text-brand-700">
+                <i class="fa-solid fa-shield-halved text-brand-600"></i>
+                <span>FoodWorld Secure Delivery Code</span>
+              </div>
+              <button onclick="copyOtpToClipboard('${otpCode}')" class="px-2 py-0.5 bg-brand-500 hover:bg-brand-600 text-white text-[10px] font-extrabold rounded-lg active:scale-95 transition flex items-center gap-1 shadow-xs">
+                <i class="fa-solid fa-copy"></i> Copy
+              </button>
+            </div>
+            
+            <div class="flex items-center justify-center gap-2 py-1">
+              ${otpCode.split('').map(digit => `
+                <div class="w-10 h-11 rounded-xl bg-white border-2 border-brand-500/40 text-slate-900 font-black text-xl flex items-center justify-center shadow-sm font-mono">
+                  ${digit}
+                </div>
+              `).join('')}
+            </div>
+            
+            <p class="text-[10px] text-slate-500 text-center font-bold">
+              <i class="fa-solid fa-circle-info text-brand-500 mr-1"></i> Delivery partner ko khana milne par hi yeh code share karein.
+            </p>
+          </div>
+        `;
+
+        let deliveryCard = '';
+        if (o.deliveryUid && cachedDeliveryBoys[o.deliveryUid]) {
+          const d = cachedDeliveryBoys[o.deliveryUid];
+          deliveryCard = `
+            <div class="mt-2 p-3 bg-brand-50/70 border border-brand-100 rounded-2xl space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center text-xs shadow-xs"><i class="fa-solid fa-person-biking"></i></div>
+                  <div>
+                    <p class="text-xs font-bold text-slate-800">${escapeHtml(d.name || 'Rider')}</p>
+                    <p class="text-[10px] text-slate-500 font-mono">${escapeHtml(d.phone || '')}</p>
+                  </div>
+                </div>
+                <a href="tel:${escapeHtml(d.phone || '')}" class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs"><i class="fa-solid fa-phone"></i></a>
+              </div>
+              
+              ${o.locationLink ? `
+                <a href="${escapeHtml(o.locationLink)}" target="_blank" class="w-full min-h-[38px] py-2 px-3 bg-blue-600 active:scale-95 text-white text-[11px] font-extrabold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition">
+                  <i class="fa-solid fa-location-crosshairs text-amber-300"></i> Track Rider on Live Map
+                </a>
+              ` : `
+                <div class="text-[10px] text-slate-400 bg-white p-2 rounded-xl border border-slate-100 text-center">Rider assigned! Live map updating soon...</div>
+              `}
+            </div>
+          `;
+        } else if (!isClosed) {
+          deliveryCard = `
+            <div class="mt-2 p-2.5 bg-orange-50 border border-orange-200 rounded-2xl flex items-center gap-2 text-xs font-bold text-orange-700">
+              <span class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping flex-shrink-0"></span>
+              <span>Broadcasting to nearby delivery fleet...</span>
+            </div>
+          `;
+        }
+
+        if (!isClosed) {
+          const step = STATUS_PROGRESS[o.status] || 1;
+          const canCancel = (o.status === 'PLACED');
+
+          activeHtml += `
+            <div class="bg-white p-4 rounded-3xl border border-brand-200 shadow-sm space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <div>
+                  <h4 class="font-extrabold text-sm text-slate-900">${escapeHtml(restName)}</h4>
+                  <p class="text-[10px] text-slate-400 font-mono">Order #${orderId.slice(-6)} • ₹${o.totalAmount} (${isOnlinePay ? 'UPI Paid' : 'COD'})</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-brand-50 text-brand-700 border border-brand-200">
+                  ${o.status.replace(/_/g, ' ')}
+                </span>
+              </div>
+
+              <div class="py-1">
+                <div class="grid grid-cols-4 gap-1 text-center text-[9px] font-bold">
+                  <div class="${step >= 1 ? 'text-brand-600' : 'text-slate-300'}"><div class="h-1.5 rounded-full mb-1 ${step >= 1 ? 'bg-brand-500' : 'bg-slate-200'}"></div>Placed</div>
+                  <div class="${step >= 3 ? 'text-brand-600' : 'text-slate-300'}"><div class="h-1.5 rounded-full mb-1 ${step >= 3 ? 'bg-brand-500' : 'bg-slate-200'}"></div>Kitchen</div>
+                  <div class="${step >= 5 ? 'text-brand-600' : 'text-slate-300'}"><div class="h-1.5 rounded-full mb-1 ${step >= 5 ? 'bg-brand-500' : 'bg-slate-200'}"></div>On Way</div>
+                  <div class="${step >= 6 ? 'text-brand-600' : 'text-slate-300'}"><div class="h-1.5 rounded-full mb-1 ${step >= 6 ? 'bg-brand-500' : 'bg-slate-200'}"></div>Delivered</div>
+                </div>
+              </div>
+
+              ${otpDisplayCard}
+
+              <div class="text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl">
+                ${o.items ? o.items.map(i => `<div>• ${escapeHtml(i.name)} x${i.qty}</div>`).join('') : ''}
+              </div>
+
+              ${deliveryCard}
+
+              ${canCancel ? `
+                <div class="pt-1">
+                  <button onclick="cancelOrderByCustomer('${orderId}')" class="w-full min-h-[40px] py-2 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 border border-rose-200 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-solid fa-ban text-xs"></i>
+                    <span>Cancel Order</span>
+                  </button>
+                  <p class="text-[10px] text-slate-400 text-center mt-1">Cancellation available until kitchen accepts order.</p>
+                </div>
+              ` : `
+                <div class="p-2 bg-slate-50 border border-slate-100 rounded-xl text-center">
+                  <p class="text-[10px] text-slate-500 font-bold"><i class="fa-solid fa-lock text-brand-500 mr-1"></i> Order accepted by kitchen. Cancellation closed.</p>
+                </div>
+              `}
+            </div>
+          `;
+        } else {
+          pastHtml += `
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="font-extrabold text-xs text-slate-800">${escapeHtml(restName)}</h4>
+                  <span class="text-[10px] text-slate-400 font-mono">${new Date(o.createdAt || Date.now()).toLocaleDateString()} • ₹${o.totalAmount} (${isOnlinePay ? 'UPI' : 'COD'})</span>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${o.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                  ${o.status}
+                </span>
+              </div>
+              
+              ${o.deliveryOtp ? `
+                <div class="text-[10px] text-slate-500 font-mono bg-slate-50 p-1.5 rounded-lg">
+                  <i class="fa-solid fa-shield-check text-emerald-600 mr-1"></i> FoodWorld OTP: <strong>${o.deliveryOtp}</strong> ${o.verifiedDelivery ? '(Verified)' : ''}
+                </div>
+              ` : ''}
+
+              <div class="flex gap-2 pt-1">
+                <button onclick="reorderItems('${orderId}')" class="flex-1 min-h-[38px] py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-xl text-xs font-bold active:scale-95 transition">
+                  <i class="fa-solid fa-rotate-right text-[10px]"></i> Reorder
+                </button>
+                ${o.status === 'DELIVERED' ? `
+                  <button onclick="openRatingModal('${orderId}', '${o.restaurantId}', '${escapeHtml(restName)}')" class="flex-1 min-h-[38px] py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl text-xs font-bold active:scale-95 transition">
+                    <i class="fa-solid fa-star text-[10px]"></i> Rate Food
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      activeContainer.innerHTML = activeHtml || '<p class="text-xs text-slate-400 bg-white p-4 rounded-2xl text-center border border-slate-200">No ongoing orders.</p>';
+      pastContainer.innerHTML = pastHtml || '<p class="text-xs text-slate-400 bg-white p-4 rounded-2xl text-center border border-slate-200">No past order history.</p>';
+    }
+
+    function reorderItems(orderId) {
+      const o = cachedOrders[orderId];
+      if (!o || !o.items) return;
+
+      cart = {};
+      o.items.forEach(it => {
+        cart[it.itemId || it.name] = {
+          itemId: it.itemId || it.name,
+          restaurantId: o.restaurantId,
+          name: it.name,
+          price: Number(it.price) || 0,
+          qty: it.qty || 1
+        };
+      });
+
+      updateCartFloatingBar();
+      openCheckoutModal();
+    }
+
+    function openRatingModal(orderId, restId, restName) {
+      document.getElementById('ratingOrderId').value = orderId;
+      document.getElementById('ratingRestId').value = restId;
+      document.getElementById('ratingRestName').innerText = restName;
+      setStarRating(5);
+      document.getElementById('ratingReviewText').value = '';
+      document.getElementById('ratingModal').classList.remove('hidden');
+    }
+
+    function closeRatingModal() {
+      document.getElementById('ratingModal').classList.add('hidden');
+    }
+
+    function setStarRating(num) {
+      selectedRatingStars = num;
+      for (let i = 1; i <= 5; i++) {
+        const star = document.getElementById(`star-${i}`);
+        if (i <= num) star.className = "fa-solid fa-star text-amber-400";
+        else star.className = "fa-regular fa-star text-slate-300";
+      }
+    }
+
+    async function submitOrderRating() {
+      const orderId = document.getElementById('ratingOrderId').value;
+      const restId = document.getElementById('ratingRestId').value;
+      const reviewText = document.getElementById('ratingReviewText').value.trim();
+
+      try {
+        await db.ref(`orders/${orderId}/rating`).set({
+          stars: selectedRatingStars, review: reviewText, ratedAt: Date.now()
+        });
+        await db.ref(`restaurants/${restId}/reviews`).push({
+          orderId, customerName: currentCustomer?.name || 'Customer', stars: selectedRatingStars, review: reviewText, createdAt: Date.now()
+        });
+        closeRatingModal();
+        showModernFloatingToast("Review Submitted", "Thank you for your rating!", "fa-solid fa-star");
+      } catch (err) {
+        alert('Failed: ' + err.message);
+      }
+    }
+
+    async function handleUpdateProfile(e) {
+      e.preventDefault();
+      const name = document.getElementById('profName').value.trim();
+      const phone = document.getElementById('profPhone').value.trim();
+      const address = document.getElementById('profAddress').value.trim();
+      const btn = document.getElementById('saveProfBtn');
+
+      btn.disabled = true;
+      try {
+        await db.ref(`customers/${auth.currentUser.uid}`).update({ 
+          name, phone, address, customerLat, customerLng 
+        });
+        showModernFloatingToast("Profile Updated", "Your details have been saved.", "fa-solid fa-circle-check");
+      } catch (err) {
+        alert('Update failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function switchAppTab(tabId) {
+      currentAppTab = tabId;
+      document.getElementById('tab-menu').classList.add('hidden');
+
+      ['home', 'orders', 'support', 'profile'].forEach(t => {
+        const sec = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`navBtn-${t}`);
+        if (t === tabId) {
+          sec.classList.remove('hidden');
+          btn.classList.add('text-brand-600');
+          btn.classList.remove('text-slate-400');
+        } else {
+          sec.classList.add('hidden');
+          btn.classList.remove('text-brand-600');
+          btn.classList.add('text-slate-400');
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
