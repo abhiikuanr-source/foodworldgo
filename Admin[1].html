@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>FoodWorld - Super Admin Command Center</title>
+  
+  <!-- Tailwind CSS & FontAwesome Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Firebase Compat SDKs (App, Auth, Database) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff7ed', 100: '#ffedd5', 500: '#f97316',
+              600: '#ea580c', 700: '#c2410c', 900: '#7c2d12',
+            },
+            accent: {
+              50: '#fff1f2', 500: '#e23744', 600: '#cb202d', 700: '#9b131e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    @media (max-width: 640px) { input, select, textarea { font-size: 16px !important; } }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    @keyframes toastSlideDown {
+      0% { transform: translate(-50%, -100%) scale(0.9); opacity: 0; }
+      60% { transform: translate(-50%, 10px) scale(1.02); opacity: 1; }
+      100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+    }
+    @keyframes toastSlideUp {
+      0% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -100%) scale(0.9); opacity: 0; }
+    }
+    .toast-enter { animation: toastSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .toast-exit { animation: toastSlideUp 0.3s ease-in forwards; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- ================= INITIAL SPLASH SCREEN ================= -->
+  <div id="splashScreen" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center text-white">
+    <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-brand-500 to-accent-600 flex items-center justify-center text-3xl shadow-2xl shadow-brand-500/40 mb-3 animate-pulse">
+      <i class="fa-solid fa-bolt text-white"></i>
+    </div>
+    <h2 class="text-xl font-black tracking-tight">FoodWorld Command Center</h2>
+    <div class="flex items-center gap-2 mt-4 text-xs text-brand-400 font-semibold">
+      <i class="fa-solid fa-spinner fa-spin"></i> Authenticating administrator privileges...
+    </div>
+  </div>
+
+  <!-- ================= MODERN FLOATING TOAST ================= -->
+  <div id="modernFloatingToast" class="hidden fixed top-3 left-1/2 -translate-x-1/2 z-[95] w-[92%] max-w-md">
+    <div class="bg-slate-900/95 backdrop-blur-xl border border-white/15 text-white p-3.5 rounded-3xl shadow-2xl flex items-center gap-3">
+      <div id="toastIconBox" class="w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-base flex-shrink-0">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between">
+          <span id="toastTag" class="text-[10px] font-black uppercase tracking-wider text-brand-400">Admin Alert</span>
+          <span class="text-[9px] text-slate-400 font-mono">Just now</span>
+        </div>
+        <p id="toastBody" class="text-xs font-semibold text-slate-100 truncate mt-0.5">Notification text goes here...</p>
+      </div>
+      <button onclick="dismissFloatingToast()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-400 hover:text-white transition flex-shrink-0 text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= 1. FORGOT PASSWORD MODAL ================= -->
+  <div id="forgotPasswordModal" class="hidden fixed inset-0 z-[98] bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-lg shadow-inner">
+            <i class="fa-solid fa-key"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-slate-900 text-sm">Reset Admin Password</h3>
+            <p class="text-[10px] text-slate-400">FoodWorld Recovery Link</p>
+          </div>
+        </div>
+        <button onclick="closeForgotPasswordModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+      
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Enter your registered Admin email below. We'll send a password recovery verification link to your email.
+      </p>
+
+      <form onsubmit="handleSendPasswordReset(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Admin Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="email" id="resetEmailInput" required class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="admin@foodworld.com">
+          </div>
+        </div>
+
+        <div id="resetErrorBox" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium"></div>
+
+        <div class="flex gap-2 pt-1">
+          <button type="button" onclick="closeForgotPasswordModal()" class="flex-1 min-h-[42px] py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs active:scale-95 transition">Cancel</button>
+          <button type="submit" id="resetSubmitBtn" class="flex-1 min-h-[42px] py-2 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-black rounded-xl text-xs shadow-md transition">Send Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= 2. EMAIL SENT SUCCESS POPUP ================= -->
+  <div id="emailSentSuccessModal" class="hidden fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl space-y-4 text-center border border-emerald-200">
+      <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
+        <i class="fa-solid fa-envelope-circle-check"></i>
+      </div>
+      <div>
+        <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">Mail Dispatched</span>
+        <h3 class="font-black text-slate-900 text-base mt-2">Verification Link Sent!</h3>
+        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+          Password recovery verification link has been sent to your inbox/spam folder.
+        </p>
+        <p class="text-xs font-mono font-bold text-brand-600 bg-brand-50 p-2 rounded-xl mt-2.5 truncate" id="sentSuccessEmailPreview">admin@foodworld.com</p>
+      </div>
+      <div class="pt-1">
+        <button onclick="closeEmailSentSuccessModal()" class="w-full min-h-[42px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold rounded-xl text-xs shadow-md transition">
+          Understood / ठीक है
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 3. EXIT CONFIRMATION MODAL ================= -->
+  <div id="exitAppModal" class="hidden fixed inset-0 z-[99] bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl space-y-4 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl mx-auto shadow-inner">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </div>
+      <div>
+        <h3 class="font-black text-slate-900 text-base">Exit Command Center?</h3>
+        <p class="text-xs text-slate-500 mt-1">Are you sure you want to close the admin portal?</p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="cancelExitApp()" class="min-h-[42px] py-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold rounded-xl text-xs transition">No</button>
+        <button onclick="confirmExitApp()" class="min-h-[42px] py-2 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-bold rounded-xl text-xs shadow-md transition">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= AUTH VIEW (ADMIN LOGIN) ================= -->
+  <div id="authView" class="hidden min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-stone-950">
+    <div class="max-w-md w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-6 sm:p-8 border border-white/20">
+      <div class="text-center mb-6 sm:mb-8">
+        <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-br from-brand-500 to-accent-600 text-white text-2xl sm:text-3xl shadow-xl shadow-brand-500/40 mb-3">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <h1 class="text-xl sm:text-2xl font-black text-slate-900">FoodWorld Super Admin</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Central Operations & Control Command</p>
+      </div>
+
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Admin Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400"></i>
+            <input type="email" id="loginEmail" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition" placeholder="admin@foodworld.com">
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">Admin Password</label>
+            <button type="button" onclick="openForgotPasswordModal()" class="text-xs text-brand-600 hover:text-brand-700 font-black transition">Forgot Password?</button>
+          </div>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400"></i>
+            <input type="password" id="loginPassword" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition" placeholder="••••••••">
+          </div>
+        </div>
+
+        <div id="loginError" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+          <span id="loginErrorText">Access Denied: Invalid admin credentials.</span>
+        </div>
+
+        <button type="submit" id="loginBtn" class="w-full min-h-[48px] py-3 bg-gradient-to-r from-brand-600 to-accent-600 hover:from-brand-500 hover:to-accent-500 active:scale-98 text-white font-black rounded-xl text-xs sm:text-sm shadow-xl shadow-brand-600/30 transition flex items-center justify-center gap-2">
+          <span>Enter Command Center</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= DASHBOARD VIEW ================= -->
+  <div id="dashboardView" class="hidden min-h-screen flex flex-col md:flex-row">
+    
+    <div id="sidebarBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 hidden md:hidden transition-opacity"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 max-w-[85vw] bg-slate-950 text-slate-300 flex-shrink-0 flex flex-col justify-between border-r border-slate-900 z-50 transform -translate-x-full md:translate-x-0 md:sticky md:h-screen transition-transform duration-300 ease-in-out shadow-2xl">
+      <div>
+        <div class="p-5 flex items-center justify-between border-b border-slate-900">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-500 to-accent-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-brand-500/30">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <div>
+              <h2 class="font-black text-white text-base leading-tight">FoodWorld</h2>
+              <span class="text-[10px] font-extrabold text-brand-400 uppercase tracking-widest">Operations Ops</span>
+            </div>
+          </div>
+          <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-2 rounded-lg active:bg-slate-900">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+
+        <nav class="p-3 sm:p-4 space-y-4 text-xs font-bold overflow-y-auto max-h-[calc(100vh-190px)] no-scrollbar">
+          <div>
+            <span class="px-3 text-[10px] font-black uppercase tracking-wider text-slate-500">Live Operations</span>
+            <div class="mt-1 space-y-1">
+              <button onclick="switchTab('overview')" id="nav-overview" class="tab-btn w-full min-h-[42px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-white bg-brand-600 shadow-sm transition active:scale-95">
+                <i class="fa-solid fa-chart-pie w-4 text-center"></i>
+                <span>Dashboard Overview</span>
+              </button>
+              <button onclick="switchTab('orders')" id="nav-orders" class="tab-btn w-full min-h-[42px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition active:scale-95">
+                <i class="fa-solid fa-receipt w-4 text-center"></i>
+                <span class="flex-1 text-left">Live Order Radar</span>
+                <span id="navLiveOrdersBadge" class="hidden px-2 py-0.5 rounded-full bg-orange-500 text-white text-[9px] font-black">0</span>
+              </button>
+              <button onclick="switchTab('support')" id="nav-support" class="tab-btn w-full min-h-[42px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition active:scale-95">
+                <i class="fa-solid fa-headset w-4 text-center text-amber-400"></i>
+                <span class="flex-1 text-left">Helpdesk & Support</span>
+                <span id="navSupportBadge" class="hidden px-2 py-0.5 rounded-full bg-rose-500 text-white font-black text-[9px]">0</span>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <span class="px-3 text-[10px] font-black uppercase tracking-wider text-slate-500">Partner Ecosystem</span>
+            <div class="mt-1 space-y-1">
+              <button onclick="switchTab('restaurants')" id="nav-restaurants" class="tab-btn w-full min-h-[42px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition active:scale-95">
+                <i class="fa-solid fa-store w-4 text-center"></i>
+                <span>Kitchen Partners & Banks</span>
+              </button>
+              <button onclick="switchTab('delivery')" id="nav-delivery" class="tab-btn w-full min-h-[42px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition active:scale-95">
+                <i class="fa-solid fa-motorcycle w-4 text-center"></i>
+                <span>Delivery Fleet & Banks</span>
+              </button>
+              <button onclick="switchTab('customers')" id="nav-customers" class="tab-btn w-full min-h-[42px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition active:scale-95">
+                <i class="fa-solid fa-users w-4 text-center"></i>
+                <span>Customer Base</span>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <span class="px-3 text-[10px] font-black uppercase tracking-wider text-slate-500">Finance & Comms</span>
+            <div class="mt-1 space-y-1">
+              <button onclick="switchTab('notifications')" id="nav-notifications" class="tab-btn w-full min-h-[42px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition active:scale-95">
+                <i class="fa-solid fa-bullhorn w-4 text-center"></i>
+                <span>Push Broadcasts</span>
+              </button>
+              <button onclick="switchTab('reports')" id="nav-reports" class="tab-btn w-full min-h-[42px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition active:scale-95">
+                <i class="fa-solid fa-chart-line w-4 text-center"></i>
+                <span>COD, UPI & Revenue Pulse</span>
+              </button>
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      <div class="p-4 border-t border-slate-900 bg-slate-950/80">
+        <div class="flex items-center gap-3 p-2.5 rounded-2xl bg-slate-900/60 mb-2.5 border border-slate-800/60">
+          <div class="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center font-bold text-xs">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <div class="overflow-hidden">
+            <p class="text-xs font-bold text-white truncate" id="adminUserEmail">Admin</p>
+            <span class="text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Super Admin
+            </span>
+          </div>
+        </div>
+        <button onclick="handleLogout()" class="w-full min-h-[38px] flex items-center justify-center gap-2 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 active:scale-95 text-red-400 rounded-xl text-xs font-bold transition">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      <header class="bg-white/95 backdrop-blur-md border-b border-slate-100 sticky top-0 z-30 px-4 sm:px-6 py-3 flex items-center justify-between shadow-xs">
+        <div class="flex items-center gap-3">
+          <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-700 p-2 rounded-xl bg-slate-100 active:bg-slate-200">
+            <i class="fa-solid fa-bars text-base"></i>
+          </button>
+          <h1 id="pageTitle" class="text-base sm:text-lg font-black text-slate-900 truncate">Dashboard Overview</h1>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 bg-orange-50 border border-orange-200 text-orange-800 rounded-full text-[10px] sm:text-xs font-black flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span> Live Dispatch
+          </span>
+          <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-full text-[10px] sm:text-xs font-black flex items-center gap-1">
+            <i class="fa-solid fa-shield-halved text-emerald-600"></i> OTP Security
+          </span>
+        </div>
+      </header>
+
+      <div class="p-3.5 sm:p-6 space-y-5 max-w-7xl w-full mx-auto pb-16">
+
+        <!-- 1. OVERVIEW TAB -->
+        <section id="section-overview" class="space-y-4 sm:space-y-6">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Live Orders</span>
+              <h3 class="text-2xl font-black text-slate-900 mt-2" id="statTotalOrders">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Open Tickets</span>
+              <h3 class="text-2xl font-black text-rose-600 mt-2" id="statOpenTickets">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Kitchens</span>
+              <div>
+                <h3 class="text-2xl font-black text-slate-900 mt-2" id="statTotalRestaurants">0</h3>
+                <span class="text-[10px] text-amber-600 font-bold" id="statPendingRestaurants">0 pending</span>
+              </div>
+            </div>
+            <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Fleet Riders</span>
+              <div>
+                <h3 class="text-2xl font-black text-slate-900 mt-2" id="statTotalDelivery">0</h3>
+                <span class="text-[10px] text-amber-600 font-bold" id="statPendingDelivery">0 pending</span>
+              </div>
+            </div>
+            <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Customers</span>
+              <h3 class="text-2xl font-black text-slate-900 mt-2" id="statTotalCustomers">0</h3>
+            </div>
+            <div class="col-span-2 sm:col-span-1 bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Total Revenue</span>
+              <h3 class="text-2xl font-black text-emerald-600 mt-2" id="statTotalRevenue">₹0</h3>
+            </div>
+          </div>
+
+          <div id="pendingAlert" class="hidden p-4 rounded-3xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-brand-500/10 border border-amber-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-lg flex-shrink-0 shadow-sm">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </div>
+              <div>
+                <h4 class="text-xs sm:text-sm font-black text-amber-950">Partner Verification Approvals Waiting</h4>
+                <p class="text-[11px] text-amber-800 mt-0.5" id="pendingAlertText">Pending partner accounts require administrator review.</p>
+              </div>
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto">
+              <button onclick="switchTab('restaurants')" class="flex-1 sm:flex-initial px-4 py-2 bg-amber-600 text-white rounded-xl text-xs font-black active:scale-95 shadow-sm transition">Kitchens</button>
+              <button onclick="switchTab('delivery')" class="flex-1 sm:flex-initial px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-black active:scale-95 shadow-sm transition">Fleet Riders</button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 class="font-black text-sm text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-brand-500"></i> Active Live Orders Radar
+              </h3>
+              <button onclick="switchTab('orders')" class="text-xs text-brand-600 hover:underline font-extrabold">View All Radar &rarr;</button>
+            </div>
+            <div id="recentOrdersMobileFeed" class="divide-y divide-slate-100">
+              <div class="p-6 text-center text-slate-400 text-xs">Loading orders...</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. LIVE ORDERS TAB -->
+        <section id="section-orders" class="hidden space-y-4">
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-black text-slate-900 text-base">Live Order & Dispatch Command</h3>
+              <p class="text-[11px] text-slate-400">Track 4-digit verification OTPs, payment mode (COD / UPI), and rider overrides</p>
+            </div>
+            <select id="orderStatusFilter" onchange="renderOrdersTable()" class="w-full sm:w-auto px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500 font-extrabold">
+              <option value="ALL">All Statuses</option>
+              <option value="PLACED">🔴 Placed (Waiting Acceptance)</option>
+              <option value="ACCEPTED">Accepted by Kitchen</option>
+              <option value="PREPARING">Preparing Dishes</option>
+              <option value="READY_FOR_PICKUP">Ready For Pickup</option>
+              <option value="PICKED_UP">Picked Up</option>
+              <option value="OUT_FOR_DELIVERY">Out For Delivery</option>
+              <option value="DELIVERED">Delivered (OTP Verified)</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+          </div>
+
+          <div id="ordersCardsContainer" class="space-y-3">
+            <div class="p-6 text-center text-slate-400 text-xs bg-white rounded-3xl border border-slate-200">Loading live orders...</div>
+          </div>
+        </section>
+
+        <!-- 3. HELPDESK & SUPPORT TAB -->
+        <section id="section-support" class="hidden space-y-5">
+          <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 class="font-black text-base text-slate-900 flex items-center gap-2">
+                  <i class="fa-solid fa-headset text-brand-500"></i> Customer Helpdesk Contact Configuration
+                </h3>
+                <p class="text-[11px] text-slate-400">These contact details update in real-time inside the Customer App.</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black">Live Synced</span>
+            </div>
+
+            <form onsubmit="handleSaveSupportConfig(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Support Calling Number (Phone)</label>
+                <div class="relative">
+                  <i class="fa-solid fa-phone absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                  <input type="tel" id="suppPhone" required class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="+91 9876543210">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Support WhatsApp Number</label>
+                <div class="relative">
+                  <i class="fa-brands fa-whatsapp absolute left-3.5 top-3 text-emerald-500 text-sm"></i>
+                  <input type="tel" id="suppWhatsapp" required class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="919876543210">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Official Support Email</label>
+                <div class="relative">
+                  <i class="fa-solid fa-envelope absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                  <input type="email" id="suppEmail" required class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="support@foodworld.com">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Support Operating Hours</label>
+                <input type="text" id="suppHours" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="24/7 Live Support or 9 AM - 11 PM">
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Customer Support Description (Header Text in App)</label>
+                <input type="text" id="suppDescription" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Have an issue with your food or delivery? FoodWorld Helpdesk is here for you 24/7.">
+              </div>
+
+              <div class="sm:col-span-full pt-1">
+                <button type="submit" id="saveSuppBtn" class="min-h-[44px] px-6 py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-floppy-disk"></i>
+                  <span>Save & Push Support Settings</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div>
+                <h3 class="font-black text-base text-slate-900 flex items-center gap-2">
+                  <i class="fa-solid fa-ticket text-rose-500"></i> Customer Support Tickets
+                </h3>
+                <p class="text-[11px] text-slate-400">Resolve customer complaints or directly connect via Call/WhatsApp.</p>
+              </div>
+
+              <select id="ticketFilter" onchange="renderSupportTickets()" class="w-full sm:w-auto px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold">
+                <option value="ALL">All Tickets</option>
+                <option value="OPEN">Open (Pending)</option>
+                <option value="RESOLVED">Resolved</option>
+              </select>
+            </div>
+
+            <div id="supportTicketsContainer" class="space-y-3">
+              <div class="p-8 text-center text-slate-400 text-xs">Loading support tickets...</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. KITCHEN PARTNERS TAB -->
+        <section id="section-restaurants" class="hidden space-y-4">
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-black text-slate-900 text-base">Kitchen Restaurant Partners & Bank Accounts</h3>
+              <p class="text-[11px] text-slate-400">Verify kitchen partners, access bank account numbers & IFSC codes for payouts</p>
+            </div>
+            <input type="text" id="restaurantSearch" onkeyup="filterRestaurants()" placeholder="Search kitchen or bank..." class="w-full sm:w-64 px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
+          </div>
+
+          <div id="restaurantsCardList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div class="p-6 text-center text-slate-400 text-xs col-span-full">Loading kitchens...</div>
+          </div>
+        </section>
+
+        <!-- 5. DELIVERY FLEET TAB -->
+        <section id="section-delivery" class="hidden space-y-4">
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-black text-slate-900 text-base">Delivery Fleet Riders & Bank Accounts</h3>
+              <p class="text-[11px] text-slate-400">Manage fleet registration, duty status, bank accounts & IFSC for COD/earnings settlements</p>
+            </div>
+            <input type="text" id="deliverySearch" onkeyup="filterDelivery()" placeholder="Search rider or bank..." class="w-full sm:w-64 px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
+          </div>
+
+          <div id="deliveryCardList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div class="p-6 text-center text-slate-400 text-xs col-span-full">Loading delivery partners...</div>
+          </div>
+        </section>
+
+        <!-- 6. CUSTOMER BASE TAB -->
+        <section id="section-customers" class="hidden space-y-4">
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs">
+            <h3 class="font-black text-slate-900 text-base">Registered Customer Base</h3>
+            <p class="text-[11px] text-slate-400">Customer directory with saved address and phone</p>
+          </div>
+
+          <div id="customersCardsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div class="p-6 text-center text-slate-400 text-xs col-span-full">Loading customers...</div>
+          </div>
+        </section>
+
+        <!-- 7. PUSH BROADCASTS TAB -->
+        <section id="section-notifications" class="hidden space-y-4">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-3.5">
+              <h3 class="font-black text-slate-900 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-bullhorn text-brand-500"></i> Send Push Announcement
+              </h3>
+              <form onsubmit="handleSendNotification(event)" class="space-y-3">
+                <textarea id="notifMessage" rows="3" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium" placeholder="Type notice banner message to broadcast to all customer apps..."></textarea>
+                <button type="submit" id="sendNotifBtn" class="w-full min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-2xl text-xs font-black shadow-md transition flex items-center justify-center gap-2 active:scale-95">
+                  <i class="fa-solid fa-paper-plane"></i> Send Broadcast Notice
+                </button>
+              </form>
+            </div>
+
+            <div class="lg:col-span-2 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
+              <h3 class="font-black text-slate-900 text-sm">Broadcast Notice History</h3>
+              <div id="notificationsList" class="space-y-2.5 max-h-[350px] overflow-y-auto custom-scrollbar">
+                <p class="text-xs text-slate-400">Loading broadcasts...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. COD, UPI & SALES PULSE TAB -->
+        <section id="section-reports" class="hidden space-y-4">
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <div class="p-4 rounded-3xl bg-emerald-50 border border-emerald-100">
+              <p class="text-[10px] text-emerald-800 font-black uppercase">Delivered Sales</p>
+              <p class="text-xl sm:text-2xl font-black text-emerald-800 mt-1" id="repDeliveredRevenue">₹0</p>
+            </div>
+            <div class="p-4 rounded-3xl bg-blue-50 border border-blue-100">
+              <p class="text-[10px] text-blue-800 font-black uppercase">Online / UPI</p>
+              <p class="text-xl sm:text-2xl font-black text-blue-800 mt-1" id="repOnlineRevenue">₹0</p>
+            </div>
+            <div class="p-4 rounded-3xl bg-amber-50 border border-amber-100">
+              <p class="text-[10px] text-amber-800 font-black uppercase">Pending COD</p>
+              <p class="text-xl sm:text-2xl font-black text-amber-800 mt-1" id="repPendingCod">₹0</p>
+            </div>
+            <div class="p-4 rounded-3xl bg-rose-50 border border-red-100">
+              <p class="text-[10px] text-rose-800 font-black uppercase">Cancelled Loss</p>
+              <p class="text-xl sm:text-2xl font-black text-rose-800 mt-1" id="repCancelledCod">₹0</p>
+            </div>
+            <div class="p-4 rounded-3xl bg-slate-100 border border-slate-200">
+              <p class="text-[10px] text-slate-700 font-black uppercase">Total Orders</p>
+              <p class="text-xl sm:text-2xl font-black text-slate-900 mt-1" id="repTotalCount">0</p>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
+            <h3 class="font-black text-slate-900 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-trophy text-amber-500"></i> Top Kitchens By Revenue
+            </h3>
+            <div id="topRestaurantsMobileList" class="space-y-2.5">
+              <p class="text-xs text-slate-400 text-center py-4">Calculating leaderboard...</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Reassign Rider Modal -->
+  <div id="reassignModal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-5 max-w-sm w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="font-black text-slate-900 text-sm">Assign / Override Delivery Partner</h3>
+        <button onclick="closeReassignModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark text-xs"></i></button>
+      </div>
+      <input type="hidden" id="modalOrderId">
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1.5">Choose Approved Delivery Rider</label>
+        <select id="modalDeliverySelect" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 font-bold">
+          <option value="">-- Choose Rider --</option>
+        </select>
+      </div>
+      <div class="flex gap-2 justify-end pt-1">
+        <button onclick="closeReassignModal()" class="flex-1 min-h-[44px] py-2.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 active:scale-95 transition">Cancel</button>
+        <button onclick="confirmReassignDelivery()" class="flex-1 min-h-[44px] py-2.5 rounded-xl text-xs font-black text-white bg-brand-600 active:scale-95 shadow-md transition">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyABmYgOsai5ppKsAqxGr212nZiMu9tsCjo",
+      authDomain: "foodworldfixed.firebaseapp.com",
+      databaseURL: "https://foodworldfixed-default-rtdb.firebaseio.com",
+      projectId: "foodworldfixed",
+      storageBucket: "foodworldfixed.firebasestorage.app",
+      messagingSenderId: "357094358614",
+      appId: "1:357094358614:web:e405d802735e15f4fbc5f7"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+    let cachedRestaurants = {}, cachedDelivery = {}, cachedCustomers = {}, cachedOrders = {}, cachedNotifications = {}, cachedTickets = {};
+    let isVerifyingRole = false;
+    let currentActiveTab = 'overview';
+    let toastTimeout = null;
+    let audioCtx = null;
+    const ADMIN_EMAILS = ["abhiikuanr@gmail.com", "superadmin@foodworld.com"];
+
+    // ---------------- GLOBAL AUDIO UNLOCK CONTROLLER ----------------
+    function initGlobalAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+    }
+    window.addEventListener('click', initGlobalAudioContext, { once: true });
+    window.addEventListener('touchstart', initGlobalAudioContext, { once: true });
+
+    function playModernNotifChime() {
+      try {
+        initGlobalAudioContext();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1174.66, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.35);
+      } catch (e) {}
+    }
+
+    // ---------------- FLOATING TOAST ----------------
+    function showModernFloatingToast(title, message, iconClass = 'fa-solid fa-bell', isAlert = false) {
+      playModernNotifChime();
+      const toast = document.getElementById('modernFloatingToast');
+      const tagEl = document.getElementById('toastTag');
+      const bodyEl = document.getElementById('toastBody');
+      const iconBox = document.getElementById('toastIconBox');
+
+      tagEl.innerText = title;
+      bodyEl.innerText = message;
+      iconBox.innerHTML = `<i class="${iconClass}"></i>`;
+
+      if (isAlert) {
+        iconBox.className = "w-10 h-10 rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-base flex-shrink-0";
+      } else {
+        iconBox.className = "w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-base flex-shrink-0";
+      }
+
+      toast.classList.remove('hidden', 'toast-exit');
+      toast.classList.add('toast-enter');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        dismissFloatingToast();
+      }, 5000);
+    }
+
+    function dismissFloatingToast() {
+      const toast = document.getElementById('modernFloatingToast');
+      toast.classList.remove('toast-enter');
+      toast.classList.add('toast-exit');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 300);
+    }
+
+    // ---------------- FORGOT PASSWORD ----------------
+    function openForgotPasswordModal() {
+      const loginEmail = document.getElementById('loginEmail').value.trim();
+      if (loginEmail) document.getElementById('resetEmailInput').value = loginEmail;
+      document.getElementById('resetErrorBox').classList.add('hidden');
+      document.getElementById('forgotPasswordModal').classList.remove('hidden');
+    }
+
+    function closeForgotPasswordModal() {
+      document.getElementById('forgotPasswordModal').classList.add('hidden');
+    }
+
+    function openEmailSentSuccessModal(email) {
+      document.getElementById('sentSuccessEmailPreview').innerText = email;
+      document.getElementById('emailSentSuccessModal').classList.remove('hidden');
+    }
+
+    function closeEmailSentSuccessModal() {
+      document.getElementById('emailSentSuccessModal').classList.add('hidden');
+    }
+
+    async function handleSendPasswordReset(e) {
+      e.preventDefault();
+      const email = document.getElementById('resetEmailInput').value.trim();
+      const btn = document.getElementById('resetSubmitBtn');
+      const errBox = document.getElementById('resetErrorBox');
+      errBox.classList.add('hidden');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending Link...';
+
+      try {
+        const currentUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+        const actionCodeSettings = {
+          url: `${currentUrl}/reset-password.html`,
+          handleCodeInApp: true
+        };
+        await auth.sendPasswordResetEmail(email, actionCodeSettings);
+        closeForgotPasswordModal();
+        showModernFloatingToast("Recovery Sent", `Verification link dispatched to ${email}`, "fa-solid fa-envelope-circle-check");
+        openEmailSentSuccessModal(email);
+      } catch (err) {
+        errBox.innerText = err.message || "Failed to send reset link.";
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Send Link";
+      }
+    }
+
+    // ---------------- HARDWARE BACK BUTTON ----------------
+    function pushHistoryState() {
+      history.pushState({ app: 'foodworld_admin' }, null, location.href);
+    }
+    pushHistoryState();
+
+    window.addEventListener('popstate', function () {
+      pushHistoryState();
+      handleHardwareBack();
+    });
+
+    function handleHardwareBack() {
+      const emailSentM = document.getElementById('emailSentSuccessModal');
+      if (emailSentM && !emailSentM.classList.contains('hidden')) {
+        closeEmailSentSuccessModal();
+        return;
+      }
+
+      const forgotM = document.getElementById('forgotPasswordModal');
+      if (forgotM && !forgotM.classList.contains('hidden')) {
+        closeForgotPasswordModal();
+        return;
+      }
+
+      const reassignM = document.getElementById('reassignModal');
+      if (reassignM && !reassignM.classList.contains('hidden')) {
+        closeReassignModal();
+        return;
+      }
+
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+        toggleMobileSidebar();
+        return;
+      }
+
+      if (currentActiveTab !== 'overview') {
+        switchTab('overview');
+        return;
+      }
+
+      openExitAppModal();
+    }
+
+    function openExitAppModal() {
+      document.getElementById('exitAppModal').classList.remove('hidden');
+    }
+
+    function cancelExitApp() {
+      document.getElementById('exitAppModal').classList.add('hidden');
+      switchTab('overview');
+    }
+
+    function confirmExitApp() {
+      if (navigator.app && navigator.app.exitApp) {
+        navigator.app.exitApp();
+      } else if (navigator.device && navigator.device.exitApp) {
+        navigator.device.exitApp();
+      } else {
+        window.close();
+      }
+    }
+
+    // ---------------- AUTH STATE LISTENER ----------------
+    auth.onAuthStateChanged(async (user) => {
+      const splash = document.getElementById('splashScreen');
+      if (isVerifyingRole) return;
+      if (user) {
+        isVerifyingRole = true;
+        try {
+          const adminSnap = await db.ref(`admins/${user.uid}`).once('value');
+          const isAdminNode = adminSnap.exists();
+          const isAdminEmail = ADMIN_EMAILS.includes(user.email?.toLowerCase().trim());
+
+          if (!isAdminNode && !isAdminEmail) {
+            await auth.signOut();
+            showAuthError("Access Denied: This account is NOT an authorized Admin.");
+            splash.classList.add('hidden');
+            return;
+          }
+
+          if (!isAdminNode && isAdminEmail) {
+            await db.ref(`admins/${user.uid}`).set({
+              email: user.email, role: 'SUPER_ADMIN', createdAt: Date.now()
+            });
+          }
+
+          document.getElementById('authView').classList.add('hidden');
+          document.getElementById('dashboardView').classList.remove('hidden');
+          document.getElementById('adminUserEmail').innerText = user.email || 'Admin';
+          initRealtimeListeners();
+        } catch (err) {
+          await auth.signOut();
+          showAuthError(err.message || 'Authentication error.');
+        } finally {
+          isVerifyingRole = false;
+          splash.classList.add('hidden');
+        }
+      } else {
+        document.getElementById('dashboardView').classList.add('hidden');
+        document.getElementById('authView').classList.remove('hidden');
+        splash.classList.add('hidden');
+        detachRealtimeListeners();
+      }
+    });
+
+    function showAuthError(msg) {
+      const errorDiv = document.getElementById('loginError');
+      const errorText = document.getElementById('loginErrorText');
+      errorDiv.classList.remove('hidden');
+      errorText.innerText = msg;
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const btn = document.getElementById('loginBtn');
+      document.getElementById('loginError').classList.add('hidden');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+      } catch (err) {
+        showAuthError(err.message || 'Invalid admin credentials.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Enter Command Center</span> <i class="fa-solid fa-arrow-right"></i>';
+      }
+    }
+
+    function handleLogout() { 
+      auth.signOut().catch(err => alert("Logout error: " + err.message)); 
+    }
+
+    function detachRealtimeListeners() {
+      db.ref('restaurants').off();
+      db.ref('deliveryPartners').off();
+      db.ref('customers').off();
+      db.ref('orders').off();
+      db.ref('admin/notifications').off();
+      db.ref('settings/support').off();
+      db.ref('supportTickets').off();
+    }
+
+    function initRealtimeListeners() {
+      db.ref('restaurants').on('value', snap => {
+        cachedRestaurants = snap.val() || {};
+        renderRestaurantsTable();
+        updateStats();
+        renderTopRestaurants();
+      });
+
+      db.ref('deliveryPartners').on('value', snap => {
+        cachedDelivery = snap.val() || {};
+        renderDeliveryTable();
+        updateStats();
+        populateDeliveryModalDropdown();
+      });
+
+      db.ref('customers').on('value', snap => {
+        cachedCustomers = snap.val() || {};
+        renderCustomersTable();
+        updateStats();
+      });
+
+      db.ref('orders').on('value', snap => {
+        cachedOrders = snap.val() || {};
+        renderRecentOrders();
+        renderOrdersTable();
+        updateStats();
+        renderTopRestaurants();
+        renderCodReports();
+      });
+
+      db.ref('admin/notifications').on('value', snap => {
+        cachedNotifications = snap.val() || {};
+        renderNotifications();
+      });
+
+      db.ref('settings/support').on('value', snap => {
+        const conf = snap.val() || {};
+        document.getElementById('suppPhone').value = conf.phone || '+91 9876543210';
+        document.getElementById('suppWhatsapp').value = conf.whatsapp || '919876543210';
+        document.getElementById('suppEmail').value = conf.email || 'support@foodworld.com';
+        document.getElementById('suppHours').value = conf.hours || '24/7 Live Support';
+        document.getElementById('suppDescription').value = conf.description || 'Have an issue with your food or delivery? FoodWorld Helpdesk is here for you 24/7.';
+      });
+
+      db.ref('supportTickets').on('value', snap => {
+        cachedTickets = snap.val() || {};
+        renderSupportTickets();
+        updateStats();
+      });
+    }
+
+    function updateStats() {
+      const orderKeys = Object.keys(cachedOrders);
+      const restKeys = Object.keys(cachedRestaurants);
+      const delKeys = Object.keys(cachedDelivery);
+      const custKeys = Object.keys(cachedCustomers);
+      const ticketKeys = Object.keys(cachedTickets);
+
+      let pendingRests = 0;
+      restKeys.forEach(k => { if (!cachedRestaurants[k]?.approved) pendingRests++; });
+
+      let pendingDels = 0;
+      delKeys.forEach(k => { if (!cachedDelivery[k]?.approved) pendingDels++; });
+
+      let openTicketsCount = 0;
+      ticketKeys.forEach(k => { if (cachedTickets[k]?.status !== 'RESOLVED') openTicketsCount++; });
+
+      let activeOrdersCount = 0;
+      let totalRevenue = 0;
+      orderKeys.forEach(k => {
+        const o = cachedOrders[k];
+        if (!o) return;
+        if (o.status !== 'DELIVERED' && o.status !== 'CANCELLED') activeOrdersCount++;
+        if (o.status === 'DELIVERED' && o.totalAmount) totalRevenue += Number(o.totalAmount) || 0;
+      });
+
+      document.getElementById('statTotalOrders').innerText = orderKeys.length;
+      document.getElementById('statOpenTickets').innerText = openTicketsCount;
+      document.getElementById('statTotalRestaurants').innerText = restKeys.length;
+      document.getElementById('statPendingRestaurants').innerText = `${pendingRests} pending`;
+      document.getElementById('statTotalDelivery').innerText = delKeys.length;
+      document.getElementById('statPendingDelivery').innerText = `${pendingDels} pending`;
+      
+      const custStatEl = document.getElementById('statTotalCustomers');
+      if (custStatEl) custStatEl.innerText = custKeys.length;
+
+      document.getElementById('statTotalRevenue').innerText = `₹${totalRevenue.toLocaleString('en-IN')}`;
+
+      const suppBadge = document.getElementById('navSupportBadge');
+      if (openTicketsCount > 0) {
+        suppBadge.innerText = openTicketsCount;
+        suppBadge.classList.remove('hidden');
+      } else {
+        suppBadge.classList.add('hidden');
+      }
+
+      const ordersBadge = document.getElementById('navLiveOrdersBadge');
+      if (activeOrdersCount > 0) {
+        ordersBadge.innerText = activeOrdersCount;
+        ordersBadge.classList.remove('hidden');
+      } else {
+        ordersBadge.classList.add('hidden');
+      }
+
+      const alertBox = document.getElementById('pendingAlert');
+      if (pendingRests + pendingDels > 0) {
+        alertBox.classList.remove('hidden');
+        document.getElementById('pendingAlertText').innerText = `${pendingRests} kitchen(s) & ${pendingDels} fleet rider(s) awaiting verification.`;
+      } else {
+        alertBox.classList.add('hidden');
+      }
+    }
+
+    async function handleSaveSupportConfig(e) {
+      e.preventDefault();
+      const phone = document.getElementById('suppPhone').value.trim();
+      const whatsapp = document.getElementById('suppWhatsapp').value.trim();
+      const email = document.getElementById('suppEmail').value.trim();
+      const hours = document.getElementById('suppHours').value.trim();
+      const description = document.getElementById('suppDescription').value.trim();
+      const btn = document.getElementById('saveSuppBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+      try {
+        await db.ref('settings/support').set({
+          phone, whatsapp, email, hours, description, updatedAt: Date.now()
+        });
+        showModernFloatingToast("Support Config Saved", "New contact details pushed to Customer App.", "fa-solid fa-headset");
+      } catch (err) {
+        alert("Failed to save: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>Save & Push Support Settings</span>';
+      }
+    }
+
+    function renderSupportTickets() {
+      const container = document.getElementById('supportTicketsContainer');
+      const filter = document.getElementById('ticketFilter').value;
+      const keys = Object.keys(cachedTickets).reverse();
+
+      if (keys.length === 0) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs">No customer issues or tickets submitted yet.</div>';
+        return;
+      }
+
+      let html = '';
+      keys.forEach(id => {
+        const t = cachedTickets[id];
+        if (!t) return;
+        const isResolved = t.status === 'RESOLVED';
+
+        if (filter === 'OPEN' && isResolved) return;
+        if (filter === 'RESOLVED' && !isResolved) return;
+
+        const custPhone = t.customerPhone || '';
+        const waUrl = custPhone ? `https://wa.me/${custPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${t.customerName || 'Customer'}, this is FoodWorld Admin regarding Support Ticket #${id.slice(-6)}`)}` : '';
+
+        html += `
+          <div class="p-4 rounded-3xl border ${isResolved ? 'bg-slate-50/60 border-slate-200' : 'bg-white border-amber-300 shadow-xs'} space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-black text-xs text-slate-900">#${id.slice(-6)}</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black ${isResolved ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                  ${isResolved ? 'RESOLVED' : 'OPEN / PENDING'}
+                </span>
+                <span class="px-2 py-0.5 rounded-md text-[9px] font-black bg-slate-100 text-slate-700">${escapeHtml(t.category || 'General Issue')}</span>
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono">${new Date(t.createdAt || Date.now()).toLocaleString()}</span>
+            </div>
+
+            <div class="text-xs space-y-1">
+              <div class="flex items-center justify-between">
+                <p class="font-black text-slate-900"><i class="fa-solid fa-user text-slate-400 mr-1"></i> ${escapeHtml(t.customerName || 'Customer')} (${escapeHtml(t.customerPhone || 'N/A')})</p>
+                ${t.orderId ? `<span class="text-[10px] font-mono text-brand-600 font-black bg-brand-50 px-2 py-0.5 rounded">Order Ref: #${t.orderId.slice(-6)}</span>` : ''}
+              </div>
+              <p class="text-slate-700 bg-slate-50 p-2.5 rounded-2xl border border-slate-100 mt-1">${escapeHtml(t.message || 'No description provided.')}</p>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <div class="flex gap-2">
+                ${custPhone ? `
+                  <a href="tel:${escapeHtml(custPhone)}" class="min-h-[32px] px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-black flex items-center gap-1.5 active:scale-95 transition">
+                    <i class="fa-solid fa-phone"></i> Call
+                  </a>
+                  <a href="${waUrl}" target="_blank" class="min-h-[32px] px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl text-xs font-black flex items-center gap-1.5 active:scale-95 transition">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                  </a>
+                ` : ''}
+              </div>
+
+              <div class="flex gap-2">
+                ${!isResolved ? `
+                  <button onclick="updateTicketStatus('${id}', 'RESOLVED')" class="min-h-[32px] px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black active:scale-95 transition flex items-center gap-1 shadow-sm">
+                    <i class="fa-solid fa-check"></i> Mark Resolved
+                  </button>
+                ` : `
+                  <button onclick="updateTicketStatus('${id}', 'OPEN')" class="min-h-[32px] px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold active:scale-95 transition">
+                    Reopen Ticket
+                  </button>
+                `}
+                <button onclick="deleteTicket('${id}')" class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center text-xs active:scale-95 transition" title="Delete Ticket">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html || '<div class="p-8 text-center text-slate-400 text-xs">No tickets match filter.</div>';
+    }
+
+    function updateTicketStatus(ticketId, newStatus) {
+      db.ref(`supportTickets/${ticketId}`).update({ status: newStatus, updatedAt: Date.now() })
+        .then(() => {
+          showModernFloatingToast("Ticket Updated", `Ticket #${ticketId.slice(-6)} marked as ${newStatus}.`, "fa-solid fa-headset");
+        })
+        .catch(err => alert("Failed to update ticket: " + err.message));
+    }
+
+    function deleteTicket(ticketId) {
+      if (confirm(`Delete ticket #${ticketId.slice(-6)}?`)) {
+        db.ref(`supportTickets/${ticketId}`).remove()
+          .then(() => showModernFloatingToast("Ticket Deleted", "Support ticket removed.", "fa-solid fa-trash-can"))
+          .catch(err => alert("Failed to delete ticket: " + err.message));
+      }
+    }
+
+    const STATUS_BADGES = {
+      PLACED: 'bg-orange-50 text-orange-800 border-orange-200',
+      ACCEPTED: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+      PREPARING: 'bg-amber-50 text-amber-800 border-amber-200',
+      READY_FOR_PICKUP: 'bg-purple-50 text-purple-800 border-purple-200',
+      PICKED_UP: 'bg-cyan-50 text-cyan-800 border-cyan-200',
+      OUT_FOR_DELIVERY: 'bg-blue-50 text-blue-800 border-blue-200',
+      DELIVERED: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      CANCELLED: 'bg-rose-50 text-rose-800 border-rose-200'
+    };
+
+    function renderRecentOrders() {
+      const container = document.getElementById('recentOrdersMobileFeed');
+      const orderKeys = Object.keys(cachedOrders).reverse().slice(0, 6);
+
+      if (orderKeys.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs">No orders placed yet.</div>`;
+        return;
+      }
+
+      let html = '';
+      orderKeys.forEach(id => {
+        const o = cachedOrders[id];
+        if (!o) return;
+        const restName = cachedRestaurants[o.restaurantId]?.name || 'Unknown Restaurant';
+        const badgeClass = STATUS_BADGES[o.status] || 'bg-slate-100 text-slate-700';
+        const paymentMode = o.paymentMethod === 'ONLINE' ? 'UPI / Online' : 'Cash on Delivery';
+
+        html += `
+          <div class="p-3.5 sm:p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-black text-xs text-slate-900">#${id.slice(-6)}</span>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black border ${badgeClass}">${o.status}</span>
+                ${o.deliveryOtp ? `<span class="text-[9px] font-mono font-black bg-brand-50 text-brand-700 px-1.5 py-0.2 rounded">OTP: ${o.deliveryOtp}</span>` : ''}
+              </div>
+              <p class="text-xs font-black text-slate-800 truncate mt-0.5">${escapeHtml(restName)}</p>
+              <p class="text-[11px] text-slate-400 truncate">${escapeHtml(o.phone || 'Customer')} • ${escapeHtml(o.address || '')}</p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <span class="font-black text-xs sm:text-sm text-emerald-700">₹${o.totalAmount || 0}</span>
+              <span class="block text-[9px] font-extrabold ${o.paymentMethod === 'ONLINE' ? 'text-blue-600' : 'text-slate-500'}">${paymentMode}</span>
+              <button onclick="switchTab('orders')" class="block text-[11px] text-brand-600 font-bold hover:underline mt-0.5">Manage</button>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function renderRestaurantsTable(filterText = '') {
+      const container = document.getElementById('restaurantsCardList');
+      const keys = Object.keys(cachedRestaurants);
+
+      if (keys.length === 0) {
+        container.innerHTML = `<div class="col-span-full p-6 text-center text-slate-400 text-xs">No restaurants registered.</div>`;
+        return;
+      }
+
+      let html = '';
+      keys.forEach(uid => {
+        const r = cachedRestaurants[uid];
+        if (!r) return;
+        const name = r.name || 'Unnamed Kitchen';
+        const email = r.email || 'No email';
+        const isApproved = r.approved === true;
+
+        if (filterText && !name.toLowerCase().includes(filterText.toLowerCase()) && !email.toLowerCase().includes(filterText.toLowerCase()) && !r.bankAccountNo?.includes(filterText) && !r.ifscCode?.toLowerCase().includes(filterText.toLowerCase())) return;
+
+        const hasBank = r.bankAccountNo && r.ifscCode;
+        const bankHtml = hasBank ? `
+          <div class="p-2.5 rounded-2xl bg-slate-900 text-white space-y-1 text-[11px] mt-2">
+            <div class="flex items-center justify-between text-[10px] text-slate-400 border-b border-slate-800 pb-1 font-mono">
+              <span class="font-bold text-amber-400"><i class="fa-solid fa-building-columns mr-1"></i> ${escapeHtml(r.bankName || 'Partner Bank')}</span>
+              <span class="text-emerald-400 font-black">IFSC: ${escapeHtml(r.ifscCode || 'N/A')}</span>
+            </div>
+            <p class="font-mono text-xs font-black text-slate-100 flex items-center justify-between pt-0.5">
+              <span>A/C: ${escapeHtml(r.bankAccountNo)}</span>
+              <span class="text-[10px] font-sans text-slate-400 font-bold">${escapeHtml(r.accountHolderName || name)}</span>
+            </p>
+          </div>
+        ` : `
+          <div class="p-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold flex items-center gap-1 mt-2">
+            <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Bank Details: Not updated yet
+          </div>
+        `;
+
+        const logoHtml = r.imageUrl ? 
+          `<img src="${escapeHtml(r.imageUrl)}" class="w-10 h-10 rounded-2xl object-cover border border-slate-200 flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&q=80'">` : 
+          `<div class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center font-black text-sm flex-shrink-0">${name.charAt(0).toUpperCase()}</div>`;
+
+        html += `
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 flex flex-col justify-between">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  ${logoHtml}
+                  <div class="min-w-0">
+                    <h4 class="font-black text-xs sm:text-sm text-slate-900 truncate">${escapeHtml(name)}</h4>
+                    <p class="text-[10px] text-slate-400 font-mono truncate">${escapeHtml(email)} • ${escapeHtml(r.phone || '')}</p>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black ${isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${isApproved ? 'Approved' : 'Pending'}
+                </span>
+              </div>
+              
+              <p class="text-[11px] text-slate-500 mt-2 line-clamp-1"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(r.address || 'N/A')}</p>
+              
+              ${bankHtml}
+            </div>
+
+            <div class="pt-2 border-t border-slate-100">
+              ${!isApproved 
+                ? `<button onclick="setRestaurantApproval('${uid}', true)" class="w-full min-h-[38px] py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black shadow-sm transition"><i class="fa-solid fa-check"></i> Approve Kitchen</button>`
+                : `<button onclick="setRestaurantApproval('${uid}', false)" class="w-full min-h-[38px] py-2 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black transition border border-rose-200"><i class="fa-solid fa-ban"></i> Suspend Kitchen</button>`
+              }
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html || `<div class="col-span-full p-6 text-center text-slate-400 text-xs">No matching restaurants found.</div>`;
+    }
+
+    function filterRestaurants() {
+      renderRestaurantsTable(document.getElementById('restaurantSearch').value);
+    }
+
+    function setRestaurantApproval(uid, approve) {
+      db.ref(`restaurants/${uid}`).update({ approved: approve })
+        .then(() => showModernFloatingToast("Kitchen Status", `Approval state changed.`, "fa-solid fa-store"))
+        .catch(err => alert("Failed to update status: " + err.message));
+    }
+
+    function renderDeliveryTable(filterText = '') {
+      const container = document.getElementById('deliveryCardList');
+      const keys = Object.keys(cachedDelivery);
+
+      if (keys.length === 0) {
+        container.innerHTML = `<div class="col-span-full p-6 text-center text-slate-400 text-xs">No delivery fleet registered.</div>`;
+        return;
+      }
+
+      let html = '';
+      keys.forEach(uid => {
+        const d = cachedDelivery[uid];
+        if (!d) return;
+        const name = d.name || 'Rider';
+        const isApproved = d.approved === true;
+
+        if (filterText && !name.toLowerCase().includes(filterText.toLowerCase()) && !d.phone?.includes(filterText) && !d.bankAccountNo?.includes(filterText) && !d.ifscCode?.toLowerCase().includes(filterText.toLowerCase())) return;
+
+        const hasBank = d.bankAccountNo && d.ifscCode;
+        const bankHtml = hasBank ? `
+          <div class="p-2.5 rounded-2xl bg-slate-900 text-white space-y-1 text-[11px] mt-2">
+            <div class="flex items-center justify-between text-[10px] text-slate-400 border-b border-slate-800 pb-1 font-mono">
+              <span class="font-bold text-amber-400"><i class="fa-solid fa-building-columns mr-1"></i> ${escapeHtml(d.bankName || 'Rider Bank')}</span>
+              <span class="text-emerald-400 font-black">IFSC: ${escapeHtml(d.ifscCode || 'N/A')}</span>
+            </div>
+            <p class="font-mono text-xs font-black text-slate-100 flex items-center justify-between pt-0.5">
+              <span>A/C: ${escapeHtml(d.bankAccountNo)}</span>
+              <span class="text-[10px] font-sans text-slate-400 font-bold">${escapeHtml(d.accountHolderName || name)}</span>
+            </p>
+          </div>
+        ` : `
+          <div class="p-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold flex items-center gap-1 mt-2">
+            <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Bank Details: Not updated yet
+          </div>
+        `;
+
+        html += `
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 flex flex-col justify-between">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-base flex-shrink-0">
+                    <i class="fa-solid fa-motorcycle"></i>
+                  </div>
+                  <div class="min-w-0">
+                    <h4 class="font-black text-xs sm:text-sm text-slate-900 truncate">${escapeHtml(name)}</h4>
+                    <p class="text-[10px] text-slate-400 font-mono truncate">${escapeHtml(d.phone || 'N/A')}</p>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black ${isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${isApproved ? 'Approved' : 'Pending'}
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between text-[11px] text-slate-600 mt-2">
+                <span><i class="fa-solid fa-car text-slate-400 mr-1"></i> ${escapeHtml(d.vehicle || 'Bike')}</span>
+                <span class="font-black ${d.online !== false ? 'text-emerald-600' : 'text-slate-400'}">● ${d.online !== false ? 'Online Duty' : 'Offline'}</span>
+              </div>
+
+              ${bankHtml}
+            </div>
+
+            <div class="pt-2 border-t border-slate-100">
+              ${!isApproved 
+                ? `<button onclick="setDeliveryApproval('${uid}', true)" class="w-full min-h-[38px] py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black shadow-sm transition"><i class="fa-solid fa-check"></i> Approve Rider</button>`
+                : `<button onclick="setDeliveryApproval('${uid}', false)" class="w-full min-h-[38px] py-2 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black transition border border-rose-200"><i class="fa-solid fa-ban"></i> Suspend Rider</button>`
+              }
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html || `<div class="col-span-full p-6 text-center text-slate-400 text-xs">No riders match search.</div>`;
+    }
+
+    function filterDelivery() {
+      renderDeliveryTable(document.getElementById('deliverySearch').value);
+    }
+
+    function setDeliveryApproval(uid, approve) {
+      db.ref(`deliveryPartners/${uid}`).update({ approved: approve })
+        .then(() => showModernFloatingToast("Rider Status", `Approval state changed.`, "fa-solid fa-motorcycle"))
+        .catch(err => alert("Failed to update rider: " + err.message));
+    }
+
+    function renderOrdersTable() {
+      const container = document.getElementById('ordersCardsContainer');
+      const filterStatus = document.getElementById('orderStatusFilter').value;
+      const orderKeys = Object.keys(cachedOrders).reverse();
+
+      if (orderKeys.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs bg-white rounded-3xl border border-slate-200">No orders found.</div>`;
+        return;
+      }
+
+      let html = '';
+      orderKeys.forEach(id => {
+        const o = cachedOrders[id];
+        if (!o) return;
+        if (filterStatus !== 'ALL' && o.status !== filterStatus) return;
+
+        const restName = cachedRestaurants[o.restaurantId]?.name || 'Unknown Restaurant';
+        const isClosed = o.status === 'DELIVERED' || o.status === 'CANCELLED';
+        
+        let deliveryBoyInfo = '';
+        if (o.deliveryUid && cachedDelivery[o.deliveryUid]) {
+          deliveryBoyInfo = `<span class="text-emerald-700 font-bold"><i class="fa-solid fa-person-biking mr-1"></i> Rider: ${escapeHtml(cachedDelivery[o.deliveryUid].name)} (${escapeHtml(cachedDelivery[o.deliveryUid].phone || '')})</span>`;
+        } else if (!isClosed) {
+          deliveryBoyInfo = `<span class="text-orange-600 font-black flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span> Live Broadcast (Waiting for Rider Lock)</span>`;
+        } else {
+          deliveryBoyInfo = `<span class="text-slate-400 font-bold">Unassigned</span>`;
+        }
+
+        const badgeClass = STATUS_BADGES[o.status] || 'bg-slate-100 text-slate-700';
+        const paymentBadge = o.paymentMethod === 'ONLINE' ? 
+          `<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-50 text-blue-700 border border-blue-200">UPI / ONLINE</span>` : 
+          `<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">COD</span>`;
+
+        let mapsUrl = "";
+        if (o.customerLat && o.customerLng) {
+          mapsUrl = `https://www.google.com/maps?q=${o.customerLat},${o.customerLng}`;
+        } else if (o.address) {
+          mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.address)}`;
+        }
+
+        html += `
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <div>
+                <span class="font-mono font-black text-xs text-slate-900">#${id.slice(-6)}</span>
+                <p class="text-[10px] text-slate-400 font-mono">${new Date(o.createdAt || Date.now()).toLocaleTimeString()}</p>
+              </div>
+              <div class="flex items-center gap-1.5">
+                ${paymentBadge}
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black border ${badgeClass}">${o.status}</span>
+                ${o.deliveryOtp ? `
+                  <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-black ${o.verifiedDelivery ? 'bg-emerald-100 text-emerald-800' : 'bg-brand-50 text-brand-700 border border-brand-200'}">
+                    OTP: ${o.deliveryOtp} ${o.verifiedDelivery ? '✓' : ''}
+                  </span>
+                ` : ''}
+              </div>
+            </div>
+
+            <div class="text-xs space-y-1.5">
+              <p class="font-black text-slate-900"><i class="fa-solid fa-utensils text-brand-500 mr-1"></i> ${escapeHtml(restName)}</p>
+              <div class="flex items-center justify-between">
+                <p class="text-slate-600 truncate flex-1 mr-2"><i class="fa-solid fa-location-dot text-slate-400 mr-1"></i> ${escapeHtml(o.address || 'No address')} (${escapeHtml(o.phone || 'N/A')})</p>
+                ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" class="text-blue-600 font-bold text-[10px] hover:underline flex-shrink-0"><i class="fa-solid fa-map-pin"></i> Pin</a>` : ''}
+              </div>
+              <div class="flex items-center justify-between pt-1">
+                <div class="text-[11px]">${deliveryBoyInfo}</div>
+                ${o.locationLink ? `<a href="${escapeHtml(o.locationLink)}" target="_blank" class="text-blue-600 font-black text-[11px] hover:underline"><i class="fa-solid fa-location-crosshairs"></i> Live GPS Map</a>` : ''}
+              </div>
+              ${o.cancelReason ? `<p class="text-[10px] text-rose-600 font-bold bg-rose-50 p-1.5 rounded-xl"><i class="fa-solid fa-circle-info"></i> ${escapeHtml(o.cancelReason)}</p>` : ''}
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+              <span class="font-black text-sm text-emerald-700">₹${o.totalAmount || 0}</span>
+              <div class="flex gap-1.5">
+                ${o.status !== 'DELIVERED' && o.status !== 'CANCELLED' ? `
+                  <button onclick="openReassignModal('${id}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-xl text-xs font-black transition" title="Assign / Override Rider">
+                    <i class="fa-solid fa-user-gear"></i> Rider
+                  </button>
+                  <button onclick="cancelOrder('${id}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black border border-rose-200 transition" title="Cancel Order">
+                    <i class="fa-solid fa-ban"></i>
+                  </button>
+                ` : '<span class="text-[11px] text-slate-400 font-bold">Closed</span>'}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html || `<div class="p-6 text-center text-slate-400 text-xs bg-white rounded-3xl border border-slate-200">No orders match filter.</div>`;
+    }
+
+    async function cancelOrder(orderId) {
+      if (!confirm(`Cancel order #${orderId.slice(-6)}?`)) return;
+      try {
+        const updates = {};
+        updates[`orders/${orderId}/status`] = 'CANCELLED';
+        updates[`orders/${orderId}/cancelledBy`] = 'ADMIN';
+        updates[`orders/${orderId}/cancelReason`] = 'Cancelled by Super Admin';
+        updates[`orders/${orderId}/updatedAt`] = Date.now();
+        updates[`unassignedOrders/${orderId}`] = null; // Clean up broadcast queue
+
+        await db.ref().update(updates);
+        showModernFloatingToast("Order Cancelled", `Order #${orderId.slice(-6)} was cancelled by Admin.`, "fa-solid fa-ban", true);
+      } catch (err) {
+        alert("Failed to cancel order: " + err.message);
+      }
+    }
+
+    function populateDeliveryModalDropdown() {
+      const select = document.getElementById('modalDeliverySelect');
+      select.innerHTML = '<option value="">-- Choose Rider --</option>';
+      Object.keys(cachedDelivery).forEach(uid => {
+        const d = cachedDelivery[uid];
+        if (d && d.approved) {
+          select.innerHTML += `<option value="${uid}">${escapeHtml(d.name || 'Rider')} (${d.phone || ''}) - ${d.online !== false ? 'Online' : 'Offline'}</option>`;
+        }
+      });
+    }
+
+    function openReassignModal(orderId) {
+      document.getElementById('modalOrderId').value = orderId;
+      const order = cachedOrders[orderId];
+      document.getElementById('modalDeliverySelect').value = (order && order.deliveryUid) ? order.deliveryUid : '';
+      document.getElementById('reassignModal').classList.remove('hidden');
+    }
+
+    function closeReassignModal() {
+      document.getElementById('reassignModal').classList.add('hidden');
+    }
+
+    async function confirmReassignDelivery() {
+      const orderId = document.getElementById('modalOrderId').value;
+      const deliveryUid = document.getElementById('modalDeliverySelect').value;
+      if (!deliveryUid) { alert('Please select a rider.'); return; }
+
+      try {
+        const updates = {};
+        updates[`orders/${orderId}/deliveryUid`] = deliveryUid;
+        updates[`orders/${orderId}/updatedAt`] = Date.now();
+        updates[`unassignedOrders/${orderId}`] = null; // Remove from open queue
+
+        await db.ref().update(updates);
+        closeReassignModal();
+        showModernFloatingToast("Rider Assigned", `Order #${orderId.slice(-6)} was assigned manually.`, "fa-solid fa-motorcycle");
+      } catch (err) {
+        alert("Failed to assign rider: " + err.message);
+      }
+    }
+
+    function renderCustomersTable() {
+      const container = document.getElementById('customersCardsList');
+      const keys = Object.keys(cachedCustomers);
+
+      if (keys.length === 0) {
+        container.innerHTML = `<div class="col-span-full p-6 text-center text-slate-400 text-xs">No customers registered.</div>`;
+        return;
+      }
+
+      let html = '';
+      keys.forEach(uid => {
+        const c = cachedCustomers[uid];
+        if (!c) return;
+        html += `
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-1.5">
+            <h4 class="font-black text-xs sm:text-sm text-slate-900">${escapeHtml(c.name || 'Customer')}</h4>
+            <p class="text-[11px] text-slate-500 font-mono">${escapeHtml(c.phone || 'No phone')} • ${escapeHtml(c.email || '')}</p>
+            <p class="text-[11px] text-slate-600 line-clamp-2"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(c.address || 'No address set')}</p>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    async function handleSendNotification(e) {
+      e.preventDefault();
+      const msgInput = document.getElementById('notifMessage');
+      const message = msgInput.value.trim();
+      if (!message) return;
+
+      const btn = document.getElementById('sendNotifBtn');
+      btn.disabled = true;
+      try {
+        await db.ref('admin/notifications').push({ message, createdAt: Date.now() });
+        msgInput.value = '';
+        showModernFloatingToast("Broadcast Sent", "Notice sent to all customers & partners.", "fa-solid fa-paper-plane");
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function renderNotifications() {
+      const list = document.getElementById('notificationsList');
+      const keys = Object.keys(cachedNotifications).reverse();
+      if (keys.length === 0) {
+        list.innerHTML = `<p class="text-xs text-slate-400">No broadcasts sent yet.</p>`;
+        return;
+      }
+      let html = '';
+      keys.forEach(id => {
+        const n = cachedNotifications[id];
+        if (!n) return;
+        html += `
+          <div class="p-3 bg-slate-50 border border-slate-100 rounded-2xl flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs text-slate-800 font-bold">${escapeHtml(n.message || '')}</p>
+              <span class="text-[10px] text-slate-400 font-mono mt-0.5 block">${new Date(n.createdAt || Date.now()).toLocaleString()}</span>
+            </div>
+            <button onclick="deleteNotification('${id}')" class="text-slate-300 hover:text-rose-500 text-xs p-1 transition"><i class="fa-solid fa-trash-can"></i></button>
+          </div>
+        `;
+      });
+      list.innerHTML = html;
+    }
+
+    function deleteNotification(id) {
+      if (confirm('Delete this broadcast?')) {
+        db.ref(`admin/notifications/${id}`).remove()
+          .catch(err => alert("Failed to delete notification: " + err.message));
+      }
+    }
+
+    function renderTopRestaurants() {
+      const container = document.getElementById('topRestaurantsMobileList');
+      const stats = {};
+      Object.keys(cachedOrders).forEach(k => {
+        const o = cachedOrders[k];
+        if (!o) return;
+        const rId = o.restaurantId || 'unknown';
+        if (!stats[rId]) stats[rId] = { count: 0, revenue: 0 };
+        stats[rId].count++;
+        if (o.status === 'DELIVERED') stats[rId].revenue += (Number(o.totalAmount) || 0);
+      });
+
+      const sorted = Object.keys(stats).sort((a, b) => stats[b].revenue - stats[a].revenue);
+      if (sorted.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No sales recorded yet.</p>`;
+        return;
+      }
+
+      let html = '';
+      sorted.forEach(rId => {
+        const rName = cachedRestaurants[rId]?.name || `ID: ${rId.slice(0, 6)}`;
+        html += `
+          <div class="p-3 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between">
+            <div>
+              <h5 class="font-black text-xs text-slate-900">${escapeHtml(rName)}</h5>
+              <span class="text-[10px] text-slate-400 font-bold">${stats[rId].count} orders</span>
+            </div>
+            <span class="font-black text-xs text-emerald-700">₹${stats[rId].revenue.toLocaleString('en-IN')}</span>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function renderCodReports() {
+      let collected = 0, onlineAmt = 0, pending = 0, cancelled = 0, total = 0;
+      Object.keys(cachedOrders).forEach(k => {
+        const o = cachedOrders[k];
+        if (!o) return;
+        const amt = Number(o.totalAmount) || 0;
+        total++;
+        if (o.status === 'DELIVERED') {
+          collected += amt;
+          if (o.paymentMethod === 'ONLINE') onlineAmt += amt;
+        } else if (o.status === 'CANCELLED') {
+          cancelled += amt;
+        } else {
+          pending += amt;
+        }
+      });
+
+      document.getElementById('repDeliveredRevenue').innerText = `₹${collected.toLocaleString('en-IN')}`;
+      document.getElementById('repOnlineRevenue').innerText = `₹${onlineAmt.toLocaleString('en-IN')}`;
+      document.getElementById('repPendingCod').innerText = `₹${pending.toLocaleString('en-IN')}`;
+      document.getElementById('repCancelledCod').innerText = `₹${cancelled.toLocaleString('en-IN')}`;
+      document.getElementById('repTotalCount').innerText = total;
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const isClosed = sidebar.classList.contains('-translate-x-full');
+
+      if (isClosed) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    function switchTab(tabId) {
+      currentActiveTab = tabId;
+      const sections = ['overview', 'orders', 'support', 'restaurants', 'delivery', 'customers', 'notifications', 'reports'];
+      sections.forEach(s => {
+        const secEl = document.getElementById(`section-${s}`);
+        const navEl = document.getElementById(`nav-${s}`);
+        if (secEl && navEl) {
+          if (s === tabId) {
+            secEl.classList.remove('hidden');
+            navEl.classList.add('bg-brand-600', 'text-white');
+            navEl.classList.remove('text-slate-400', 'hover:bg-slate-900');
+          } else {
+            secEl.classList.add('hidden');
+            navEl.classList.remove('bg-brand-600', 'text-white');
+            navEl.classList.add('text-slate-400', 'hover:bg-slate-900');
+          }
+        }
+      });
+
+      const titleMap = {
+        overview: 'Dashboard Overview',
+        orders: 'Live Order Radar & Dispatch',
+        support: 'Customer Helpdesk & Support',
+        restaurants: 'Kitchen Restaurant Partners & Bank Accounts',
+        delivery: 'Delivery Fleet Riders & Bank Accounts',
+        customers: 'Customer Directory',
+        notifications: 'Push Broadcasts',
+        reports: 'COD, UPI & Revenue Pulse'
+      };
+      document.getElementById('pageTitle').innerText = titleMap[tabId] || 'Admin';
+      if (window.innerWidth < 768) {
+        const sidebar = document.getElementById('sidebar');
+        if (!sidebar.classList.contains('-translate-x-full')) toggleMobileSidebar();
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
