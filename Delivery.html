@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>FoodWorld - Delivery Partner App</title>
+
+  <!-- Tailwind CSS & FontAwesome Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Firebase Compat SDKs (App, Auth, Database) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    @media (max-width: 640px) {
+      input, select, textarea { font-size: 16px !important; }
+    }
+    .pb-safe {
+      padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
+      100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+    }
+    .pulse-broadcast {
+      animation: pulse-ring 2s infinite;
+    }
+
+    /* Modern Dynamic Toast Spring Animation */
+    @keyframes toastSlideDown {
+      0% { transform: translate(-50%, -100%) scale(0.9); opacity: 0; }
+      60% { transform: translate(-50%, 10px) scale(1.02); opacity: 1; }
+      100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+    }
+    @keyframes toastSlideUp {
+      0% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -100%) scale(0.9); opacity: 0; }
+    }
+    .toast-enter { animation: toastSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .toast-exit { animation: toastSlideUp 0.3s ease-in forwards; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
+
+  <!-- ================= INITIAL SPLASH SCREEN ================= -->
+  <div id="splashScreen" class="fixed inset-0 z-[100] bg-gradient-to-br from-slate-900 via-slate-800 to-brand-900 flex flex-col items-center justify-center text-white">
+    <div class="w-16 h-16 rounded-2xl bg-brand-500 flex items-center justify-center text-3xl shadow-xl shadow-brand-500/40 mb-3 animate-pulse">
+      <i class="fa-solid fa-motorcycle"></i>
+    </div>
+    <h2 class="text-xl font-black">FoodWorld Fleet</h2>
+    <div class="flex items-center gap-2 mt-4 text-xs text-brand-400 font-semibold">
+      <i class="fa-solid fa-spinner fa-spin"></i> Connecting to live delivery radar...
+    </div>
+  </div>
+
+  <!-- ================= MODERN FLOATING TOAST ================= -->
+  <div id="modernFloatingToast" class="hidden fixed top-3 left-1/2 -translate-x-1/2 z-[95] w-[92%] max-w-md">
+    <div class="bg-slate-900/95 backdrop-blur-xl border border-white/15 text-white p-3.5 rounded-3xl shadow-2xl flex items-center gap-3">
+      <div id="toastIconBox" class="w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-base flex-shrink-0">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between">
+          <span id="toastTag" class="text-[10px] font-black uppercase tracking-wider text-brand-400">Rider Alert</span>
+          <span class="text-[9px] text-slate-400 font-mono">Just now</span>
+        </div>
+        <p id="toastBody" class="text-xs font-semibold text-slate-100 truncate mt-0.5">Notification text goes here...</p>
+      </div>
+      <button onclick="dismissFloatingToast()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-400 hover:text-white transition flex-shrink-0 text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= 1. FORGOT PASSWORD MODAL ================= -->
+  <div id="riderForgotModal" class="hidden fixed inset-0 z-[98] bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-lg shadow-inner">
+            <i class="fa-solid fa-key"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-slate-900 text-sm">Rider Account Recovery</h3>
+            <p class="text-[10px] text-slate-400">FoodWorld Fleet</p>
+          </div>
+        </div>
+        <button onclick="closeRiderForgotModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+      
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Apna registered Rider email enter karein taaki password reset link bheja ja sake.
+      </p>
+
+      <form onsubmit="handleRiderPasswordReset(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Rider Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="email" id="riderResetEmail" required class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="rider@foodworld.com">
+          </div>
+        </div>
+
+        <div id="riderResetError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium"></div>
+
+        <div class="flex gap-2 pt-1">
+          <button type="button" onclick="closeRiderForgotModal()" class="flex-1 min-h-[42px] py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs active:scale-95 transition">Cancel</button>
+          <button type="submit" id="riderResetBtn" class="flex-1 min-h-[42px] py-2 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-black rounded-xl text-xs shadow-md transition">Send Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= 2. EMAIL SENT SUCCESS POPUP ================= -->
+  <div id="riderEmailSentSuccessModal" class="hidden fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl space-y-4 text-center border border-emerald-200">
+      <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
+        <i class="fa-solid fa-envelope-circle-check"></i>
+      </div>
+      <div>
+        <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">Mail Dispatched</span>
+        <h3 class="font-black text-slate-900 text-base mt-2">Rider Recovery Link Sent!</h3>
+        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+          Password reset verification link has been sent to your registered email. Please check your inbox.
+        </p>
+        <p class="text-xs font-mono font-bold text-brand-600 bg-brand-50 p-2 rounded-xl mt-2.5 truncate" id="riderSuccessEmailPreview">rider@foodworld.com</p>
+      </div>
+      <div class="pt-1">
+        <button onclick="closeRiderEmailSuccessModal()" class="w-full min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold rounded-2xl text-xs shadow-md transition">
+          Understood / ठीक है
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 3. FOODWORLD 4-DIGIT OTP VERIFICATION MODAL ================= -->
+  <div id="otpVerifyModal" class="hidden fixed inset-0 z-[96] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-5 sm:p-6 max-w-xs w-full shadow-2xl space-y-4 text-center border border-slate-100">
+      <div class="w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-2xl mx-auto shadow-inner">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div>
+        <h3 class="font-black text-slate-900 text-base">FoodWorld Delivery Code</h3>
+        <p class="text-xs text-slate-500 mt-1">Ask customer for their 4-digit code to verify & complete delivery.</p>
+      </div>
+
+      <input type="hidden" id="otpModalOrderId">
+      
+      <div>
+        <!-- Numeric keypad input -->
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="otpInputCode" maxlength="4" placeholder="••••" class="w-full text-center py-3 bg-slate-50 border-2 border-brand-500/40 rounded-2xl text-2xl font-black tracking-widest text-slate-900 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none font-mono">
+        <p id="otpErrorMsg" class="hidden text-[11px] text-rose-600 font-bold mt-1.5 flex items-center justify-center gap-1">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>Invalid Code! Please check with customer.</span>
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="closeOtpModal()" class="min-h-[44px] py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold rounded-xl text-xs transition">
+          Cancel
+        </button>
+        <button onclick="confirmAndVerifyDeliveryOtp()" id="verifyOtpBtn" class="min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-check"></i>
+          <span>Verify & Deliver</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 4. DELIVERY SUCCESS POPUP MODAL ================= -->
+  <div id="deliverySuccessModal" class="hidden fixed inset-0 z-[97] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl space-y-4 text-center border border-emerald-200">
+      <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto animate-bounce shadow-sm">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div>
+        <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">OTP Verified</span>
+        <h3 class="font-black text-slate-900 text-lg mt-1.5">Delivery Successful!</h3>
+        <p class="text-xs text-slate-500 mt-1">Food successfully handed over to customer.</p>
+      </div>
+
+      <div class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-1">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 block" id="successPayModeLabel">COD Cash Collected</span>
+        <span class="text-2xl font-black text-emerald-800" id="successCodAmount">₹0</span>
+      </div>
+
+      <button onclick="dismissSuccessModal()" class="w-full min-h-[46px] py-3 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-extrabold rounded-2xl text-xs shadow-md transition">
+        Awesome, Next Task ➔
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= 5. CANCELLED ORDER POPUP MODAL ================= -->
+  <div id="orderCancelledModal" class="hidden fixed inset-0 z-[98] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl space-y-3 text-center border border-rose-200">
+      <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl mx-auto animate-bounce">
+        <i class="fa-solid fa-ban"></i>
+      </div>
+      <div>
+        <h3 class="font-black text-rose-600 text-base">Order Cancelled!</h3>
+        <p class="text-xs text-slate-600 mt-1" id="orderCancelledMsg">Customer or kitchen has cancelled order.</p>
+      </div>
+      <button onclick="dismissCancelledModal()" class="w-full min-h-[42px] py-2 bg-slate-900 text-white font-bold rounded-xl text-xs shadow-md active:scale-95 transition">
+        Understood, Return to Duty
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= 6. EXIT CONFIRMATION MODAL ================= -->
+  <div id="exitAppModal" class="hidden fixed inset-0 z-[99] bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl space-y-4 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl mx-auto">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </div>
+      <div>
+        <h3 class="font-black text-slate-900 text-base">Exit Rider App?</h3>
+        <p class="text-xs text-slate-500 mt-1">Are you sure you want to close the app?</p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="cancelExitApp()" class="min-h-[42px] py-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold rounded-xl text-xs">No</button>
+        <button onclick="confirmExitApp()" class="min-h-[42px] py-2 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-bold rounded-xl text-xs shadow-md">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= AUTH VIEW (LOGIN / REGISTER) ================= -->
+  <div id="authView" class="hidden min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-brand-900">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
+      
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 text-2xl shadow-inner mb-2">
+          <i class="fa-solid fa-motorcycle"></i>
+        </div>
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">FoodWorld Fleet</h1>
+        <p class="text-xs text-slate-500 mt-0.5">Delivery Rider Partner Portal</p>
+      </div>
+
+      <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl mb-5 text-xs font-bold">
+        <button type="button" onclick="toggleAuthMode('login')" id="authTabLogin" class="min-h-[40px] rounded-lg bg-white shadow-sm text-brand-600 transition active:scale-95">Rider Login</button>
+        <button type="button" onclick="toggleAuthMode('signup')" id="authTabSignup" class="min-h-[40px] rounded-lg text-slate-500 hover:text-slate-800 transition active:scale-95">Register Rider</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="riderLoginForm" onsubmit="handleRiderLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Rider Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="email" id="loginEmail" required class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="rider@foodworld.com">
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-600">Password</label>
+            <button type="button" onclick="openRiderForgotModal()" class="text-xs text-brand-600 hover:text-brand-700 font-extrabold transition">Forgot?</button>
+          </div>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="password" id="loginPassword" required class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="••••••••">
+          </div>
+        </div>
+
+        <div id="loginError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
+          <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+          <span id="loginErrorMsg">Error</span>
+        </div>
+
+        <button type="submit" id="loginBtn" class="w-full min-h-[48px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
+          <span>Start Duty</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- Signup Form with Mandatory Bank Details -->
+      <form id="riderSignupForm" onsubmit="handleRiderSignup(event)" class="space-y-3 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
+          <input type="text" id="regName" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="e.g. Alex Kumar">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Email Address</label>
+            <input type="email" id="regEmail" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="alex@gmail.com">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Phone Number</label>
+            <input type="tel" id="regPhone" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="+91 9876543210">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Vehicle Type & Reg. No.</label>
+          <input type="text" id="regVehicle" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Honda Activa (DL-01-AB-1234)">
+        </div>
+
+        <!-- MANDATORY BANK DETAILS SECTION -->
+        <div class="p-3 bg-brand-50/70 border border-brand-200 rounded-2xl space-y-2.5">
+          <div class="flex items-center gap-1.5 text-xs font-black text-brand-800">
+            <i class="fa-solid fa-building-columns text-brand-600"></i>
+            <span>Bank Account Details (For Payouts)</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Name</label>
+              <input type="text" id="regBankName" required class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="SBI / HDFC">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Account Holder Name</label>
+              <input type="text" id="regAccHolder" required class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="As per passbook">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Account Number</label>
+            <input type="text" id="regBankAcc" required class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="11 to 16 digit account no.">
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank IFSC Code</label>
+            <input type="text" id="regIfsc" required oninput="this.value = this.value.toUpperCase()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="SBIN0001234">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Create Password</label>
+          <input type="password" id="regPassword" minlength="6" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Min. 6 characters">
+        </div>
+
+        <div id="signupError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
+          <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+          <span id="signupErrorMsg">Error</span>
+        </div>
+
+        <button type="submit" id="signupBtn" class="w-full min-h-[48px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
+          <span>Apply as Delivery Partner</span>
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= DELIVERY BOY APP VIEW ================= -->
+  <div id="appView" class="hidden max-w-md mx-auto bg-white min-h-screen relative shadow-2xl pb-safe flex flex-col">
+
+    <!-- Topbar with Duty Status Switch & WakeLock Indicator -->
+    <header class="sticky top-0 z-30 bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between shadow-xs">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-10 h-10 rounded-2xl bg-brand-500 text-white flex items-center justify-center font-black text-base shadow-md shadow-brand-500/30 flex-shrink-0">
+          <i class="fa-solid fa-person-biking"></i>
+        </div>
+        <div class="overflow-hidden">
+          <div class="flex items-center gap-1.5">
+            <h2 class="text-xs font-extrabold text-slate-800 truncate" id="topRiderName">Rider</h2>
+            <span id="riderApprovalPill" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800">Pending</span>
+          </div>
+          <p class="text-[10px] text-slate-400 font-mono truncate" id="topVehicleInfo">Bike</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span id="wakeLockBadge" class="hidden px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-[9px] font-black" title="Screen Stay Awake Active">
+          <i class="fa-solid fa-sun text-[8px]"></i> Awake
+        </span>
+        <button onclick="toggleOnlineDuty()" id="dutyStatusBtn" class="min-h-[36px] px-3.5 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1.5 transition active:scale-95 shadow-xs bg-emerald-100 text-emerald-800">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="dutyStatusText">Online</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Verification Warning Banner -->
+    <div id="approvalWarningBanner" class="hidden bg-amber-500 text-white px-4 py-2.5 text-xs font-semibold flex items-center gap-2">
+      <i class="fa-solid fa-triangle-exclamation text-sm flex-shrink-0"></i>
+      <span>Verification Pending: Admin approval required to accept orders.</span>
+    </div>
+
+    <!-- MAIN VIEWS -->
+    <main class="flex-1 p-4 space-y-4">
+
+      <!-- ================= 1. DELIVERIES TAB ================= -->
+      <section id="tab-deliveries" class="space-y-4">
+        
+        <!-- Live Duty Quick Stats -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Assigned Trips</p>
+              <h3 class="text-xl font-black text-slate-900 mt-0.5" id="statAssignedCount">0</h3>
+            </div>
+            <div class="w-8 h-8 rounded-xl bg-orange-100 text-brand-600 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-box"></i>
+            </div>
+          </div>
+          
+          <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200 flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-bold text-emerald-800 uppercase">Cash in Hand</p>
+              <h3 class="text-xl font-black text-emerald-700 mt-0.5" id="statCodCashInHand">₹0</h3>
+            </div>
+            <div class="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-sm">
+              <i class="fa-solid fa-hand-holding-dollar"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION A: BROADCASTED OPEN ORDERS -->
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-extrabold text-orange-600 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span> Live Broadcast Tasks
+            </h3>
+            <span class="text-[10px] font-extrabold text-white bg-orange-500 px-2 py-0.5 rounded-full" id="openBroadcastBadge">0 Open</span>
+          </div>
+
+          <div id="openOrdersBroadcastList" class="space-y-3">
+            <div class="p-4 text-center text-slate-400 text-xs bg-orange-50/40 rounded-2xl border border-orange-100">
+              <p>Radar active: Waiting for new orders...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION B: MY ACCEPTED / ASSIGNED DELIVERIES -->
+        <div class="space-y-3 pt-2">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-route text-brand-500"></i> My Active Trips
+            </h3>
+            <span class="text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full" id="activeTripsBadge">0 Ongoing</span>
+          </div>
+
+          <div id="assignedDeliveriesList" class="space-y-4">
+            <div class="p-6 text-center text-slate-400 text-xs bg-slate-50 rounded-2xl border border-slate-200">
+              <p>No active trips. Accept incoming orders from above!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. EARNINGS & COD TRIPS TAB ================= -->
+      <section id="tab-earnings" class="hidden space-y-4">
+        <div>
+          <h3 class="font-extrabold text-slate-900 text-base">Trips & COD Collected</h3>
+          <p class="text-[11px] text-slate-400">Delivered orders & cash collection log</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-slate-900 to-stone-900 text-white p-5 rounded-3xl shadow-xl space-y-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Total COD Cash Collected</p>
+              <h2 class="text-3xl font-black text-emerald-400 mt-1" id="earningTotalCod">₹0</h2>
+              <p class="text-[10px] text-slate-400 mt-0.5">To be settled with Admin</p>
+            </div>
+            <div class="p-3 bg-white/10 rounded-2xl text-emerald-400 text-2xl">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+          </div>
+          <div class="pt-2 border-t border-white/10 text-xs flex justify-between">
+            <span class="text-slate-400">Delivered Trips:</span>
+            <span class="font-black text-sm" id="earningCompletedTrips">0 orders</span>
+          </div>
+        </div>
+
+        <div class="space-y-2.5">
+          <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Completed Trips</h4>
+          <div id="deliveredTripsList" class="space-y-2.5">
+            <p class="text-xs text-slate-400 text-center py-6 bg-slate-50 rounded-2xl border border-slate-200">No completed trips yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. RIDER PROFILE TAB ================= -->
+      <section id="tab-profile" class="hidden space-y-4">
+        <div>
+          <h3 class="font-extrabold text-slate-900 text-base">Rider Profile & Bank Details</h3>
+          <p class="text-[11px] text-slate-400">Manage vehicle, phone & bank account for payouts</p>
+        </div>
+
+        <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-xs space-y-3.5">
+          <form onsubmit="handleUpdateProfile(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
+              <input type="text" id="profName" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Email</label>
+              <input type="email" id="profEmail" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 text-slate-500 rounded-xl text-xs cursor-not-allowed">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Phone Number</label>
+              <input type="tel" id="profPhone" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Vehicle Details & Plate</label>
+              <input type="text" id="profVehicle" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+
+            <!-- MANDATORY BANK DETAILS IN PROFILE -->
+            <div class="p-3.5 bg-brand-50/70 border border-brand-200 rounded-2xl space-y-2.5">
+              <div class="flex items-center gap-1.5 text-xs font-black text-brand-800">
+                <i class="fa-solid fa-building-columns text-brand-600"></i>
+                <span>Bank Account Details (Payouts & Settlement)</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Name</label>
+                  <input type="text" id="profBankName" required class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="e.g. State Bank of India">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Account Holder Name</label>
+                  <input type="text" id="profAccHolder" required class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="As per bank account">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Account Number</label>
+                <input type="text" id="profBankAcc" required class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Enter bank account no.">
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank IFSC Code</label>
+                <input type="text" id="profIfsc" required oninput="this.value = this.value.toUpperCase()" class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="SBIN0001234">
+              </div>
+            </div>
+
+            <button type="submit" id="saveProfBtn" class="w-full min-h-[44px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-md transition">
+              Update Profile & Bank Details
+            </button>
+          </form>
+        </div>
+
+        <button onclick="handleLogout()" class="w-full min-h-[44px] py-3 bg-red-50 hover:bg-red-100 text-rose-600 font-bold rounded-2xl text-xs border border-red-200 transition flex items-center justify-center gap-2 active:scale-98">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Logout From Fleet</span>
+        </button>
+      </section>
+
+    </main>
+
+    <!-- BOTTOM APP NAVIGATION -->
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] z-30 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+      <button onclick="switchTab('deliveries')" id="navBtn-deliveries" class="flex flex-col items-center gap-1 py-1 text-brand-600 transition flex-1 active:scale-90">
+        <i class="fa-solid fa-motorcycle text-lg"></i>
+        <span class="text-[10px] font-bold">Deliveries</span>
+      </button>
+      <button onclick="switchTab('earnings')" id="navBtn-earnings" class="flex flex-col items-center gap-1 py-1 text-slate-400 hover:text-slate-600 transition flex-1 active:scale-90">
+        <i class="fa-solid fa-wallet text-lg"></i>
+        <span class="text-[10px] font-bold">Earnings</span>
+      </button>
+      <button onclick="switchTab('profile')" id="navBtn-profile" class="flex flex-col items-center gap-1 py-1 text-slate-400 hover:text-slate-600 transition flex-1 active:scale-90">
+        <i class="fa-solid fa-user text-lg"></i>
+        <span class="text-[10px] font-bold">Profile</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- UPDATE LOCATION LINK MODAL -->
+  <div id="locationModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+        <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-location-crosshairs text-brand-500"></i> Location URL Link
+        </h3>
+        <button onclick="closeLocationModal()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-xs">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <input type="hidden" id="locModalOrderId">
+      <div class="space-y-2">
+        <label class="block text-xs font-bold text-slate-600">Manual Location URL</label>
+        <textarea id="locModalInput" rows="3" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Paste Google Maps live link..."></textarea>
+      </div>
+
+      <div class="flex gap-2">
+        <button type="button" onclick="closeLocationModal()" class="flex-1 min-h-[40px] py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs active:scale-95 transition">Cancel</button>
+        <button type="button" onclick="saveLocationLink()" id="saveLocBtn" class="flex-1 min-h-[40px] py-2.5 bg-brand-600 text-white font-bold rounded-xl text-xs active:scale-95 shadow-md transition">Send Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyABmYgOsai5ppKsAqxGr212nZiMu9tsCjo",
+      authDomain: "foodworldfixed.firebaseapp.com",
+      databaseURL: "https://foodworldfixed-default-rtdb.firebaseio.com",
+      projectId: "foodworldfixed",
+      storageBucket: "foodworldfixed.firebasestorage.app",
+      messagingSenderId: "357094358614",
+      appId: "1:357094358614:web:e405d802735e15f4fbc5f7"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+    let currentRider = null, unassignedTasks = {}, assignedOrders = {}, cachedRestaurants = {}, isRoleChecking = false;
+    let currentActiveTab = 'deliveries';
+    let knownBroadcastTaskIds = new Set();
+    let myTrackedActiveOrderIds = new Set();
+    let toastTimeout = null;
+    let audioCtx = null;
+    let wakeLockSentinel = null;
+
+    // ---------------- SCREEN WAKE LOCK (STAY AWAKE ON DUTY) ----------------
+    async function requestScreenWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLockSentinel = await navigator.wakeLock.request('screen');
+          document.getElementById('wakeLockBadge').classList.remove('hidden');
+          wakeLockSentinel.addEventListener('release', () => {
+            document.getElementById('wakeLockBadge').classList.add('hidden');
+          });
+        }
+      } catch (err) {
+        console.log("WakeLock error:", err);
+      }
+    }
+
+    function releaseScreenWakeLock() {
+      if (wakeLockSentinel) {
+        wakeLockSentinel.release().catch(() => {});
+        wakeLockSentinel = null;
+        document.getElementById('wakeLockBadge').classList.add('hidden');
+      }
+    }
+
+    // ---------------- SYSTEM VIBRATION ENGINE ----------------
+    function triggerRiderVibration() {
+      try {
+        if ("vibrate" in navigator) {
+          navigator.vibrate([300, 100, 300, 100, 500]);
+        }
+      } catch (e) {}
+    }
+
+    // ---------------- GLOBAL AUDIO UNLOCK CONTROLLER ----------------
+    function initGlobalAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+    }
+    window.addEventListener('click', initGlobalAudioContext, { once: true });
+    window.addEventListener('touchstart', initGlobalAudioContext, { once: true });
+
+    function playModernNotifChime() {
+      try {
+        initGlobalAudioContext();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1174.66, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+        
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.35);
+      } catch (e) {}
+    }
+
+    function playTaskBroadcastSound() {
+      try {
+        initGlobalAudioContext();
+        triggerRiderVibration();
+        if (!audioCtx) return;
+        for (let i = 0; i < 2; i++) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.setValueAtTime(700, audioCtx.currentTime + (i * 0.25));
+          osc.frequency.setValueAtTime(1050, audioCtx.currentTime + (i * 0.25) + 0.12);
+          gain.gain.setValueAtTime(0.35, audioCtx.currentTime + (i * 0.25));
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (i * 0.25) + 0.22);
+          osc.start(audioCtx.currentTime + (i * 0.25));
+          osc.stop(audioCtx.currentTime + (i * 0.25) + 0.22);
+        }
+      } catch (e) {}
+    }
+
+    function playCancelSound() {
+      try {
+        initGlobalAudioContext();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 0.4);
+        gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.4);
+      } catch (e) {}
+    }
+
+    // ---------------- FLOATING TOAST CONTROLLER ----------------
+    function showModernFloatingToast(title, message, iconClass = 'fa-solid fa-bell', isAlert = false) {
+      playModernNotifChime();
+      const toast = document.getElementById('modernFloatingToast');
+      const tagEl = document.getElementById('toastTag');
+      const bodyEl = document.getElementById('toastBody');
+      const iconBox = document.getElementById('toastIconBox');
+
+      tagEl.innerText = title;
+      bodyEl.innerText = message;
+      iconBox.innerHTML = `<i class="${iconClass}"></i>`;
+
+      if (isAlert) {
+        iconBox.className = "w-10 h-10 rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-base flex-shrink-0";
+      } else {
+        iconBox.className = "w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-base flex-shrink-0";
+      }
+
+      toast.classList.remove('hidden', 'toast-exit');
+      toast.classList.add('toast-enter');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        dismissFloatingToast();
+      }, 5000);
+    }
+
+    function dismissFloatingToast() {
+      const toast = document.getElementById('modernFloatingToast');
+      toast.classList.remove('toast-enter');
+      toast.classList.add('toast-exit');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 300);
+    }
+
+    function showOrderCancelledAlert(orderId, reason) {
+      playCancelSound();
+      document.getElementById('orderCancelledMsg').innerHTML = `Order <strong>#${orderId.slice(-6)}</strong> has been cancelled.<br><span class="text-[11px] text-slate-400">Reason: ${escapeHtml(reason || 'N/A')}</span>`;
+      document.getElementById('orderCancelledModal').classList.remove('hidden');
+    }
+
+    function dismissCancelledModal() {
+      document.getElementById('orderCancelledModal').classList.add('hidden');
+    }
+
+    // ---------------- FORGOT PASSWORD & RECOVERY ----------------
+    function openRiderForgotModal() {
+      const email = document.getElementById('loginEmail').value.trim();
+      if (email) document.getElementById('riderResetEmail').value = email;
+      document.getElementById('riderResetError').classList.add('hidden');
+      document.getElementById('riderForgotModal').classList.remove('hidden');
+    }
+
+    function closeRiderForgotModal() {
+      document.getElementById('riderForgotModal').classList.add('hidden');
+    }
+
+    function openRiderEmailSuccessModal(email) {
+      document.getElementById('riderSuccessEmailPreview').innerText = email;
+      document.getElementById('riderEmailSentSuccessModal').classList.remove('hidden');
+    }
+
+    function closeRiderEmailSuccessModal() {
+      document.getElementById('riderEmailSentSuccessModal').classList.add('hidden');
+    }
+
+    async function handleRiderPasswordReset(e) {
+      e.preventDefault();
+      const email = document.getElementById('riderResetEmail').value.trim();
+      const btn = document.getElementById('riderResetBtn');
+      const errBox = document.getElementById('riderResetError');
+      errBox.classList.add('hidden');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+      try {
+        const actionCodeSettings = {
+      url: 'https://foodworldgo.netlify.app/reset-password.html',
+      handleCodeInApp: true
+    };
+        await auth.sendPasswordResetEmail(email, actionCodeSettings);
+        closeRiderForgotModal();
+        showModernFloatingToast("Recovery Sent", `Verification link dispatched to ${email}`, "fa-solid fa-envelope-circle-check");
+        openRiderEmailSuccessModal(email);
+      } catch (err) {
+        errBox.innerText = err.message || "Failed to send reset link.";
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Send Link";
+      }
+    }
+
+    // ---------------- ANDROID HARDWARE BACK BUTTON LOGIC ----------------
+    function pushHistoryState() {
+      history.pushState({ app: 'foodworld_delivery' }, null, location.href);
+    }
+    pushHistoryState();
+
+    window.addEventListener('popstate', function () {
+      pushHistoryState();
+      handleHardwareBack();
+    });
+
+    function handleHardwareBack() {
+      const emailSentM = document.getElementById('riderEmailSentSuccessModal');
+      if (emailSentM && !emailSentM.classList.contains('hidden')) {
+        closeRiderEmailSuccessModal();
+        return;
+      }
+
+      const forgotM = document.getElementById('riderForgotModal');
+      if (forgotM && !forgotM.classList.contains('hidden')) {
+        closeRiderForgotModal();
+        return;
+      }
+
+      const otpM = document.getElementById('otpVerifyModal');
+      if (otpM && !otpM.classList.contains('hidden')) {
+        closeOtpModal();
+        return;
+      }
+
+      const succM = document.getElementById('deliverySuccessModal');
+      if (succM && !succM.classList.contains('hidden')) {
+        dismissSuccessModal();
+        return;
+      }
+
+      const cancelM = document.getElementById('orderCancelledModal');
+      if (cancelM && !cancelM.classList.contains('hidden')) {
+        dismissCancelledModal();
+        return;
+      }
+
+      const locM = document.getElementById('locationModal');
+      if (locM && !locM.classList.contains('hidden')) {
+        closeLocationModal();
+        return;
+      }
+
+      if (currentActiveTab !== 'deliveries') {
+        switchTab('deliveries');
+        return;
+      }
+
+      openExitAppModal();
+    }
+
+    function openExitAppModal() {
+      document.getElementById('exitAppModal').classList.remove('hidden');
+    }
+
+    function cancelExitApp() {
+      document.getElementById('exitAppModal').classList.add('hidden');
+      switchTab('deliveries');
+    }
+
+    function confirmExitApp() {
+      if (navigator.app && navigator.app.exitApp) {
+        navigator.app.exitApp();
+      } else if (navigator.device && navigator.device.exitApp) {
+        navigator.device.exitApp();
+      } else {
+        window.close();
+      }
+    }
+
+    // ---------------- GPS GEOLOCATION SHARING ----------------
+    function shareLiveGPS(orderId) {
+      if (!navigator.geolocation) { alert("GPS not supported."); return; }
+      const btn = document.getElementById(`gpsBtn_${orderId}`);
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Getting GPS...';
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const liveMapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+
+          try {
+            await db.ref(`orders/${orderId}`).update({
+              locationLink: liveMapUrl,
+              riderLat: lat,
+              riderLng: lng,
+              updatedAt: Date.now()
+            });
+            showModernFloatingToast("GPS Active", "Your real-time GPS location is live for customer.", "fa-solid fa-satellite-dish");
+          } catch (err) {
+            alert("Failed: " + err.message);
+          } finally {
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-satellite-dish text-emerald-300"></i> Update Live GPS';
+          }
+        },
+        (error) => {
+          if (btn) btn.innerHTML = '<i class="fa-solid fa-location-arrow"></i> Share Live GPS';
+          alert("Enable location permissions: " + error.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+
+    function toggleAuthMode(mode) {
+      const loginForm = document.getElementById('riderLoginForm');
+      const signupForm = document.getElementById('riderSignupForm');
+      const tabLogin = document.getElementById('authTabLogin');
+      const tabSignup = document.getElementById('authTabSignup');
+
+      if (mode === 'signup') {
+        loginForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+        tabSignup.classList.add('bg-white', 'text-brand-600', 'shadow-sm');
+        tabSignup.classList.remove('text-slate-500');
+        tabLogin.classList.remove('bg-white', 'text-brand-600', 'shadow-sm');
+        tabLogin.classList.add('text-slate-500');
+      } else {
+        signupForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+        tabLogin.classList.add('bg-white', 'text-brand-600', 'shadow-sm');
+        tabLogin.classList.remove('text-slate-500');
+        tabSignup.classList.remove('bg-white', 'text-brand-600', 'shadow-sm');
+        tabSignup.classList.add('text-slate-500');
+      }
+    }
+
+    async function handleRiderLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const btn = document.getElementById('loginBtn');
+      document.getElementById('loginError').classList.add('hidden');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+      } catch (err) {
+        document.getElementById('loginError').classList.remove('hidden');
+        document.getElementById('loginErrorMsg').innerText = err.message || 'Login failed.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Start Duty</span> <i class="fa-solid fa-arrow-right"></i>';
+      }
+    }
+
+    // REGISTRATION WITH MANDATORY BANK ACCOUNT DETAILS
+    async function handleRiderSignup(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const vehicle = document.getElementById('regVehicle').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      
+      const bankName = document.getElementById('regBankName').value.trim();
+      const accountHolderName = document.getElementById('regAccHolder').value.trim();
+      const bankAccountNo = document.getElementById('regBankAcc').value.trim();
+      const ifscCode = document.getElementById('regIfsc').value.trim().toUpperCase();
+
+      const btn = document.getElementById('signupBtn');
+      document.getElementById('signupError').classList.add('hidden');
+
+      if (!bankName || !accountHolderName || !bankAccountNo || !ifscCode) {
+        document.getElementById('signupError').classList.remove('hidden');
+        document.getElementById('signupErrorMsg').innerText = "All Bank Account details are mandatory for payouts.";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registering...';
+
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        await db.ref(`deliveryPartners/${userCredential.user.uid}`).set({
+          name,
+          email,
+          phone,
+          vehicle,
+          bankName,
+          accountHolderName,
+          bankAccountNo,
+          ifscCode,
+          approved: false,
+          online: true,
+          createdAt: Date.now()
+        });
+      } catch (err) {
+        document.getElementById('signupError').classList.remove('hidden');
+        document.getElementById('signupErrorMsg').innerText = err.message || 'Signup failed.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Apply as Delivery Partner</span> <i class="fa-solid fa-paper-plane"></i>';
+      }
+    }
+
+    function handleLogout() {
+      if (currentRider && currentRider.uid) {
+        db.ref(`deliveryPartners/${currentRider.uid}`).update({ online: false });
+      }
+      releaseScreenWakeLock();
+      auth.signOut().catch(err => alert("Logout error: " + err.message));
+    }
+
+    auth.onAuthStateChanged(async (user) => {
+      const splash = document.getElementById('splashScreen');
+      if (isRoleChecking) return;
+      if (user) {
+        isRoleChecking = true;
+        try {
+          const snap = await db.ref(`deliveryPartners/${user.uid}`).once('value');
+          if (!snap.exists()) {
+            await auth.signOut();
+            document.getElementById('loginError').classList.remove('hidden');
+            document.getElementById('loginErrorMsg').innerText = "Access Denied: Not registered as Delivery Partner.";
+            splash.classList.add('hidden');
+            return;
+          }
+          document.getElementById('authView').classList.add('hidden');
+          document.getElementById('appView').classList.remove('hidden');
+          listenToRiderData(user.uid);
+        } catch (err) {
+          await auth.signOut();
+        } finally {
+          isRoleChecking = false;
+          splash.classList.add('hidden');
+        }
+      } else {
+        document.getElementById('appView').classList.add('hidden');
+        document.getElementById('authView').classList.remove('hidden');
+        splash.classList.add('hidden');
+        currentRider = null;
+        releaseScreenWakeLock();
+        detachListeners();
+      }
+    });
+
+    function detachListeners() {
+      if (currentRider && currentRider.uid) {
+        db.ref(`deliveryPartners/${currentRider.uid}`).off();
+        db.ref('restaurants').off();
+        db.ref('unassignedOrders').off();
+        db.ref('orders').off();
+      }
+    }
+
+    function listenToRiderData(uid) {
+      db.ref(`deliveryPartners/${uid}`).on('value', snap => {
+        currentRider = snap.val() || {};
+        currentRider.uid = uid;
+
+        document.getElementById('topRiderName').innerText = currentRider.name || 'Rider';
+        document.getElementById('topVehicleInfo').innerText = currentRider.vehicle || 'Bike';
+
+        const pill = document.getElementById('riderApprovalPill');
+        const warn = document.getElementById('approvalWarningBanner');
+        if (currentRider.approved === true) {
+          pill.className = "px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800";
+          pill.innerText = "Verified";
+          warn.classList.add('hidden');
+        } else {
+          pill.className = "px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800";
+          pill.innerText = "Pending";
+          warn.classList.remove('hidden');
+        }
+
+        const isOnline = (currentRider.online !== false);
+        updateDutyBtnUI(isOnline);
+        if (isOnline) {
+          requestScreenWakeLock();
+        } else {
+          releaseScreenWakeLock();
+        }
+
+        document.getElementById('profName').value = currentRider.name || '';
+        document.getElementById('profEmail').value = currentRider.email || auth.currentUser?.email || '';
+        document.getElementById('profPhone').value = currentRider.phone || '';
+        document.getElementById('profVehicle').value = currentRider.vehicle || '';
+        
+        document.getElementById('profBankName').value = currentRider.bankName || '';
+        document.getElementById('profAccHolder').value = currentRider.accountHolderName || '';
+        document.getElementById('profBankAcc').value = currentRider.bankAccountNo || '';
+        document.getElementById('profIfsc').value = currentRider.ifscCode || '';
+      });
+
+      db.ref('restaurants').on('value', snap => {
+        cachedRestaurants = snap.val() || {};
+        renderAllDeliveryFeeds();
+      });
+
+      // 1. LISTEN TO LIGHTWEIGHT UNASSIGNED BROADCAST QUEUE
+      db.ref('unassignedOrders').on('value', snap => {
+        unassignedTasks = snap.val() || {};
+        checkNewBroadcastTasks();
+        renderAllDeliveryFeeds();
+      });
+
+      // 2. LISTEN ONLY TO MY ASSIGNED ORDERS (Privacy Safe & Fast)
+      db.ref('orders').orderByChild('deliveryUid').equalTo(uid).on('value', snap => {
+        assignedOrders = snap.val() || {};
+        checkAssignedOrderCancellations();
+        renderAllDeliveryFeeds();
+        renderEarningsAndTrips();
+      });
+    }
+
+    function checkNewBroadcastTasks() {
+      const isRiderEligible = currentRider && currentRider.approved === true && currentRider.online !== false;
+
+      Object.keys(unassignedTasks).forEach(id => {
+        const task = unassignedTasks[id];
+        if (!task) return;
+
+        const isRejectedByMe = task.rejectedRiders && task.rejectedRiders[currentRider?.uid];
+        
+        if (!isRejectedByMe && !knownBroadcastTaskIds.has(id)) {
+          if (isRiderEligible) {
+            playTaskBroadcastSound();
+            showModernFloatingToast("New Delivery Task!", `Order #${id.slice(-6)} available near you.`, "fa-solid fa-bolt");
+          }
+          knownBroadcastTaskIds.add(id);
+        }
+      });
+    }
+
+    function checkAssignedOrderCancellations() {
+      Object.keys(assignedOrders).forEach(id => {
+        const o = assignedOrders[id];
+        if (!o) return;
+
+        if (o.status !== 'CANCELLED' && o.status !== 'DELIVERED') {
+          myTrackedActiveOrderIds.add(id);
+        } else if (o.status === 'CANCELLED' && myTrackedActiveOrderIds.has(id)) {
+          myTrackedActiveOrderIds.delete(id);
+          showOrderCancelledAlert(id, o.cancelReason || 'Cancelled by customer/kitchen');
+        }
+      });
+    }
+
+    function toggleOnlineDuty() {
+      if (!currentRider) return;
+      const newStatus = !(currentRider.online !== false);
+      db.ref(`deliveryPartners/${currentRider.uid}`).update({ online: newStatus })
+        .then(() => {
+          if (newStatus) requestScreenWakeLock();
+          else releaseScreenWakeLock();
+        })
+        .catch(err => alert("Failed to change duty status: " + err.message));
+    }
+
+    function updateDutyBtnUI(isOnline) {
+      const btn = document.getElementById('dutyStatusBtn');
+      if (isOnline) {
+        btn.className = "min-h-[36px] px-3.5 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1.5 transition active:scale-95 shadow-xs bg-emerald-100 text-emerald-800";
+        btn.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online';
+      } else {
+        btn.className = "min-h-[36px] px-3.5 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1.5 transition active:scale-95 shadow-xs bg-slate-200 text-slate-700";
+        btn.innerHTML = '<span class="w-2 h-2 rounded-full bg-slate-500"></span> Offline';
+      }
+    }
+
+    // ==========================================
+    // TASK ACCEPTANCE (ATOMIC MULTI-PATH SYNC)
+    // ==========================================
+    async function acceptBroadcastTask(orderId) {
+      if (!currentRider) return;
+      if (currentRider.approved !== true) {
+        alert("⚠️ You must be verified by Super Admin before accepting tasks.");
+        return;
+      }
+      if (currentRider.online === false) {
+        alert("⚠️ You are currently Offline. Please go Online first.");
+        return;
+      }
+
+      const btn = document.getElementById(`acceptBtn_${orderId}`);
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locking...';
+      }
+
+      try {
+        const orderRef = db.ref(`orders/${orderId}`);
+        const result = await orderRef.transaction(currentOrder => {
+          if (!currentOrder) return currentOrder;
+          if (currentOrder.deliveryUid && currentOrder.deliveryUid !== "") return;
+          if (currentOrder.status === 'CANCELLED' || currentOrder.status === 'DELIVERED') return;
+          
+          currentOrder.deliveryUid = currentRider.uid;
+          currentOrder.updatedAt = Date.now();
+          return currentOrder;
+        });
+
+        if (result.committed && result.snapshot.exists() && result.snapshot.val().deliveryUid === currentRider.uid) {
+          // Remove from unassigned queue
+          await db.ref(`unassignedOrders/${orderId}`).remove();
+          showModernFloatingToast("Task Accepted!", `Order #${orderId.slice(-6)} is now assigned to you.`, "fa-solid fa-circle-check");
+          myTrackedActiveOrderIds.add(orderId);
+        } else {
+          showModernFloatingToast("Missed It!", "Another rider accepted this order first.", "fa-solid fa-triangle-exclamation", true);
+        }
+      } catch (err) {
+        alert("Acceptance failed: " + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-check text-emerald-600"></i> <span>Accept Task</span>';
+        }
+      }
+    }
+
+    async function rejectBroadcastTask(orderId) {
+      if (!currentRider) return;
+      if (!confirm(`Decline delivery request for Order #${orderId.slice(-6)}?`)) return;
+
+      try {
+        await db.ref(`unassignedOrders/${orderId}/rejectedRiders/${currentRider.uid}`).set(true);
+        showModernFloatingToast("Task Declined", `Order #${orderId.slice(-6)} removed from your feed.`, "fa-solid fa-xmark");
+        renderAllDeliveryFeeds();
+      } catch (err) {
+        alert("Action failed: " + err.message);
+      }
+    }
+
+    // ==========================================
+    // 4-DIGIT FOODWORLD OTP VERIFICATION
+    // ==========================================
+    function openOtpVerificationModal(orderId) {
+      document.getElementById('otpModalOrderId').value = orderId;
+      document.getElementById('otpInputCode').value = '';
+      document.getElementById('otpErrorMsg').classList.add('hidden');
+      document.getElementById('otpVerifyModal').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('otpInputCode').focus();
+      }, 200);
+    }
+
+    function closeOtpModal() {
+      document.getElementById('otpVerifyModal').classList.add('hidden');
+    }
+
+    async function confirmAndVerifyDeliveryOtp() {
+      const orderId = document.getElementById('otpModalOrderId').value;
+      const enteredCode = document.getElementById('otpInputCode').value.trim();
+      const errorMsg = document.getElementById('otpErrorMsg');
+      const verifyBtn = document.getElementById('verifyOtpBtn');
+
+      if (!enteredCode || enteredCode.length < 4) {
+        errorMsg.classList.remove('hidden');
+        errorMsg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> <span>Please enter 4-digit code.</span>';
+        return;
+      }
+
+      const order = assignedOrders[orderId];
+      if (!order) {
+        alert("Order data not found.");
+        return;
+      }
+
+      const correctOtp = String(order.deliveryOtp || '');
+      if (enteredCode !== correctOtp) {
+        errorMsg.classList.remove('hidden');
+        errorMsg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> <span>Invalid Code! Please check with customer.</span>';
+        return;
+      }
+
+      errorMsg.classList.add('hidden');
+      verifyBtn.disabled = true;
+      verifyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+
+      try {
+        await db.ref(`orders/${orderId}`).update({
+          status: 'DELIVERED',
+          verifiedDelivery: true,
+          verifiedOtp: enteredCode,
+          paymentStatus: order.paymentMethod === 'ONLINE' ? 'PAID_ONLINE' : 'PAID_COD',
+          deliveredAt: Date.now(),
+          updatedAt: Date.now()
+        });
+
+        closeOtpModal();
+        const isOnline = (order.paymentMethod === 'ONLINE');
+        document.getElementById('successPayModeLabel').innerText = isOnline ? "Prepaid Online (No Cash to Collect)" : "COD Cash Collected";
+        document.getElementById('successCodAmount').innerText = `₹${order.totalAmount || 0}`;
+        document.getElementById('deliverySuccessModal').classList.remove('hidden');
+        playModernNotifChime();
+      } catch (err) {
+        alert("Delivery update failed: " + err.message);
+      } finally {
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Verify & Deliver</span>';
+      }
+    }
+
+    function dismissSuccessModal() {
+      document.getElementById('deliverySuccessModal').classList.add('hidden');
+    }
+
+    function renderAllDeliveryFeeds() {
+      const openContainer = document.getElementById('openOrdersBroadcastList');
+      const assignedContainer = document.getElementById('assignedDeliveriesList');
+
+      const broadcastKeys = Object.keys(unassignedTasks).reverse();
+      const assignedKeys = Object.keys(assignedOrders).reverse();
+
+      let openCount = 0;
+      let activeAssignedCount = 0;
+      let codInHand = 0;
+
+      let openHtml = '';
+      let assignedHtml = '';
+
+      const isRiderOnline = currentRider && currentRider.online !== false;
+      const isRiderApproved = currentRider && currentRider.approved === true;
+
+      // Render Broadcast Queue
+      broadcastKeys.forEach(id => {
+        const task = unassignedTasks[id];
+        if (!task) return;
+
+        const isRejectedByMe = task.rejectedRiders && task.rejectedRiders[currentRider?.uid];
+        if (isRejectedByMe) return;
+
+        openCount++;
+        const isOnlinePay = (task.paymentMethod === 'ONLINE');
+
+        openHtml += `
+          <div class="bg-gradient-to-r from-orange-500 to-brand-600 text-white p-4 rounded-3xl shadow-lg space-y-3 pulse-broadcast">
+            <div class="flex items-center justify-between border-b border-white/20 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-300 animate-ping"></span>
+                <span class="font-mono font-black text-sm">#${id.slice(-6)}</span>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-white text-orange-600 shadow-xs">
+                ${isOnlinePay ? 'Prepaid (UPI)' : `COD ₹${task.totalAmount}`}
+              </span>
+            </div>
+
+            <div class="text-xs space-y-1 bg-black/15 p-2.5 rounded-2xl">
+              <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-utensils text-amber-200"></i> ${escapeHtml(task.restaurantName || 'Kitchen')}</p>
+              <p class="text-[11px] text-white/90 truncate"><i class="fa-solid fa-location-dot text-amber-200"></i> ${escapeHtml(task.restaurantAddress || 'Pickup address')}</p>
+              <p class="text-[11px] text-white/90 truncate"><i class="fa-solid fa-house text-emerald-200"></i> Drop: ${escapeHtml(task.customerAddress || 'Customer Location')}</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button onclick="rejectBroadcastTask('${id}')" class="min-h-[44px] py-2 bg-white/20 hover:bg-white/30 active:scale-95 text-white font-bold rounded-2xl text-xs flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-xmark"></i>
+                <span>Decline</span>
+              </button>
+              <button id="acceptBtn_${id}" onclick="acceptBroadcastTask('${id}')" ${(!isRiderOnline || !isRiderApproved) ? 'disabled' : ''} class="min-h-[44px] py-2 bg-white hover:bg-slate-100 active:scale-95 text-orange-600 font-black rounded-2xl text-xs shadow-md transition flex items-center justify-center gap-1.5 ${(!isRiderOnline || !isRiderApproved) ? 'opacity-60 cursor-not-allowed' : ''}">
+                <i class="fa-solid fa-check text-emerald-600"></i>
+                <span>Accept Task</span>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      // Render My Assigned Deliveries
+      assignedKeys.forEach(id => {
+        const o = assignedOrders[id];
+        if (!o) return;
+
+        const rest = cachedRestaurants[o.restaurantId] || {};
+        const restName = rest.name || 'Partner Kitchen';
+        const restAddr = rest.address || 'Restaurant address';
+        const restPhone = rest.phone || '';
+        const isOnlinePay = (o.paymentMethod === 'ONLINE');
+
+        if (o.status === 'DELIVERED') {
+          if (!isOnlinePay) codInHand += (Number(o.totalAmount) || 0);
+          return;
+        }
+
+        if (o.status === 'CANCELLED') {
+          assignedHtml += `
+            <div class="bg-rose-50 border border-rose-200 p-4 rounded-3xl space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-mono font-black text-rose-700">#${id.slice(-6)}</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-200 text-rose-800">CANCELLED</span>
+              </div>
+              <p class="text-xs font-bold text-rose-800"><i class="fa-solid fa-ban mr-1"></i> ${escapeHtml(o.cancelReason || 'Order cancelled by customer/kitchen')}</p>
+              <p class="text-[10px] text-slate-500">No further delivery required.</p>
+            </div>
+          `;
+          return;
+        }
+
+        activeAssignedCount++;
+
+        const restNavUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(restAddr)}`;
+        let customerNavUrl = "";
+        if (o.customerLat && o.customerLng) {
+          customerNavUrl = `https://www.google.com/maps/dir/?api=1&destination=${o.customerLat},${o.customerLng}`;
+        } else {
+          customerNavUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(o.address || '')}`;
+        }
+
+        let actionButtons = '';
+        if (o.status === 'READY_FOR_PICKUP') {
+          actionButtons = `
+            <button onclick="updateRiderOrderStatus('${id}', 'PICKED_UP')" class="w-full min-h-[48px] py-3.5 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-extrabold rounded-2xl text-xs shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-box-open text-sm"></i>
+              <span>Confirm Food Picked Up (Packed by Kitchen)</span>
+            </button>
+          `;
+        } else if (o.status === 'PLACED' || o.status === 'ACCEPTED' || o.status === 'PREPARING') {
+          actionButtons = `
+            <div class="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-center space-y-1">
+              <p class="text-xs font-black text-amber-900 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-fire-burner animate-pulse text-brand-600"></i>
+                <span>Kitchen Preparing Food...</span>
+              </p>
+              <p class="text-[10px] text-amber-700">Reach the restaurant. Pickup button will activate once food is packed.</p>
+            </div>
+          `;
+        } else if (o.status === 'PICKED_UP') {
+          actionButtons = `
+            <button onclick="updateRiderOrderStatus('${id}', 'OUT_FOR_DELIVERY')" class="w-full min-h-[48px] py-3.5 bg-amber-500 hover:bg-amber-600 active:scale-98 text-white font-extrabold rounded-2xl text-xs shadow-lg shadow-amber-500/30 transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-motorcycle text-sm"></i>
+              <span>Start Trip (Out for Delivery)</span>
+            </button>
+          `;
+        } else if (o.status === 'OUT_FOR_DELIVERY') {
+          actionButtons = `
+            <button onclick="openOtpVerificationModal('${id}')" class="w-full min-h-[48px] py-3.5 bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-extrabold rounded-2xl text-xs shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-shield-halved text-base text-amber-300"></i>
+              <span>Verify OTP & Deliver (${isOnlinePay ? 'Prepaid UPI' : `Collect ₹${o.totalAmount} Cash`})</span>
+            </button>
+          `;
+        }
+
+        assignedHtml += `
+          <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-md space-y-3.5">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span class="font-mono font-black text-slate-900 text-sm">Order #${id.slice(-6)}</span>
+                <p class="text-[10px] text-slate-400 font-mono">${new Date(o.createdAt || Date.now()).toLocaleTimeString()}</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-black ${isOnlinePay ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'}">
+                ${isOnlinePay ? 'Prepaid Online' : `COD ₹${o.totalAmount}`}
+              </span>
+            </div>
+
+            <!-- Stop 1: Pickup Kitchen -->
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase text-amber-700 bg-amber-100 px-2 py-0.5 rounded">1. Pickup Kitchen</span>
+                <div class="flex items-center gap-2">
+                  ${restPhone ? `<a href="tel:${escapeHtml(restPhone)}" class="min-h-[32px] px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs text-brand-600 font-bold flex items-center gap-1 active:scale-95"><i class="fa-solid fa-phone"></i> Call</a>` : ''}
+                  <a href="${restNavUrl}" target="_blank" class="min-h-[32px] px-2.5 py-1 bg-blue-600 text-white rounded-lg text-xs font-extrabold flex items-center gap-1 active:scale-95"><i class="fa-solid fa-location-arrow"></i> Navigate</a>
+                </div>
+              </div>
+              <h4 class="font-extrabold text-xs text-slate-900">${escapeHtml(restName)}</h4>
+              <p class="text-[11px] text-slate-500"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(restAddr)}</p>
+            </div>
+
+            <!-- Stop 2: Customer Drop -->
+            <div class="p-3 bg-brand-50/50 rounded-2xl border border-brand-100 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">2. Customer Drop</span>
+                <div class="flex items-center gap-2">
+                  ${o.phone ? `<a href="tel:${escapeHtml(o.phone)}" class="min-h-[32px] px-2.5 py-1 bg-white border border-emerald-200 rounded-lg text-xs text-emerald-700 font-bold flex items-center gap-1 active:scale-95"><i class="fa-solid fa-phone"></i> Call</a>` : ''}
+                  <a href="${customerNavUrl}" target="_blank" class="min-h-[32px] px-2.5 py-1 bg-blue-600 text-white rounded-lg text-xs font-extrabold flex items-center gap-1 active:scale-95"><i class="fa-solid fa-location-arrow"></i> Navigate</a>
+                </div>
+              </div>
+              <p class="text-xs font-bold text-slate-800"><i class="fa-solid fa-user text-slate-400 mr-1"></i> ${escapeHtml(o.phone || 'Customer')}</p>
+              <p class="text-[11px] text-slate-600"><i class="fa-solid fa-house text-brand-500 mr-1"></i> ${escapeHtml(o.address || 'Address provided')}</p>
+            </div>
+
+            <!-- Live GPS Broadcaster -->
+            <div class="p-3 rounded-2xl bg-slate-900 text-white space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-[10px] font-bold text-slate-400">Live GPS Tracking:</span>
+                <span class="text-[10px] font-extrabold ${o.locationLink ? 'text-emerald-400' : 'text-amber-400'}">
+                  ${o.locationLink ? '● GPS Connected' : '○ Not Shared Yet'}
+                </span>
+              </div>
+              <div class="flex gap-2">
+                <button type="button" id="gpsBtn_${id}" onclick="shareLiveGPS('${id}')" class="flex-1 min-h-[44px] py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-extrabold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md transition">
+                  <i class="fa-solid fa-satellite-dish"></i> <span>Share My Live GPS</span>
+                </button>
+                <button type="button" onclick="openLocationModal('${id}', '${escapeHtml(o.locationLink || '')}')" class="min-h-[44px] px-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 font-bold text-xs rounded-xl" title="Paste Custom URL">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="pt-1">${actionButtons}</div>
+          </div>
+        `;
+      });
+
+      document.getElementById('openBroadcastBadge').innerText = `${openCount} Open`;
+      document.getElementById('statAssignedCount').innerText = activeAssignedCount;
+      document.getElementById('activeTripsBadge').innerText = `${activeAssignedCount} Ongoing`;
+      document.getElementById('statCodCashInHand').innerText = `₹${codInHand.toLocaleString('en-IN')}`;
+
+      openContainer.innerHTML = openHtml || `
+        <div class="p-4 text-center text-slate-400 text-xs bg-orange-50/40 rounded-2xl border border-orange-100">
+          <i class="fa-solid fa-radar text-lg text-orange-400 mb-1"></i>
+          <p>Radar active: No unassigned orders right now.</p>
+        </div>
+      `;
+
+      assignedContainer.innerHTML = assignedHtml || `
+        <div class="p-6 text-center text-slate-400 text-xs bg-slate-50 rounded-2xl border border-slate-200">
+          <i class="fa-solid fa-box-open text-2xl text-slate-300 mb-1"></i>
+          <p>No active delivery tasks. Accept tasks from the live broadcast above!</p>
+        </div>
+      `;
+    }
+
+    function updateRiderOrderStatus(orderId, newStatus) {
+      db.ref(`orders/${orderId}`).update({ status: newStatus, updatedAt: Date.now() })
+        .then(() => {
+          showModernFloatingToast("Status Updated", `Order #${orderId.slice(-6)} set to ${newStatus}.`, "fa-solid fa-check");
+        })
+        .catch(err => alert("Failed to update status: " + err.message));
+    }
+
+    function openLocationModal(orderId, currentLink) {
+      document.getElementById('locModalOrderId').value = orderId;
+      document.getElementById('locModalInput').value = currentLink || '';
+      document.getElementById('locationModal').classList.remove('hidden');
+    }
+
+    function closeLocationModal() {
+      document.getElementById('locationModal').classList.add('hidden');
+    }
+
+    async function saveLocationLink() {
+      const orderId = document.getElementById('locModalOrderId').value;
+      const link = document.getElementById('locModalInput').value.trim();
+      const btn = document.getElementById('saveLocBtn');
+
+      btn.disabled = true;
+      try {
+        await db.ref(`orders/${orderId}`).update({ locationLink: link, updatedAt: Date.now() });
+        closeLocationModal();
+        showModernFloatingToast("Location Link Sent", "Custom live link saved.", "fa-solid fa-location-crosshairs");
+      } catch (err) {
+        alert('Failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function renderEarningsAndTrips() {
+      const assignedKeys = Object.keys(assignedOrders);
+      let totalCod = 0, completedTrips = 0, tripsHtml = '';
+
+      assignedKeys.reverse().forEach(id => {
+        const o = assignedOrders[id];
+        if (!o || o.status !== 'DELIVERED') return;
+
+        completedTrips++;
+        const amt = Number(o.totalAmount) || 0;
+        const isOnlinePay = (o.paymentMethod === 'ONLINE');
+        if (!isOnlinePay) totalCod += amt;
+
+        tripsHtml += `
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-mono font-black text-slate-800 text-xs">#${id.slice(-6)}</span>
+                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">OTP Delivered</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-mono mt-0.5">${new Date(o.createdAt || Date.now()).toLocaleDateString()} • ${escapeHtml(o.phone || 'Customer')}</p>
+            </div>
+            <span class="font-extrabold text-xs ${isOnlinePay ? 'text-blue-700' : 'text-emerald-700'}">${isOnlinePay ? 'Prepaid UPI' : `+₹${amt} COD`}</span>
+          </div>
+        `;
+      });
+
+      document.getElementById('earningTotalCod').innerText = `₹${totalCod.toLocaleString('en-IN')}`;
+      document.getElementById('earningCompletedTrips').innerText = `${completedTrips} orders`;
+      document.getElementById('deliveredTripsList').innerHTML = tripsHtml || '<p class="text-xs text-slate-400 text-center py-6 bg-slate-50 rounded-2xl border border-slate-200">No completed trips yet.</p>';
+    }
+
+    // PROFILE & MANDATORY BANK DETAILS UPDATE
+    async function handleUpdateProfile(e) {
+      e.preventDefault();
+      const name = document.getElementById('profName').value.trim();
+      const phone = document.getElementById('profPhone').value.trim();
+      const vehicle = document.getElementById('profVehicle').value.trim();
+      
+      const bankName = document.getElementById('profBankName').value.trim();
+      const accountHolderName = document.getElementById('profAccHolder').value.trim();
+      const bankAccountNo = document.getElementById('profBankAcc').value.trim();
+      const ifscCode = document.getElementById('profIfsc').value.trim().toUpperCase();
+      
+      const btn = document.getElementById('saveProfBtn');
+
+      if (!bankName || !accountHolderName || !bankAccountNo || !ifscCode) {
+        alert('Please fill all Bank Account details (Bank Name, Account Holder Name, Account No, IFSC).');
+        return;
+      }
+
+      btn.disabled = true;
+      try {
+        await db.ref(`deliveryPartners/${auth.currentUser.uid}`).update({ 
+          name, phone, vehicle, bankName, accountHolderName, bankAccountNo, ifscCode 
+        });
+        showModernFloatingToast("Profile & Bank Updated", "Your bank and profile details have been saved.", "fa-solid fa-circle-check");
+      } catch (err) {
+        alert('Update failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function switchTab(tabId) {
+      currentActiveTab = tabId;
+      ['deliveries', 'earnings', 'profile'].forEach(t => {
+        const sec = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`navBtn-${t}`);
+        if (t === tabId) {
+          sec.classList.remove('hidden');
+          btn.classList.add('text-brand-600');
+          btn.classList.remove('text-slate-400');
+        } else {
+          sec.classList.add('hidden');
+          btn.classList.remove('text-brand-600');
+          btn.classList.add('text-slate-400');
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>FoodWorld - Order Food Online</title>
+  <title>FoodWorldgo - Order Food Online</title>
 
   <!-- Tailwind CSS & FontAwesome Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -904,28 +904,32 @@
     }
 
     async function handleCustomerPasswordReset(e) {
-      e.preventDefault();
-      const email = document.getElementById('custResetEmail').value.trim();
-      const btn = document.getElementById('custResetBtn');
-      const errBox = document.getElementById('custResetError');
-      errBox.classList.add('hidden');
+  e.preventDefault();
+  const email = document.getElementById('custResetEmail').value.trim();
+  const btn = document.getElementById('custResetBtn');
+  const errBox = document.getElementById('custResetError');
+  errBox.classList.add('hidden');
 
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending link...';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending link...';
 
-      try {
-        await auth.sendPasswordResetEmail(email);
-        closeCustomerForgotModal();
-        showModernFloatingToast("Verification Sent!", `Password recovery mail sent to: ${email}`, "fa-solid fa-envelope-circle-check");
-        openCustEmailSuccessModal(email);
-      } catch (err) {
-        errBox.innerText = err.message || "Failed to send reset link.";
-        errBox.classList.remove('hidden');
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "Send Link";
-      }
-    }
+  try {
+   const actionCodeSettings = {
+      url: 'https://foodworldgo.netlify.app/reset-password.html',
+      handleCodeInApp: true
+    };
+    await auth.sendPasswordResetEmail(email, actionCodeSettings);
+    closeCustomerForgotModal();
+    showModernFloatingToast("Verification Sent!", `Password recovery mail sent to: ${email}`, "fa-solid fa-envelope-circle-check");
+    openCustEmailSuccessModal(email);
+  } catch (err) {
+    errBox.innerText = err.message || "Failed to send reset link.";
+    errBox.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "Send Link";
+  }
+}
 
     // ---------------- NOTIFICATION CENTER ----------------
     function toggleNotifCenter(show) {
