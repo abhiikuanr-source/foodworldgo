@@ -1,6 +1,22 @@
 {
+  "customer_version": "1.0.0",
+  "customer_apk": "https://foodworldgo.netlify.app/foodworld-customer.apk",
+  "customer_message": "Naye features aur fast speed ke liye Customer app update karein!",
+
+  "rider_version": "1.0.0",
+  "rider_apk": "https://foodworldgo.netlify.app/foodworld-rider.apk",
+  "rider_message": "Rider app ka naya version update karein!",
+
+  "restaurant_version": "1.0.0",
+  "restaurant_apk": "https://foodworldgo.netlify.app/foodworld-kitchen.apk",
+  "restaurant_message": "Kitchen app ka naya version update karein!",
+
+  "admin_version": "1.0.0",
+  "admin_apk": "https://foodworldgo.netlify.app/foodworld-admin.apk",
+  "admin_message": "Admin Command Center ka naya version update karein!",
+
   "latest_version": "1.0.0",
-  "update_url":
-  "https://foodworldgo.netlify.app/",
-  "message": "Naye features aur fast speed le liye update karein!"
+  "apk_url": "https://foodworldgo.netlify.app/foodworld-customer.apk",
+  "message": "Naye features aur fast speed ke liye app update karein!"
+}
 }
