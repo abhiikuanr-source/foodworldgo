@@ -43,7 +43,6 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* Modern Dynamic Toast Spring Animation */
     @keyframes toastSlideDown {
       0% { transform: translate(-50%, -100%) scale(0.9); opacity: 0; }
       60% { transform: translate(-50%, 10px) scale(1.02); opacity: 1; }
@@ -56,41 +55,18 @@
     .toast-enter { animation: toastSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .toast-exit { animation: toastSlideUp 0.3s ease-in forwards; }
 
-    /* FoodWorld Veg/Non-Veg Indicators */
     .veg-icon {
-      width: 14px;
-      height: 14px;
-      border: 1.5px solid #16a34a;
-      border-radius: 3px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: white;
+      width: 14px; height: 14px; border: 1.5px solid #16a34a; border-radius: 3px;
+      display: inline-flex; align-items: center; justify-content: center; background: white;
     }
-    .veg-icon::after {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: #16a34a;
-      border-radius: 50%;
-    }
+    .veg-icon::after { content: ''; width: 6px; height: 6px; background: #16a34a; border-radius: 50%; }
     .nonveg-icon {
-      width: 14px;
-      height: 14px;
-      border: 1.5px solid #dc2626;
-      border-radius: 3px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: white;
+      width: 14px; height: 14px; border: 1.5px solid #dc2626; border-radius: 3px;
+      display: inline-flex; align-items: center; justify-content: center; background: white;
     }
     .nonveg-icon::after {
-      content: '';
-      width: 0;
-      height: 0;
-      border-left: 4px solid transparent;
-      border-right: 4px solid transparent;
-      border-bottom: 7px solid #dc2626;
+      content: ''; width: 0; height: 0; border-left: 4px solid transparent;
+      border-right: 4px solid transparent; border-bottom: 7px solid #dc2626;
     }
 
     @keyframes pulse-kitchen {
@@ -98,9 +74,7 @@
       70% { box-shadow: 0 0 0 10px rgba(234, 88, 12, 0); }
       100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0); }
     }
-    .new-order-pulse {
-      animation: pulse-kitchen 1.5s infinite;
-    }
+    .new-order-pulse { animation: pulse-kitchen 1.5s infinite; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
@@ -227,7 +201,6 @@
         <p class="text-xs text-slate-500 mt-0.5">Kitchen & Menu Management Portal</p>
       </div>
 
-      <!-- Auth Switcher Tabs -->
       <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl mb-5 text-xs font-bold">
         <button type="button" onclick="toggleAuthMode('login')" id="authTabLogin" class="min-h-[40px] rounded-lg bg-white shadow-sm text-brand-600 transition active:scale-95">Partner Login</button>
         <button type="button" onclick="toggleAuthMode('signup')" id="authTabSignup" class="min-h-[40px] rounded-lg text-slate-500 hover:text-slate-800 transition active:scale-95">Register Kitchen</button>
@@ -304,7 +277,6 @@
             <i class="fa-solid fa-building-columns text-brand-600"></i>
             <span>Kitchen Bank Account (For Payouts)</span>
           </div>
-
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Name</label>
@@ -315,12 +287,10 @@
               <input type="text" id="regAccHolder" required class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Business / Personal Name">
             </div>
           </div>
-
           <div>
             <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Account Number</label>
             <input type="text" id="regBankAcc" required class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="11 to 16 digit account number">
           </div>
-
           <div>
             <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank IFSC Code</label>
             <input type="text" id="regIfsc" required oninput="this.value = this.value.toUpperCase()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="SBIN0001234">
@@ -328,7 +298,7 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Password</label>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Create Password</label>
           <input type="password" id="regPassword" minlength="6" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Min. 6 characters">
         </div>
 
@@ -426,7 +396,7 @@
             <h3 class="font-black text-slate-900 text-sm sm:text-base flex items-center gap-2">
               <i class="fa-solid fa-kitchen-set text-brand-600"></i> FoodWorld Kitchen Terminal (KOT)
             </h3>
-            <p class="text-[11px] text-slate-400">Accept orders, track chef checklist & coordinate with FoodWorld delivery riders</p>
+            <p class="text-[11px] text-slate-400">Accept orders, cook fresh dishes & coordinate with FoodWorld delivery fleet</p>
           </div>
 
           <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar">
@@ -569,7 +539,6 @@
                 <i class="fa-solid fa-building-columns text-brand-600"></i>
                 <span>Kitchen Bank Account Details (Payout Settlements)</span>
               </div>
-
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Name</label>
@@ -580,12 +549,10 @@
                   <input type="text" id="profAccHolder" required class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Name as per bank">
                 </div>
               </div>
-
               <div>
                 <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Account Number</label>
                 <input type="text" id="profBankAcc" required class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Bank account no.">
               </div>
-
               <div>
                 <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank IFSC Code</label>
                 <input type="text" id="profIfsc" required oninput="this.value = this.value.toUpperCase()" class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="HDFC0001234">
@@ -670,6 +637,17 @@
     </div>
   </div>
 
+  <!-- ================= UPDATE POPUP MODAL ================= -->
+  <div id="updateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
+    <div style="background:#1e1e1e; border:1px solid #333; padding:25px; border-radius:16px; width:85%; max-width:320px; text-align:center; color:#fff;">
+      <div style="font-size:36px; margin-bottom:10px;">👨‍🍳</div>
+      <h3 style="margin:0 0 10px; font-size:18px;">Kitchen App Update!</h3>
+      <p id="updateDesc" style="font-size:13px; color:#aaa; margin-bottom:20px;">Naye features aur fast order alert ke liye app update karein.</p>
+      <button id="btnUpdateNow" style="background:#ea580c; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">Update Now</button>
+      <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
+    </div>
+  </div>
+
   <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
     const firebaseConfig = {
@@ -693,6 +671,22 @@
     let toastTimeout = null;
     let audioCtx = null;
     let wakeLockSentinel = null;
+
+    // ---------------- SYSTEM PUSH NOTIFICATION REQUEST ----------------
+    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission().catch(() => {});
+    }
+
+    function sendSystemNotification(title, body) {
+      if ("Notification" in window && Notification.permission === "granted") {
+        try {
+          new Notification(title, { 
+            body, 
+            icon: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png" 
+          });
+        } catch(e) {}
+      }
+    }
 
     // ---------------- SCREEN WAKE LOCK (STAY AWAKE ON DUTY) ----------------
     async function requestScreenWakeLock() {
@@ -773,6 +767,7 @@
     // ---------------- FLOATING TOAST ----------------
     function showModernFloatingToast(title, message, iconClass = 'fa-solid fa-bell', isAlert = false) {
       playModernNotifChime();
+      sendSystemNotification(title, message);
       const toast = document.getElementById('modernFloatingToast');
       const tagEl = document.getElementById('toastTag');
       const bodyEl = document.getElementById('toastBody');
@@ -838,7 +833,11 @@
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
 
       try {
-        await auth.sendPasswordResetEmail(email);
+        const actionCodeSettings = {
+          url: 'https://foodworldgo.netlify.app/reset-password.html',
+          handleCodeInApp: true
+        };
+        await auth.sendPasswordResetEmail(email, actionCodeSettings);
         closePartnerForgotModal();
         showModernFloatingToast("Recovery Sent", `Password reset email dispatched to ${email}`, "fa-solid fa-envelope-circle-check");
         openPartnerEmailSuccessModal(email);
@@ -979,7 +978,6 @@
       }
     }
 
-    // SIGNUP WITH MANDATORY BANK DETAILS & URL IMAGE
     async function handlePartnerSignup(e) {
       e.preventDefault();
       const name = document.getElementById('regName').value.trim();
@@ -1141,9 +1139,11 @@
         renderOrdersFeed();
       });
 
-      db.ref('orders').orderByChild('restaurantId').equalTo(uid).on('value', snap => {
+      // SAFE SPARKLIMIT: Limit to last 50 orders using .indexOn
+      db.ref('orders').orderByChild('restaurantId').equalTo(uid).limitToLast(50).on('value', snap => {
         const orders = snap.val() || {};
         Object.keys(orders).forEach(id => {
+          // Play loud chime only when order is confirmed PLACED (not PAYMENT_PENDING)
           if (!knownOrderIds.has(id) && orders[id]?.status === 'PLACED') {
             playKitchenLoudChime();
             showModernFloatingToast("New Order!", `Order #${id.slice(-6)} received in kitchen.`, "fa-solid fa-bell-concierge");
@@ -1202,6 +1202,9 @@
       el.classList.toggle('text-slate-400');
     }
 
+    // ==========================================
+    // RENDER ORDERS (GHOST-ORDER PROTECTED)
+    // ==========================================
     function renderOrdersFeed() {
       const container = document.getElementById('ordersFeedContainer');
       const filter = document.getElementById('ordersFilterSelect').value;
@@ -1212,6 +1215,10 @@
       orderKeys.forEach(id => {
         const o = cachedOrders[id];
         if (!o) return;
+
+        // 🛑 GHOST-ORDER PROTECTION: Ignore unconfirmed / unpaid orders
+        if (o.status === 'PAYMENT_PENDING') return;
+
         const isClosed = o.status === 'DELIVERED' || o.status === 'CANCELLED';
         if (!isClosed) activeCount++;
 
@@ -1285,7 +1292,7 @@
         }
 
         html += `
-          <!-- FOODWORLD KITCHEN ORDER CARD -->
+          <!-- KITCHEN ORDER CARD -->
           <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-xs space-y-3.5 flex flex-col justify-between ${o.status === 'PLACED' ? 'new-order-pulse border-orange-300' : ''}">
             <div class="space-y-3">
               <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
@@ -1331,9 +1338,18 @@
 
               ${riderStatusHtml}
 
-              <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
-                <span class="font-bold text-slate-500">Payment: <strong class="${isOnlinePay ? 'text-blue-700' : 'text-emerald-700'} font-black">${isOnlinePay ? 'Prepaid UPI' : 'Cash on Delivery'}</strong></span>
-                <span class="font-black text-sm text-emerald-700">₹${o.totalAmount || 0}</span>
+              <!-- Payment Mode & Razorpay Status -->
+              <div class="p-2 rounded-xl bg-slate-50 border border-slate-100 text-xs flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-slate-500">Payment: <strong class="${isOnlinePay ? 'text-blue-700' : 'text-emerald-700'} font-black">${isOnlinePay ? 'Prepaid Online' : 'Cash on Delivery'}</strong></span>
+                  <span class="font-black text-sm text-emerald-700">₹${o.totalAmount || 0}</span>
+                </div>
+                ${o.razorpayPaymentId ? `
+                  <div class="text-[10px] font-mono text-blue-800 bg-blue-50 p-1.5 rounded-lg border border-blue-200 flex items-center justify-between">
+                    <span><i class="fa-solid fa-shield-halved mr-1"></i> Razorpay: <strong>${escapeHtml(o.razorpayPaymentId)}</strong></span>
+                    <span class="font-bold uppercase text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">Paid Online ✓</span>
+                  </div>
+                ` : ''}
               </div>
             </div>
 
@@ -1366,7 +1382,7 @@
         updates[`orders/${orderId}/cancelledBy`] = 'RESTAURANT';
         updates[`orders/${orderId}/cancelReason`] = 'Rejected by restaurant kitchen';
         updates[`orders/${orderId}/updatedAt`] = Date.now();
-        updates[`unassignedOrders/${orderId}`] = null; // Clean up broadcast queue
+        updates[`unassignedOrders/${orderId}`] = null;
 
         await db.ref().update(updates);
         showModernFloatingToast("Order Rejected", `Order #${orderId.slice(-6)} was rejected.`, "fa-solid fa-ban", true);
@@ -1376,7 +1392,7 @@
     }
 
     // ==========================================
-    // FOODWORLD MENU & FAST STOCK CONTROLLER
+    // MENU & STOCK CONTROLLER
     // ==========================================
     function renderMenuCards() {
       const container = document.getElementById('menuCardsContainer');
@@ -1386,7 +1402,7 @@
         container.innerHTML = `
           <div class="col-span-full p-8 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200 space-y-2">
             <i class="fa-solid fa-utensils text-2xl text-slate-300"></i>
-            <p>Your menu is empty. Click "+ Add New Dish" to enter dish photo URLs and list food items.</p>
+            <p>Your menu is empty. Click "+ Add New Dish" to list food items.</p>
           </div>
         `;
         return;
@@ -1531,13 +1547,17 @@
     function renderReports() {
       let totalOrders = 0, deliveredRev = 0, deliveredCount = 0, pendingRev = 0, pendingCount = 0, cancelledRev = 0, cancelledCount = 0;
       const orderKeys = Object.keys(cachedOrders);
-      totalOrders = orderKeys.length;
 
       let salesHtml = '';
 
       orderKeys.reverse().forEach(id => {
         const o = cachedOrders[id];
         if (!o) return;
+
+        // Skip raw unconfirmed orders
+        if (o.status === 'PAYMENT_PENDING') return;
+
+        totalOrders++;
         const amt = Number(o.totalAmount) || 0;
         const isOnlinePay = (o.paymentMethod === 'ONLINE');
 
@@ -1559,7 +1579,7 @@
               <div class="flex items-center gap-1.5">
                 <span class="font-mono font-black text-xs text-slate-800">#${id.slice(-6)}</span>
                 <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold ${o.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}">${o.status}</span>
-                <span class="text-[9px] font-bold ${isOnlinePay ? 'text-blue-700' : 'text-slate-500'}">(${isOnlinePay ? 'Prepaid UPI' : 'COD'})</span>
+                <span class="text-[9px] font-bold ${isOnlinePay ? 'text-blue-700' : 'text-slate-500'}">(${isOnlinePay ? 'Prepaid Online' : 'COD'})</span>
               </div>
               <p class="text-xs text-slate-700 truncate mt-0.5">${escapeHtml(itemsList)}</p>
               <p class="text-[10px] text-slate-400 font-mono">${new Date(o.createdAt || Date.now()).toLocaleDateString()} • ${escapeHtml(o.phone || 'Customer')}</p>
@@ -1580,7 +1600,7 @@
       document.getElementById('salesHistoryMobileFeed').innerHTML = salesHtml || `<div class="p-6 text-center text-slate-400 text-xs">No orders recorded yet.</div>`;
     }
 
-    // PROFILE & MANDATORY BANK DETAILS UPDATE (WITH DIRECT IMAGE URL)
+    // PROFILE & MANDATORY BANK DETAILS UPDATE
     async function handleUpdateProfile(e) {
       e.preventDefault();
       const name = document.getElementById('profName').value.trim();
@@ -1649,6 +1669,30 @@
       if (!str) return '';
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
+  </script>
+
+  <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
+  <script>
+    const CURRENT_APP_VERSION = "1.0.0";
+    async function checkForAppUpdate() {
+      try {
+        const response = await fetch("https://foodworldgo.netlify.app/version.json?t=" + new Date().getTime());
+        if (!response.ok) return;
+        const data = await response.json();
+        const serverVersion = data.restaurant_version || data.kitchen_version || data.latest_version;
+        if (serverVersion && serverVersion !== CURRENT_APP_VERSION) {
+          if (data.restaurant_message || data.message) {
+            document.getElementById("updateDesc").innerText = data.restaurant_message || data.message;
+          }
+          document.getElementById("updateModal").style.display = "flex";
+          document.getElementById("btnUpdateNow").onclick = function() {
+            const downloadUrl = data.restaurant_apk || data.apk_url;
+            if (downloadUrl) window.location.href = downloadUrl;
+          };
+        }
+      } catch (err) {}
+    }
+    window.addEventListener("DOMContentLoaded", checkForAppUpdate);
   </script>
 </body>
 </html>

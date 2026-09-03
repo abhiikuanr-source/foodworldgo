@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>FoodWorldgo - Order Food Online</title>
+  <title>FoodWorld - Order Food Online</title>
 
   <!-- Tailwind CSS & FontAwesome Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Razorpay Official Web Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
   <!-- Firebase Compat SDKs (App, Auth, Database) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -134,7 +137,7 @@
     </div>
   </div>
 
-  <!-- ================= 1. FORGOT PASSWORD MODAL ================= -->
+  <!-- ================= FORGOT PASSWORD MODAL ================= -->
   <div id="customerForgotModal" class="hidden fixed inset-0 z-[98] bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -153,7 +156,7 @@
       </div>
       
       <p class="text-xs text-slate-600 leading-relaxed">
-        Apna registered email address enter karein. Hum aapke email par password reset link bhejenge.
+        Apna registered email address enter karein. Hum aapke email par password reset verification link bhejenge.
       </p>
 
       <form onsubmit="handleCustomerPasswordReset(event)" class="space-y-3.5">
@@ -175,7 +178,7 @@
     </div>
   </div>
 
-  <!-- ================= 2. EMAIL SENT SUCCESS POPUP ================= -->
+  <!-- ================= EMAIL SENT SUCCESS POPUP ================= -->
   <div id="custEmailSentSuccessModal" class="hidden fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl space-y-4 text-center border border-emerald-200">
       <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
@@ -197,7 +200,7 @@
     </div>
   </div>
 
-  <!-- ================= 3. EXIT CONFIRMATION MODAL ================= -->
+  <!-- ================= EXIT CONFIRMATION MODAL ================= -->
   <div id="exitAppModal" class="hidden fixed inset-0 z-[99] bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl space-y-4 text-center">
       <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl mx-auto shadow-inner">
@@ -302,7 +305,7 @@
   <!-- ================= CUSTOMER APP VIEW ================= -->
   <div id="appView" class="hidden max-w-lg mx-auto bg-white min-h-screen relative shadow-2xl pb-safe flex flex-col">
 
-    <!-- Topbar Header with Bell Icon -->
+    <!-- Topbar Header with Live Address & Notifications Bell -->
     <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 py-3 flex items-center justify-between shadow-xs">
       <div class="flex items-center gap-2.5 overflow-hidden">
         <div class="w-9 h-9 rounded-xl bg-brand-500 text-white flex items-center justify-center font-black text-sm shadow-md shadow-brand-500/30 flex-shrink-0">
@@ -323,12 +326,12 @@
           <span id="notifBellBadge" class="hidden absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-brand-600 text-white font-extrabold text-[9px] flex items-center justify-center border-2 border-white animate-pulse">0</span>
         </button>
         <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-full text-[10px] font-black">
-          <i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Verified
+          <i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i> Live Razorpay
         </span>
       </div>
     </header>
 
-    <!-- MAIN VIEWS -->
+    <!-- MAIN APP VIEWS -->
     <main class="flex-1">
       
       <!-- ================= 1. HOME TAB ================= -->
@@ -341,7 +344,7 @@
         <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 to-brand-900 text-white p-4 sm:p-5 shadow-md">
           <div class="relative z-10 max-w-[70%]">
             <span class="px-2 py-0.5 bg-brand-500/90 rounded-md text-[9px] font-extrabold uppercase tracking-wide">Instant Delivery</span>
-            <h3 class="font-extrabold text-sm sm:text-base mt-1.5 leading-tight">Pay via UPI, Cards, or Cash on Delivery</h3>
+            <h3 class="font-extrabold text-sm sm:text-base mt-1.5 leading-tight">Pay via UPI (GPay/PhonePe), Cards or COD</h3>
             <p class="text-[10px] text-slate-300 mt-1">Superfast kitchen prep & live rider radar tracking.</p>
           </div>
           <i class="fa-solid fa-burger absolute -right-3 -bottom-3 text-7xl text-white/10 rotate-12"></i>
@@ -362,7 +365,6 @@
 
       <!-- ================= 2. RESTAURANT MENU INTERFACE ================= -->
       <section id="tab-menu" class="hidden min-h-screen bg-slate-50 flex flex-col pb-36">
-        
         <div class="bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 py-3 sticky top-0 z-20 shadow-xs flex items-center justify-between">
           <button onclick="closeRestaurantMenu()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 flex items-center justify-center text-slate-700 text-sm transition">
             <i class="fa-solid fa-arrow-left"></i>
@@ -392,7 +394,7 @@
           <div class="flex items-center gap-3 pt-2 border-t border-slate-100 text-[11px] font-bold text-slate-600">
             <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-brand-500"></i> 25-30 mins</span>
             <span class="text-slate-300">•</span>
-            <span class="text-emerald-700 flex items-center gap-1"><i class="fa-solid fa-wallet"></i> UPI & COD Accepted</span>
+            <span class="text-emerald-700 flex items-center gap-1"><i class="fa-solid fa-shield-halved"></i> 100% Secure Razorpay & COD</span>
           </div>
         </div>
 
@@ -428,8 +430,8 @@
       <!-- ================= 3. ORDERS TRACKING & HISTORY ================= -->
       <section id="tab-orders" class="hidden p-4 space-y-5">
         <div>
-          <h3 class="font-extrabold text-slate-900 text-base">Your Orders</h3>
-          <p class="text-[11px] text-slate-400">Live order status, rider GPS tracking & cancellation</p>
+          <h3 class="font-extrabold text-slate-900 text-base">Your Orders & Real-Time Tracking</h3>
+          <p class="text-[11px] text-slate-400">Live order status, rider GPS radar & OTP security</p>
         </div>
 
         <div class="space-y-3">
@@ -465,7 +467,7 @@
               <span class="px-2 py-0.5 rounded bg-brand-500/80 text-[9px] font-black uppercase tracking-wider">FoodWorld Official Helpdesk</span>
               <h4 class="font-extrabold text-sm sm:text-base mt-1" id="custSupportHours">24/7 Live Support</h4>
               <p class="text-[11px] text-slate-300 mt-1 leading-relaxed" id="custSupportDesc">
-                Have a question about your order, food quality, refund, or delivery? FoodWorld Helpdesk is here for you 24/7. Connect directly with our team or raise a ticket below for instant resolution!
+                Have a question about your order, food quality, refund, or delivery? FoodWorld Helpdesk is here for you 24/7.
               </p>
             </div>
           </div>
@@ -502,7 +504,7 @@
 
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">Related Order ID (Optional)</label>
-              <input type="text" id="ticketOrderId" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="e.g. #AB12CD (leave blank if general issue)">
+              <input type="text" id="ticketOrderId" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="e.g. #AB12CD">
             </div>
 
             <div>
@@ -607,7 +609,7 @@
     </nav>
   </div>
 
-  <!-- CHECKOUT MODAL -->
+  <!-- CHECKOUT MODAL (AUTOMATED RAZORPAY + COD) -->
   <div id="checkoutModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
       <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -654,33 +656,28 @@
 
             <label onclick="selectPaymentMethod('ONLINE')" id="payOptionONLINE" class="p-3 rounded-2xl border-2 border-slate-200 bg-slate-50/50 cursor-pointer flex flex-col justify-between transition">
               <div class="flex items-center justify-between">
-                <i class="fa-brands fa-google-pay text-blue-600 text-xl"></i>
+                <i class="fa-solid fa-shield-halved text-blue-600 text-base"></i>
                 <span id="radioCheckONLINE" class="w-4 h-4 rounded-full border-2 border-slate-300 hidden"></span>
               </div>
               <div class="mt-2">
-                <span class="block text-xs font-black text-slate-900">Online UPI / App</span>
-                <span class="block text-[9px] text-slate-500">GPay, PhonePe, Paytm</span>
+                <span class="block text-xs font-black text-slate-900">Online Payment</span>
+                <span class="block text-[9px] text-slate-500">UPI, GPay, PhonePe, Cards</span>
               </div>
             </label>
           </div>
         </div>
 
-        <div id="onlineUpiBox" class="hidden p-3.5 bg-blue-50 border border-blue-200 rounded-2xl space-y-2.5">
+        <!-- ONLINE PAYMENT DETAILS BANNER -->
+        <div id="onlineUpiBox" class="hidden p-3.5 bg-blue-50 border border-blue-200 rounded-2xl space-y-2">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-blue-900"><i class="fa-solid fa-qrcode mr-1"></i> Scan & Pay via UPI</span>
+            <span class="text-xs font-black text-blue-900 flex items-center gap-1.5">
+              <i class="fa-solid fa-lock text-blue-600"></i> 100% Secure Razorpay Checkout
+            </span>
             <span class="text-[10px] font-mono font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded" id="upiAmountTag">₹0</span>
           </div>
-          <div class="flex items-center gap-3">
-            <div class="w-20 h-20 bg-white p-1 rounded-xl border border-blue-200 flex items-center justify-center shadow-xs flex-shrink-0">
-              <img id="upiDynamicQr" src="" class="w-full h-full object-contain" alt="UPI QR">
-            </div>
-            <div class="min-w-0 flex-1 space-y-1.5">
-              <p class="text-[11px] text-slate-600 leading-tight">Pay instantly using any UPI app or scan the QR code.</p>
-              <a id="upiIntentBtn" href="#" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-xl text-[11px] font-black shadow-xs active:scale-95 transition">
-                <i class="fa-solid fa-mobile-screen-button"></i> Open UPI App
-              </a>
-            </div>
-          </div>
+          <p class="text-[11px] text-slate-600 leading-tight">
+            "Confirm & Place Order" दबाते ही सुरक्षित Razorpay विंडो खुलेगी जहाँ आप Google Pay, PhonePe, Paytm, नेटबैंकिंग या कार्ड से 1-क्लिक में पेमेंट कर सकते हैं।
+          </p>
         </div>
 
         <div class="space-y-1.5 text-xs bg-slate-50 p-3 rounded-2xl border border-slate-100">
@@ -736,8 +733,20 @@
       </div>
     </div>
   </div>
-<!-- ================= JAVASCRIPT LOGIC ================= -->
+
+  <!-- ================= UPDATE POPUP MODAL ================= -->
+  <div id="updateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
+    <div style="background:#1e1e1e; border:1px solid #333; padding:25px; border-radius:16px; width:85%; max-width:320px; text-align:center; color:#fff;">
+      <div style="font-size:36px; margin-bottom:10px;">🚀</div>
+      <h3 style="margin:0 0 10px; font-size:18px;">Naya Update Aaya Hai!</h3>
+      <p id="updateDesc" style="font-size:13px; color:#aaa; margin-bottom:20px;">Naye features ke liye app update karein.</p>
+      <button id="btnUpdateNow" style="background:#ff4757; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">Update Now</button>
+      <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
+    </div>
+  </div>
+<!-- ================= JAVASCRIPT LOGIC (100% GHOST-PROOF & SECURE) ================= -->
   <script>
+    // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyABmYgOsai5ppKsAqxGr212nZiMu9tsCjo",
       authDomain: "foodworldfixed.firebaseapp.com",
@@ -753,25 +762,45 @@
     const db = firebase.database();
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
+    // 2. LIVE BACKEND & RAZORPAY CONFIGURATION
     const DELIVERY_FEE = 30;
-    const OFFICIAL_UPI_ID = "sonukuanr2003-1@oksbi"; // Official UPI Handle
+    const BACKEND_URL = "https://foodworld-backend-8tss-zeta.vercel.app";
+    const RAZORPAY_KEY_ID = "rzp_live_TXVKN9bGeN4CAv";
 
-    let currentCustomer = null, cachedRestaurants = {}, cachedMenus = {}, cachedDeliveryBoys = {}, cachedOrders = {};
+    // 3. STATE VARIABLES
+    let currentCustomer = null;
+    let cachedRestaurants = {}, cachedMenus = {}, cachedDeliveryBoys = {}, cachedOrders = {};
     let cachedBroadcasts = {}, cachedMyTickets = {}, cachedSupportConfig = {};
     let activeRestaurantId = null, cart = {}, selectedRatingStars = 5, isRoleChecking = false;
     let customerLat = null, customerLng = null;
     let currentAppTab = 'home';
     let currentVegFilter = 'ALL';
-    let currentPaymentMethod = 'COD';
+    let currentPaymentMethod = 'ONLINE'; // By default Online
     let knownNotifIds = new Set();
     let toastTimeout = null;
     let audioCtx = null;
+
+    // ---------------- SYSTEM PUSH NOTIFICATION REQUEST ----------------
+    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission().catch(() => {});
+    }
+
+    function sendSystemNotification(title, body) {
+      if ("Notification" in window && Notification.permission === "granted") {
+        try {
+          new Notification(title, { 
+            body, 
+            icon: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png" 
+          });
+        } catch(e) {}
+      }
+    }
 
     // ---------------- 4-DIGIT UNIQUE DELIVERY OTP GENERATOR ----------------
     function generateDeliveryOtp() {
       const array = new Uint32Array(1);
       window.crypto.getRandomValues(array);
-      return (1000 + (array[0] % 9000)).toString(); // Generates 1000 - 9999
+      return (1000 + (array[0] % 9000)).toString(); // 1000 - 9999
     }
 
     // ---------------- GLOBAL AUDIO UNLOCK CONTROLLER ----------------
@@ -803,9 +832,10 @@
       } catch (e) {}
     }
 
-    // ---------------- DYNAMIC FLOATING TOAST CONTROLLER ----------------
+    // ---------------- FLOATING TOAST CONTROLLER ----------------
     function showModernFloatingToast(title, message, iconClass = 'fa-solid fa-bell', isAlert = false) {
       playModernNotifChime();
+      sendSystemNotification(title, message);
       const toast = document.getElementById('modernFloatingToast');
       const tagEl = document.getElementById('toastTag');
       const bodyEl = document.getElementById('toastBody');
@@ -839,7 +869,7 @@
       }, 300);
     }
 
-    // ---------------- PAYMENT METHOD SELECTOR & DYNAMIC UPI QR ----------------
+    // ---------------- PAYMENT METHOD SELECTOR ----------------
     function selectPaymentMethod(method) {
       currentPaymentMethod = method;
       const optCOD = document.getElementById('payOptionCOD');
@@ -862,12 +892,7 @@
         checkCOD.className = "w-4 h-4 rounded-full border-2 border-slate-300 hidden";
         checkCOD.innerHTML = '';
 
-        // Generate dynamic UPI intent & QR
         document.getElementById('upiAmountTag').innerText = `₹${grandTotal}`;
-        const upiString = `upi://pay?pa=${encodeURIComponent(OFFICIAL_UPI_ID)}&pn=FoodWorld&am=${grandTotal}&cu=INR&tn=FoodWorldOrder`;
-        document.getElementById('upiDynamicQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
-        document.getElementById('upiIntentBtn').href = upiString;
-
         onlineBox.classList.remove('hidden');
       } else {
         optCOD.className = "p-3 rounded-2xl border-2 border-brand-500 bg-brand-50/50 cursor-pointer flex flex-col justify-between transition";
@@ -882,7 +907,7 @@
       }
     }
 
-    // ---------------- FORGOT PASSWORD & RECOVERY CONTROLLERS ----------------
+    // ---------------- FORGOT PASSWORD & RECOVERY ----------------
     function openCustomerForgotModal() {
       const email = document.getElementById('loginEmail').value.trim();
       if (email) document.getElementById('custResetEmail').value = email;
@@ -904,32 +929,32 @@
     }
 
     async function handleCustomerPasswordReset(e) {
-  e.preventDefault();
-  const email = document.getElementById('custResetEmail').value.trim();
-  const btn = document.getElementById('custResetBtn');
-  const errBox = document.getElementById('custResetError');
-  errBox.classList.add('hidden');
+      e.preventDefault();
+      const email = document.getElementById('custResetEmail').value.trim();
+      const btn = document.getElementById('custResetBtn');
+      const errBox = document.getElementById('custResetError');
+      errBox.classList.add('hidden');
 
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending link...';
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending link...';
 
-  try {
-   const actionCodeSettings = {
-      url: 'https://foodworldgo.netlify.app/reset-password.html',
-      handleCodeInApp: true
-    };
-    await auth.sendPasswordResetEmail(email, actionCodeSettings);
-    closeCustomerForgotModal();
-    showModernFloatingToast("Verification Sent!", `Password recovery mail sent to: ${email}`, "fa-solid fa-envelope-circle-check");
-    openCustEmailSuccessModal(email);
-  } catch (err) {
-    errBox.innerText = err.message || "Failed to send reset link.";
-    errBox.classList.remove('hidden');
-  } finally {
-    btn.disabled = false;
-    btn.innerText = "Send Link";
-  }
-}
+      try {
+        const actionCodeSettings = {
+          url: 'https://foodworldgo.netlify.app/reset-password.html',
+          handleCodeInApp: true
+        };
+        await auth.sendPasswordResetEmail(email, actionCodeSettings);
+        closeCustomerForgotModal();
+        showModernFloatingToast("Verification Sent!", `Password recovery mail sent to: ${email}`, "fa-solid fa-envelope-circle-check");
+        openCustEmailSuccessModal(email);
+      } catch (err) {
+        errBox.innerText = err.message || "Failed to send reset link.";
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Send Link";
+      }
+    }
 
     // ---------------- NOTIFICATION CENTER ----------------
     function toggleNotifCenter(show) {
@@ -1078,6 +1103,7 @@
       );
     }
 
+    // ---------------- AUTHENTICATION HANDLERS ----------------
     function toggleAuthMode(mode) {
       const loginForm = document.getElementById('loginForm');
       const signupForm = document.getElementById('signupForm');
@@ -1153,6 +1179,7 @@
       auth.signOut().catch(err => alert("Logout error: " + err.message)); 
     }
 
+    // ---------------- AUTH STATE LISTENER & ROLE VALIDATOR ----------------
     auth.onAuthStateChanged(async (user) => {
       const splash = document.getElementById('splashScreen');
       if (isRoleChecking) return;
@@ -1221,22 +1248,26 @@
     }
 
     function initAppListeners() {
+      // 1. Approved Kitchens Listener
       db.ref('restaurants').on('value', snap => {
         cachedRestaurants = snap.val() || {};
         renderRestaurantsList();
       });
 
+      // 2. Delivery Riders Listener
       db.ref('deliveryPartners').on('value', snap => {
         cachedDeliveryBoys = snap.val() || {};
         renderOrdersList();
       });
 
-      db.ref('orders').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').on('value', snap => {
+      // 3. Customer Specific Orders Listener (Safe Spark quota with limitToLast(20))
+      db.ref('orders').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').limitToLast(20).on('value', snap => {
         cachedOrders = snap.val() || {};
         renderOrdersList();
       });
 
-      db.ref('admin/notifications').on('value', snap => {
+      // 4. Admin Push Broadcasts Listener
+      db.ref('admin/notifications').limitToLast(10).on('value', snap => {
         cachedBroadcasts = snap.val() || {};
         const keys = Object.keys(cachedBroadcasts);
         
@@ -1253,12 +1284,13 @@
         }
       });
 
+      // 5. Helpdesk Settings
       db.ref('settings/support').on('value', snap => {
         cachedSupportConfig = snap.val() || {};
         const phone = cachedSupportConfig.phone || '+91 9876543210';
         const whatsapp = cachedSupportConfig.whatsapp || '919876543210';
         const hours = cachedSupportConfig.hours || '24/7 Live Support';
-        const desc = cachedSupportConfig.description || 'Have an issue with your food or delivery? FoodWorld Helpdesk is here for you 24/7. Connect directly with our team or raise a ticket below for instant resolution!';
+        const desc = cachedSupportConfig.description || 'Have an issue with your food or delivery? FoodWorld Helpdesk is here for you 24/7.';
 
         document.getElementById('custSupportHours').innerText = hours;
         document.getElementById('custSupportDesc').innerText = desc;
@@ -1267,7 +1299,8 @@
         document.getElementById('custSupportWaLink').href = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello FoodWorld Support, I need assistance with my order.')}`;
       });
 
-      db.ref('supportTickets').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').on('value', snap => {
+      // 6. My Support Tickets
+      db.ref('supportTickets').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').limitToLast(10).on('value', snap => {
         cachedMyTickets = snap.val() || {};
         renderMyTicketsList();
       });
@@ -1385,7 +1418,7 @@
               <div class="flex items-center gap-2 mt-1.5 text-[10px] font-bold text-slate-500">
                 <span><i class="fa-solid fa-clock text-brand-500"></i> 25-35 min</span>
                 <span>•</span>
-                <span class="text-emerald-700"><i class="fa-solid fa-wallet"></i> UPI / COD</span>
+                <span class="text-emerald-700"><i class="fa-solid fa-shield-halved"></i> Razorpay / COD</span>
               </div>
             </div>
           </div>
@@ -1484,27 +1517,20 @@
         const imgUrl = item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80';
 
         html += `
-          <!-- FOODWORLD DISH CARD -->
           <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex justify-between gap-3 relative">
             <div class="flex-1 min-w-0 pr-2">
               <div class="flex items-center gap-1.5 mb-1">
                 <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'}" title="${isNonVeg ? 'Non-Vegetarian' : 'Vegetarian'}"></span>
-                <span class="px-1.5 py-0.2 rounded bg-amber-50 border border-amber-200 text-amber-800 text-[9px] font-extrabold">
-                  ★ 4.5
-                </span>
+                <span class="px-1.5 py-0.2 rounded bg-amber-50 border border-amber-200 text-amber-800 text-[9px] font-extrabold">★ 4.5</span>
               </div>
-
               <h5 class="font-extrabold text-sm text-slate-900 leading-snug">${escapeHtml(name)}</h5>
               <p class="text-xs font-black text-slate-900 mt-1">₹${item.price}</p>
-              
               <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed font-medium">
                 ${escapeHtml(desc || 'Delicious food freshly prepared by kitchen.')}
               </p>
             </div>
-
             <div class="relative flex flex-col items-center flex-shrink-0 w-28 h-28">
               <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(name)}" class="w-full h-full rounded-2xl object-cover border border-slate-100 shadow-xs" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80'">
-              
               <div class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 shadow-lg rounded-xl z-10">
                 ${qty === 0 ? `
                   <button onclick="addToCart('${restId}', '${itemId}')" class="min-w-[84px] h-[34px] bg-white hover:bg-orange-50 active:scale-95 text-brand-600 border-2 border-brand-500/40 rounded-xl text-xs font-black flex items-center justify-center gap-1 shadow-md transition">
@@ -1606,7 +1632,7 @@
       document.getElementById('checkoutSubtotal').innerText = `₹${subtotal}`;
       document.getElementById('checkoutGrandTotal').innerText = `₹${subtotal + DELIVERY_FEE}`;
       
-      selectPaymentMethod('COD'); // Default method
+      selectPaymentMethod('ONLINE');
       document.getElementById('checkoutModal').classList.remove('hidden');
     }
 
@@ -1614,10 +1640,12 @@
       document.getElementById('checkoutModal').classList.add('hidden');
     }
 
-    // MULTI-PATH ATOMIC ORDER PLACEMENT ENGINE
+    // =========================================================
+    // 100% GHOST-PROOF ORDER PLACEMENT (RAZORPAY + COD)
+    // =========================================================
     async function placeCustomerOrder() {
       if (!currentCustomer?.address || !currentCustomer?.phone) {
-        alert('Please update delivery address & phone in profile.');
+        alert('कृपया प्रोफाइल में अपना पता और फ़ोन नंबर अपडेट करें.');
         closeCheckoutModal();
         switchAppTab('profile');
         return;
@@ -1631,6 +1659,7 @@
       let calculatedItemsTotal = 0;
       const verifiedItemsArray = [];
 
+      // Anti-Tamper check against live menu cache
       for (const k of keys) {
         const cartItem = cart[k];
         const menuItem = cachedMenus[restId]?.[cartItem.itemId];
@@ -1647,65 +1676,215 @@
 
       const grandTotal = calculatedItemsTotal + DELIVERY_FEE;
       const uniqueOtp = generateDeliveryOtp();
+      const newOrderKey = db.ref('orders').push().key;
 
       const btn = document.getElementById('placeOrderBtn');
+
+      // -------------------------------------------------------------
+      // 1. CASH ON DELIVERY (COD) FLOW
+      // -------------------------------------------------------------
+      if (currentPaymentMethod === 'COD') {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ऑर्डर भेजा जा रहा है...';
+
+        try {
+          await saveOrderToFirebase({
+            orderId: newOrderKey,
+            restId,
+            rest,
+            items: verifiedItemsArray,
+            itemTotal: calculatedItemsTotal,
+            grandTotal,
+            uniqueOtp,
+            paymentMethod: 'COD',
+            paymentStatus: 'PENDING_CASH',
+            orderStatus: 'PLACED',
+            razorpayPaymentId: null
+          });
+
+          // unassignedOrders में डालें ताकि राइडर्स स्वीकार कर सकें
+          await db.ref(`unassignedOrders/${newOrderKey}`).set({
+            orderId: newOrderKey,
+            restaurantId: restId,
+            restaurantName: rest.name || 'Kitchen',
+            restaurantAddress: rest.address || 'Address',
+            customerAddress: currentCustomer.address,
+            totalAmount: grandTotal,
+            paymentMethod: 'COD',
+            createdAt: Date.now()
+          });
+
+          // 🔥 सुरक्षित बैकएंड पुश नोटिफिकेशन ट्रिगर (Serverless)
+          fetch(`${BACKEND_URL}/api/send-order-push`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: newOrderKey,
+              restaurantId: restId,
+              totalAmount: grandTotal
+            })
+          }).catch(e => console.log("Push trigger non-blocking:", e));
+
+          cart = {};
+          updateCartFloatingBar();
+          closeCheckoutModal();
+          closeRestaurantMenu();
+          switchAppTab('orders');
+          showModernFloatingToast("ऑर्डर दर्ज हुआ!", "आपका COD ऑर्डर सफलतापूर्वक किचन में भेज दिया गया है.", "fa-solid fa-circle-check");
+        } catch (err) {
+          alert("Order placement failed: " + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<span>Confirm & Place Order</span> <i class="fa-solid fa-arrow-right"></i>';
+        }
+        return;
+      }
+
+      // -------------------------------------------------------------
+      // 2. 100% GHOST-PROOF ONLINE PAYMENT (RAZORPAY)
+      // -------------------------------------------------------------
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Placing Order...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> सुरक्षित पेमेंट शुरू हो रही है...';
 
       try {
-        const newOrderKey = db.ref('orders').push().key;
-
-        const orderData = {
-          customerUid: currentCustomer.uid,
-          restaurantId: restId,
-          deliveryUid: "",
+        // 🛑 STEP A: Razorpay popup खुलने से पहले ही Firebase में save करें (Ghost-Proof)
+        await saveOrderToFirebase({
+          orderId: newOrderKey,
+          restId,
+          rest,
           items: verifiedItemsArray,
           itemTotal: calculatedItemsTotal,
-          deliveryFee: DELIVERY_FEE,
-          totalAmount: grandTotal,
-          paymentMethod: currentPaymentMethod,
-          paymentStatus: currentPaymentMethod === 'ONLINE' ? 'PAID_ONLINE' : 'PENDING_CASH',
-          address: currentCustomer.address,
-          customerLat: customerLat || null,
-          customerLng: customerLng || null,
-          phone: currentCustomer.phone,
-          status: "PLACED",
-          locationLink: "",
-          deliveryOtp: uniqueOtp,
-          verifiedDelivery: false,
-          createdAt: Date.now(),
-          updatedAt: Date.now()
+          grandTotal,
+          uniqueOtp,
+          paymentMethod: 'ONLINE',
+          paymentStatus: 'PENDING_ONLINE',
+          orderStatus: 'PAYMENT_PENDING', // 👈 सिर्फ pending status
+          razorpayPaymentId: null
+        });
+
+        // 🛑 STEP B: Vercel से Razorpay Order ID मंगवाएं
+        const orderRes = await fetch(`${BACKEND_URL}/api/create-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: grandTotal,
+            receipt: newOrderKey
+          })
+        });
+
+        const rzpOrder = await orderRes.json();
+        if (!rzpOrder.id) throw new Error(rzpOrder.error || "Order ID generation failed");
+
+        // Firebase में Razorpay Order ID लिंक करें ताकि Webhook तुरंत पहचान सके
+        await db.ref(`orders/${newOrderKey}`).update({
+          razorpayOrderId: rzpOrder.id
+        });
+
+        // 🛑 STEP C: Razorpay Popup खोलें
+        const options = {
+          "key": RAZORPAY_KEY_ID,
+          "amount": rzpOrder.amount,
+          "currency": "INR",
+          "name": "FoodWorld",
+          "description": `Food Order #${newOrderKey.slice(-6)}`,
+          "order_id": rzpOrder.id,
+          "handler": async function (response) {
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> पेमेंट कन्फर्म हो रही है...';
+
+            // Payment successful होने पर status को PLACED करें
+            await db.ref(`orders/${newOrderKey}`).update({
+              status: 'PLACED',
+              paymentStatus: 'PAID_ONLINE',
+              razorpayPaymentId: response.razorpay_payment_id,
+              updatedAt: Date.now()
+            });
+
+            // Riders को broadcast task भेजें
+            await db.ref(`unassignedOrders/${newOrderKey}`).set({
+              orderId: newOrderKey,
+              restaurantId: restId,
+              restaurantName: rest.name || 'Kitchen',
+              restaurantAddress: rest.address || 'Address',
+              customerAddress: currentCustomer.address,
+              totalAmount: grandTotal,
+              paymentMethod: 'ONLINE',
+              razorpayPaymentId: response.razorpay_payment_id,
+              createdAt: Date.now()
+            });
+
+            // 🔥 सुरक्षित बैकएंड पुश नोटिफिकेशन ट्रिगर (Serverless)
+            fetch(`${BACKEND_URL}/api/send-order-push`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                orderId: newOrderKey,
+                restaurantId: restId,
+                totalAmount: grandTotal
+              })
+            }).catch(e => console.log("Push trigger non-blocking:", e));
+
+            cart = {};
+            updateCartFloatingBar();
+            closeCheckoutModal();
+            closeRestaurantMenu();
+            switchAppTab('orders');
+            showModernFloatingToast("पेमेंट सफल!", `ऑर्डर किचन में पहुँच चुका है!`, "fa-solid fa-circle-check");
+          },
+          "prefill": {
+            "name": currentCustomer.name || "Customer",
+            "email": currentCustomer.email || "customer@foodworld.com",
+            "contact": currentCustomer.phone || ""
+          },
+          "theme": { "color": "#ea580c" },
+          "modal": {
+            "ondismiss": async function() {
+              // अगर कस्टमर पॉपअप बिना पेमेंट के काट दे
+              btn.disabled = false;
+              btn.innerHTML = '<span>Confirm & Place Order</span> <i class="fa-solid fa-arrow-right"></i>';
+              
+              await db.ref(`orders/${newOrderKey}`).update({
+                status: 'CANCELLED',
+                cancelReason: 'Customer closed payment window without paying'
+              });
+            }
+          }
         };
 
-        const unassignedData = {
-          orderId: newOrderKey,
-          restaurantId: restId,
-          restaurantName: rest.name || 'Kitchen',
-          restaurantAddress: rest.address || 'Address',
-          customerAddress: currentCustomer.address,
-          totalAmount: grandTotal,
-          paymentMethod: currentPaymentMethod,
-          createdAt: Date.now()
-        };
+        const rzp = new Razorpay(options);
+        rzp.open();
 
-        const updates = {};
-        updates[`orders/${newOrderKey}`] = orderData;
-        updates[`unassignedOrders/${newOrderKey}`] = unassignedData;
-
-        await db.ref().update(updates);
-
-        cart = {};
-        updateCartFloatingBar();
-        closeCheckoutModal();
-        closeRestaurantMenu();
-        switchAppTab('orders');
-        showModernFloatingToast("Order Dispatched!", `FoodWorld Delivery OTP: ${uniqueOtp}`, "fa-solid fa-shield-halved");
       } catch (err) {
-        alert('Order placement failed: ' + err.message);
-      } finally {
+        alert("Payment Error: " + err.message);
         btn.disabled = false;
         btn.innerHTML = '<span>Confirm & Place Order</span> <i class="fa-solid fa-arrow-right"></i>';
       }
+    }
+
+    async function saveOrderToFirebase(data) {
+      const orderData = {
+        customerUid: currentCustomer.uid,
+        restaurantId: data.restId,
+        deliveryUid: "",
+        items: data.items,
+        itemTotal: data.itemTotal,
+        deliveryFee: DELIVERY_FEE,
+        totalAmount: data.grandTotal,
+        paymentMethod: data.paymentMethod,
+        paymentStatus: data.paymentStatus,
+        razorpayPaymentId: data.razorpayPaymentId || null,
+        address: currentCustomer.address,
+        customerLat: customerLat || null,
+        customerLng: customerLng || null,
+        phone: currentCustomer.phone,
+        status: data.orderStatus, // PAYMENT_PENDING या PLACED
+        locationLink: "",
+        deliveryOtp: data.uniqueOtp,
+        verifiedDelivery: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      };
+
+      await db.ref(`orders/${data.orderId}`).set(orderData);
     }
 
     async function cancelOrderByCustomer(orderId) {
@@ -1717,9 +1896,7 @@
         return;
       }
 
-      if (!confirm(`Are you sure you want to cancel order #${orderId.slice(-6)}?`)) {
-        return;
-      }
+      if (!confirm(`Are you sure you want to cancel order #${orderId.slice(-6)}?`)) return;
 
       try {
         const snap = await db.ref(`orders/${orderId}`).once('value');
@@ -1735,10 +1912,9 @@
         updates[`orders/${orderId}/cancelledBy`] = 'CUSTOMER';
         updates[`orders/${orderId}/cancelReason`] = 'Cancelled by customer before restaurant acceptance';
         updates[`orders/${orderId}/updatedAt`] = Date.now();
-        updates[`unassignedOrders/${orderId}`] = null; // Clean up broadcast queue
+        updates[`unassignedOrders/${orderId}`] = null;
 
         await db.ref().update(updates);
-
         showModernFloatingToast("Order Cancelled", `Order #${orderId.slice(-6)} was cancelled.`, "fa-solid fa-ban", true);
       } catch (err) {
         alert('Failed to cancel order: ' + err.message);
@@ -1752,12 +1928,15 @@
     function copyOtpToClipboard(otp) {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(otp);
-        showModernFloatingToast("Code Copied", `FoodWorld OTP ${otp} copied to clipboard.`, "fa-solid fa-copy");
+        showModernFloatingToast("Code Copied", `Delivery OTP ${otp} copied to clipboard.`, "fa-solid fa-copy");
       } else {
         alert(`FoodWorld Delivery Code: ${otp}`);
       }
     }
 
+    // =========================================================================
+    // 100% REAL-TIME LIVE GPS TRACKING & ORDERS LIST
+    // =========================================================================
     function renderOrdersList() {
       const activeContainer = document.getElementById('activeOrdersList');
       const pastContainer = document.getElementById('pastOrdersList');
@@ -1799,9 +1978,17 @@
           </div>
         `;
 
+        // Real-Time Live GPS Radar Card
         let deliveryCard = '';
         if (o.deliveryUid && cachedDeliveryBoys[o.deliveryUid]) {
           const d = cachedDeliveryBoys[o.deliveryUid];
+
+          // Dynamic GPS Link
+          let liveGpsLink = o.locationLink;
+          if (!liveGpsLink && o.riderLat && o.riderLng) {
+            liveGpsLink = `https://www.google.com/maps?q=${o.riderLat},${o.riderLng}`;
+          }
+
           deliveryCard = `
             <div class="mt-2 p-3 bg-brand-50/70 border border-brand-100 rounded-2xl space-y-2">
               <div class="flex items-center justify-between">
@@ -1815,16 +2002,17 @@
                 <a href="tel:${escapeHtml(d.phone || '')}" class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs"><i class="fa-solid fa-phone"></i></a>
               </div>
               
-              ${o.locationLink ? `
-                <a href="${escapeHtml(o.locationLink)}" target="_blank" class="w-full min-h-[38px] py-2 px-3 bg-blue-600 active:scale-95 text-white text-[11px] font-extrabold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition">
-                  <i class="fa-solid fa-location-crosshairs text-amber-300"></i> Track Rider on Live Map
+              ${liveGpsLink ? `
+                <a href="${escapeHtml(liveGpsLink)}" target="_blank" class="w-full min-h-[38px] py-2 px-3 bg-blue-600 active:scale-95 text-white text-[11px] font-extrabold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 
+                  <span>Track Rider Live (100% GPS Live Stream)</span>
                 </a>
               ` : `
-                <div class="text-[10px] text-slate-400 bg-white p-2 rounded-xl border border-slate-100 text-center">Rider assigned! Live map updating soon...</div>
+                <div class="text-[10px] text-slate-400 bg-white p-2 rounded-xl border border-slate-100 text-center">Rider assigned! Live GPS coordinates acquiring...</div>
               `}
             </div>
           `;
-        } else if (!isClosed) {
+        } else if (!isClosed && o.status !== 'PAYMENT_PENDING') {
           deliveryCard = `
             <div class="mt-2 p-2.5 bg-orange-50 border border-orange-200 rounded-2xl flex items-center gap-2 text-xs font-bold text-orange-700">
               <span class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping flex-shrink-0"></span>
@@ -1842,7 +2030,8 @@
               <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                 <div>
                   <h4 class="font-extrabold text-sm text-slate-900">${escapeHtml(restName)}</h4>
-                  <p class="text-[10px] text-slate-400 font-mono">Order #${orderId.slice(-6)} • ₹${o.totalAmount} (${isOnlinePay ? 'UPI Paid' : 'COD'})</p>
+                  <p class="text-[10px] text-slate-400 font-mono">Order #${orderId.slice(-6)} • ₹${o.totalAmount} (${isOnlinePay ? 'Online Paid' : 'COD'})</p>
+                  ${o.razorpayPaymentId ? `<p class="text-[9px] font-mono font-bold text-emerald-700 mt-0.5">Payment ID: ${escapeHtml(o.razorpayPaymentId)}</p>` : ''}
                 </div>
                 <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-brand-50 text-brand-700 border border-brand-200">
                   ${o.status.replace(/_/g, ' ')}
@@ -1887,16 +2076,16 @@
               <div class="flex items-center justify-between">
                 <div>
                   <h4 class="font-extrabold text-xs text-slate-800">${escapeHtml(restName)}</h4>
-                  <span class="text-[10px] text-slate-400 font-mono">${new Date(o.createdAt || Date.now()).toLocaleDateString()} • ₹${o.totalAmount} (${isOnlinePay ? 'UPI' : 'COD'})</span>
+                  <span class="text-[10px] text-slate-400 font-mono">${new Date(o.createdAt || Date.now()).toLocaleDateString()} • ₹${o.totalAmount} (${isOnlinePay ? 'Online' : 'COD'})</span>
+                  ${o.razorpayPaymentId ? `<p class="text-[9px] font-mono font-bold text-emerald-700 mt-0.5">Ref: ${escapeHtml(o.razorpayPaymentId)}</p>` : ''}
                 </div>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${o.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
                   ${o.status}
                 </span>
               </div>
-              
               ${o.deliveryOtp ? `
                 <div class="text-[10px] text-slate-500 font-mono bg-slate-50 p-1.5 rounded-lg">
-                  <i class="fa-solid fa-shield-check text-emerald-600 mr-1"></i> FoodWorld OTP: <strong>${o.deliveryOtp}</strong> ${o.verifiedDelivery ? '(Verified)' : ''}
+                  <i class="fa-solid fa-shield-check text-emerald-600 mr-1"></i> Delivery Code: <strong>${o.deliveryOtp}</strong> ${o.verifiedDelivery ? '(Verified)' : ''}
                 </div>
               ` : ''}
 
@@ -1919,17 +2108,23 @@
       pastContainer.innerHTML = pastHtml || '<p class="text-xs text-slate-400 bg-white p-4 rounded-2xl text-center border border-slate-200">No past order history.</p>';
     }
 
-    function reorderItems(orderId) {
+    async function reorderItems(orderId) {
       const o = cachedOrders[orderId];
       if (!o || !o.items) return;
 
+      if (!cachedMenus[o.restaurantId]) {
+        const snap = await db.ref(`menus/${o.restaurantId}`).once('value');
+        cachedMenus[o.restaurantId] = snap.val() || {};
+      }
+
       cart = {};
       o.items.forEach(it => {
+        const verifiedPrice = cachedMenus[o.restaurantId]?.[it.itemId]?.price || it.price;
         cart[it.itemId || it.name] = {
           itemId: it.itemId || it.name,
           restaurantId: o.restaurantId,
           name: it.name,
-          price: Number(it.price) || 0,
+          price: Number(verifiedPrice) || 0,
           qty: it.qty || 1
         };
       });
@@ -1938,6 +2133,7 @@
       openCheckoutModal();
     }
 
+    // ---------------- RATINGS & REVIEWS ----------------
     function openRatingModal(orderId, restId, restName) {
       document.getElementById('ratingOrderId').value = orderId;
       document.getElementById('ratingRestId').value = restId;
@@ -1947,8 +2143,8 @@
       document.getElementById('ratingModal').classList.remove('hidden');
     }
 
-    function closeRatingModal() {
-      document.getElementById('ratingModal').classList.add('hidden');
+    function closeRatingModal() { 
+      document.getElementById('ratingModal').classList.add('hidden'); 
     }
 
     function setStarRating(num) {
@@ -1979,6 +2175,7 @@
       }
     }
 
+    // ---------------- PROFILE UPDATE ----------------
     async function handleUpdateProfile(e) {
       e.preventDefault();
       const name = document.getElementById('profName').value.trim();
@@ -1999,6 +2196,7 @@
       }
     }
 
+    // ---------------- TAB SWITCHER & ESCAPERS ----------------
     function switchAppTab(tabId) {
       currentAppTab = tabId;
       document.getElementById('tab-menu').classList.add('hidden');
@@ -2024,38 +2222,29 @@
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
   </script>
-<!-- ================= UPDATE POPUP CODE ================= -->
-<div id="updateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
-  <div style="background:#1e1e1e; border:1px solid #333; padding:25px; border-radius:16px; width:85%; max-width:320px; text-align:center; color:#fff;">
-    <div style="font-size:36px; margin-bottom:10px;">🚀</div>
-    <h3 style="margin:0 0 10px; font-size:18px;">Naya Update Aaya Hai!</h3>
-    <p id="updateDesc" style="font-size:13px; color:#aaa; margin-bottom:20px;">Naye features ke liye app update karein.</p>
-    <button id="btnUpdateNow" style="background:#ff4757; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">Update Now</button>
-    <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
-  </div>
-</div>
 
-<script>
-  const CURRENT_APP_VERSION = "1.0.0";
-
-  async function checkForAppUpdate() {
-    try {
-      const response = await fetch("https://foodworldgo.netlify.app/version.json?t=" + new Date().getTime());
-      if (!response.ok) return;
-      const data = await response.json();
-      if (data.latest_version && data.latest_version !== CURRENT_APP_VERSION) {
-        if(data.message) document.getElementById("updateDesc").innerText = data.message;
-        document.getElementById("updateModal").style.display = "flex";
-        document.getElementById("btnUpdateNow").onclick = function() {
-          window.location.replace("https://foodworldgo.netlify.app/");
-        };
-      }
-    } catch (err) {
-      console.log("Offline mode");
+  <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
+  <script>
+    const CURRENT_APP_VERSION = "1.0.0";
+    async function checkForAppUpdate() {
+      try {
+        const response = await fetch("https://foodworldgo.netlify.app/version.json?t=" + new Date().getTime());
+        if (!response.ok) return;
+        const data = await response.json();
+        const serverVersion = data.customer_version || data.latest_version;
+        if (serverVersion && serverVersion !== CURRENT_APP_VERSION) {
+          if (data.customer_message || data.message) {
+            document.getElementById("updateDesc").innerText = data.customer_message || data.message;
+          }
+          document.getElementById("updateModal").style.display = "flex";
+          document.getElementById("btnUpdateNow").onclick = function() {
+            const downloadUrl = data.customer_apk || data.apk_url;
+            if (downloadUrl) window.location.href = downloadUrl;
+          };
+        }
+      } catch (err) {}
     }
-  }
-  window.addEventListener("DOMContentLoaded", checkForAppUpdate);
-</script>
-<!-- ===================================================== -->
+    window.addEventListener("DOMContentLoaded", checkForAppUpdate);
+  </script>
 </body>
 </html>
