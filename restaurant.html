@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>FoodWorld - Restaurant Partner Dashboard</title>
+
+  <!-- Tailwind CSS & FontAwesome Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Firebase Compat SDKs (App, Auth, Database) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff7ed', 100: '#ffedd5', 500: '#f97316',
+              600: '#ea580c', 700: '#c2410c', 900: '#7c2d12',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    @media (max-width: 640px) {
+      input, select, textarea { font-size: 16px !important; }
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    @keyframes toastSlideDown {
+      0% { transform: translate(-50%, -100%) scale(0.9); opacity: 0; }
+      60% { transform: translate(-50%, 10px) scale(1.02); opacity: 1; }
+      100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+    }
+    @keyframes toastSlideUp {
+      0% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -100%) scale(0.9); opacity: 0; }
+    }
+    .toast-enter { animation: toastSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .toast-exit { animation: toastSlideUp 0.3s ease-in forwards; }
+
+    .veg-icon {
+      width: 14px; height: 14px; border: 1.5px solid #16a34a; border-radius: 3px;
+      display: inline-flex; align-items: center; justify-content: center; background: white;
+    }
+    .veg-icon::after { content: ''; width: 6px; height: 6px; background: #16a34a; border-radius: 50%; }
+    .nonveg-icon {
+      width: 14px; height: 14px; border: 1.5px solid #dc2626; border-radius: 3px;
+      display: inline-flex; align-items: center; justify-content: center; background: white;
+    }
+    .nonveg-icon::after {
+      content: ''; width: 0; height: 0; border-left: 4px solid transparent;
+      border-right: 4px solid transparent; border-bottom: 7px solid #dc2626;
+    }
+
+    @keyframes pulse-kitchen {
+      0% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(234, 88, 12, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0); }
+    }
+    .new-order-pulse { animation: pulse-kitchen 1.5s infinite; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- ================= INITIAL SPLASH SCREEN ================= -->
+  <div id="splashScreen" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center text-white">
+    <div class="w-16 h-16 rounded-2xl bg-brand-500 flex items-center justify-center text-3xl shadow-xl shadow-brand-500/40 mb-3 animate-pulse">
+      <i class="fa-solid fa-fire-burner"></i>
+    </div>
+    <h2 class="text-xl font-black">FoodWorld Kitchen</h2>
+    <div class="flex items-center gap-2 mt-4 text-xs text-brand-400 font-semibold">
+      <i class="fa-solid fa-spinner fa-spin"></i> Connecting to live merchant terminal...
+    </div>
+  </div>
+
+  <!-- ================= MODERN FLOATING TOAST ================= -->
+  <div id="modernFloatingToast" class="hidden fixed top-3 left-1/2 -translate-x-1/2 z-[95] w-[92%] max-w-md">
+    <div class="bg-slate-900/95 backdrop-blur-xl border border-white/15 text-white p-3.5 rounded-3xl shadow-2xl flex items-center gap-3">
+      <div id="toastIconBox" class="w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-base flex-shrink-0">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between">
+          <span id="toastTag" class="text-[10px] font-black uppercase tracking-wider text-brand-400">Kitchen Alert</span>
+          <span class="text-[9px] text-slate-400 font-mono">Just now</span>
+        </div>
+        <p id="toastBody" class="text-xs font-semibold text-slate-100 truncate mt-0.5">Notification text goes here...</p>
+      </div>
+      <button onclick="dismissFloatingToast()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-400 hover:text-white transition flex-shrink-0 text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= 1. FORGOT PASSWORD MODAL ================= -->
+  <div id="partnerForgotModal" class="hidden fixed inset-0 z-[98] bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-lg shadow-inner">
+            <i class="fa-solid fa-key"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-slate-900 text-sm">Kitchen Account Recovery</h3>
+            <p class="text-[10px] text-slate-400">FoodWorld Kitchen Partner</p>
+          </div>
+        </div>
+        <button onclick="closePartnerForgotModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+      
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Apna registered Kitchen business email enter karein. Hum verification link aapke inbox par bhejenge.
+      </p>
+
+      <form onsubmit="handlePartnerPasswordReset(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Business Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="email" id="partnerResetEmail" required class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="kitchen@foodworld.com">
+          </div>
+        </div>
+
+        <div id="partnerResetError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium"></div>
+
+        <div class="flex gap-2 pt-1">
+          <button type="button" onclick="closePartnerForgotModal()" class="flex-1 min-h-[42px] py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs active:scale-95 transition">Cancel</button>
+          <button type="submit" id="partnerResetBtn" class="flex-1 min-h-[42px] py-2 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-black rounded-xl text-xs shadow-md transition">Send Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= 2. EMAIL SENT SUCCESS POPUP ================= -->
+  <div id="partnerEmailSentSuccessModal" class="hidden fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl space-y-4 text-center border border-emerald-200">
+      <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
+        <i class="fa-solid fa-envelope-circle-check"></i>
+      </div>
+      <div>
+        <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">Mail Sent</span>
+        <h3 class="font-black text-slate-900 text-base mt-2">Kitchen Recovery Link Sent!</h3>
+        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+          Password reset verification link has been sent to your registered email. Please check your inbox or spam folder.
+        </p>
+        <p class="text-xs font-mono font-bold text-brand-600 bg-brand-50 p-2 rounded-xl mt-2.5 truncate" id="partnerSuccessEmailPreview">kitchen@foodworld.com</p>
+      </div>
+      <div class="pt-1">
+        <button onclick="closePartnerEmailSuccessModal()" class="w-full min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold rounded-2xl text-xs shadow-md transition">
+          ठीक है / Got it
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 3. EXIT CONFIRMATION MODAL ================= -->
+  <div id="exitAppModal" class="hidden fixed inset-0 z-[99] bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl space-y-4 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl mx-auto shadow-inner">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </div>
+      <div>
+        <h3 class="font-black text-slate-900 text-base">Exit Kitchen Panel?</h3>
+        <p class="text-xs text-slate-500 mt-1">Are you sure you want to close the kitchen application?</p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="cancelExitApp()" class="min-h-[42px] py-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold rounded-xl text-xs transition">No</button>
+        <button onclick="confirmExitApp()" class="min-h-[42px] py-2 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-bold rounded-xl text-xs shadow-md transition">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= AUTH VIEW (LOGIN / SIGNUP) ================= -->
+  <div id="authView" class="hidden min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-stone-900 to-brand-900">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-8 border border-white/20">
+      
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 text-2xl shadow-inner mb-2">
+          <i class="fa-solid fa-store"></i>
+        </div>
+        <h1 class="text-2xl font-black text-slate-900">FoodWorld Partner</h1>
+        <p class="text-xs text-slate-500 mt-0.5">Kitchen & Menu Management Portal</p>
+      </div>
+
+      <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl mb-5 text-xs font-bold">
+        <button type="button" onclick="toggleAuthMode('login')" id="authTabLogin" class="min-h-[40px] rounded-lg bg-white shadow-sm text-brand-600 transition active:scale-95">Partner Login</button>
+        <button type="button" onclick="toggleAuthMode('signup')" id="authTabSignup" class="min-h-[40px] rounded-lg text-slate-500 hover:text-slate-800 transition active:scale-95">Register Kitchen</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="partnerLoginForm" onsubmit="handlePartnerLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Partner Business Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="email" id="loginEmail" required class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="kitchen@foodworld.com">
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-600">Password</label>
+            <button type="button" onclick="openPartnerForgotModal()" class="text-xs text-brand-600 hover:text-brand-700 font-extrabold transition">Forgot?</button>
+          </div>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+            <input type="password" id="loginPassword" required class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="••••••••">
+          </div>
+        </div>
+
+        <div id="loginError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
+          <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+          <span id="loginErrorMsg">Error</span>
+        </div>
+
+        <button type="submit" id="loginBtn" class="w-full min-h-[48px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
+          <span>Sign In to Kitchen</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- Signup Form with Auto-Detect GPS & Mandatory Bank Details -->
+      <form id="partnerSignupForm" onsubmit="handlePartnerSignup(event)" class="space-y-3 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Restaurant / Kitchen Name</label>
+          <input type="text" id="regName" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="e.g. Royal Biryani House">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Business Email</label>
+          <input type="email" id="regEmail" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="owner@restaurant.com">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Contact Phone</label>
+            <input type="tel" id="regPhone" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="+91 9876543210">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Operating Hours</label>
+            <input type="text" id="regHours" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="10 AM - 11 PM">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Kitchen Photo / Logo URL</label>
+          <input type="url" id="regImageUrl" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="https://images.unsplash.com/photo-...">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Cuisine Specialities</label>
+          <input type="text" id="regCuisine" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Biryani, North Indian, Chinese">
+        </div>
+
+        <!-- Address with Auto-Detect GPS -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-600">Full Kitchen Address</label>
+            <button type="button" onclick="detectRestaurantLocation('regAddress', 'regGpsStatus')" class="text-[11px] text-brand-600 hover:text-brand-700 font-extrabold flex items-center gap-1 active:scale-95 transition">
+              <i class="fa-solid fa-crosshairs text-brand-500"></i>
+              <span id="regGpsStatus">Auto-Detect GPS</span>
+            </button>
+          </div>
+          <textarea id="regAddress" rows="2" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="दुकान/किचन का पूरा पता..."></textarea>
+        </div>
+
+        <!-- MANDATORY BANK DETAILS SECTION -->
+        <div class="p-3 bg-brand-50/70 border border-brand-200 rounded-2xl space-y-2.5">
+          <div class="flex items-center gap-1.5 text-xs font-black text-brand-800">
+            <i class="fa-solid fa-building-columns text-brand-600"></i>
+            <span>Kitchen Bank Account (For Payouts)</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Name</label>
+              <input type="text" id="regBankName" required class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="SBI / HDFC / ICICI">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Account Holder Name</label>
+              <input type="text" id="regAccHolder" required class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Business / Personal Name">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Account Number</label>
+            <input type="text" id="regBankAcc" required class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="11 to 16 digit account number">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank IFSC Code</label>
+            <input type="text" id="regIfsc" required oninput="this.value = this.value.toUpperCase()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="SBIN0001234">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Create Password</label>
+          <input type="password" id="regPassword" minlength="6" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Min. 6 characters">
+        </div>
+
+        <div id="signupError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
+          <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+          <span id="signupErrorMsg">Error</span>
+        </div>
+
+        <button type="submit" id="signupBtn" class="w-full min-h-[48px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
+          <span>Submit for Verification</span>
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= RESTAURANT DASHBOARD VIEW ================= -->
+  <div id="dashboardView" class="hidden min-h-screen flex flex-col bg-slate-50">
+    
+    <!-- Top Navigation Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs px-4 sm:px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3 overflow-hidden">
+        <div class="w-11 h-11 rounded-2xl bg-brand-500 text-white flex items-center justify-center font-black text-lg shadow-md shadow-brand-500/30 overflow-hidden flex-shrink-0">
+          <img id="topRestaurantAvatar" src="" class="w-full h-full object-cover hidden" alt="Kitchen Logo">
+          <i id="topRestaurantIcon" class="fa-solid fa-fire-burner"></i>
+        </div>
+        <div class="overflow-hidden">
+          <div class="flex items-center gap-2">
+            <h2 class="font-extrabold text-sm sm:text-base text-slate-900 leading-tight truncate" id="topRestaurantName">Kitchen Name</h2>
+            <span id="approvalBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 flex-shrink-0">Checking...</span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-medium truncate" id="topRestaurantCuisine">Cuisine info</p>
+        </div>
+      </div>
+
+      <!-- Store Online / Offline & WakeLock Toggle Buttons -->
+      <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        <span id="wakeLockBadge" class="hidden px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-[9px] font-black" title="Screen Stay Awake Active">
+          <i class="fa-solid fa-sun text-[8px]"></i> Awake
+        </span>
+        <button onclick="toggleKitchenStoreStatus()" id="storeStatusBtn" class="min-h-[38px] px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-2 transition active:scale-95 shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-300">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="storeStatusText">Accepting Orders</span>
+        </button>
+        <button onclick="testKitchenSound()" class="min-h-[36px] w-9 sm:w-auto px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-800 text-xs font-bold transition flex items-center justify-center gap-1" title="Test Order Chime">
+          <i class="fa-solid fa-volume-high"></i>
+          <span class="hidden sm:inline">Sound</span>
+        </button>
+        <button onclick="handleLogout()" class="min-h-[36px] px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 active:scale-95 text-rose-600 text-xs font-bold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="hidden sm:inline">Logout</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Unapproved Notice Banner -->
+    <div id="approvalWarningBanner" class="hidden bg-amber-500 text-white px-4 sm:px-6 py-2.5 text-xs font-semibold flex items-center justify-between gap-3 shadow-inner">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-base flex-shrink-0"></i>
+        <span><strong>Account Pending Approval:</strong> Your restaurant is awaiting Admin verification. You can set up your menu dishes now.</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs Bar -->
+    <div class="bg-white border-b border-slate-200 px-4 sm:px-6 sticky top-[62px] z-20 shadow-2xs">
+      <div class="flex space-x-4 sm:space-x-8 overflow-x-auto no-scrollbar py-1 text-xs font-bold whitespace-nowrap">
+        <button onclick="switchTab('orders')" id="tabBtn-orders" class="tab-button py-3 border-b-2 border-brand-600 text-brand-600 flex items-center gap-2 flex-shrink-0 transition active:scale-95">
+          <i class="fa-solid fa-bell-concierge"></i>
+          <span>Live Orders Pipeline</span>
+          <span id="activeOrdersBadge" class="px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-[10px]">0</span>
+        </button>
+        <button onclick="switchTab('menu')" id="tabBtn-menu" class="tab-button py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 flex-shrink-0 transition active:scale-95">
+          <i class="fa-solid fa-book-open"></i>
+          <span>FoodWorld Menu & Stocks</span>
+        </button>
+        <button onclick="switchTab('reports')" id="tabBtn-reports" class="tab-button py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 flex-shrink-0 transition active:scale-95">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Business Pulse & COD</span>
+        </button>
+        <button onclick="switchTab('profile')" id="tabBtn-profile" class="tab-button py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 flex-shrink-0 transition active:scale-95">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Kitchen Profile & Bank</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN VIEWS CONTENT -->
+    <main class="flex-1 p-3.5 sm:p-6 max-w-6xl w-full mx-auto space-y-5 pb-16">
+
+      <!-- ================= 1. ORDERS TAB (FOODWORLD KITCHEN PIPELINE) ================= -->
+      <section id="section-orders" class="space-y-4">
+        
+        <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="font-black text-slate-900 text-sm sm:text-base flex items-center gap-2">
+              <i class="fa-solid fa-kitchen-set text-brand-600"></i> FoodWorld Kitchen Terminal (KOT)
+            </h3>
+            <p class="text-[11px] text-slate-400">Accept orders, cook fresh dishes & coordinate with FoodWorld delivery fleet</p>
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar">
+            <select id="ordersFilterSelect" onchange="renderOrdersFeed()" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-extrabold focus:ring-2 focus:ring-brand-500 w-full sm:w-auto">
+              <option value="ACTIVE">All Active Kitchen Orders</option>
+              <option value="PLACED">🔴 New Incoming Orders</option>
+              <option value="ACCEPTED">👨‍🍳 Cooking in Progress</option>
+              <option value="READY_FOR_PICKUP">📦 Packed (Ready for Rider)</option>
+              <option value="ALL">All Lifetime History</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Orders Cards Grid -->
+        <div id="ordersFeedContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <div class="col-span-full p-8 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200">
+            <i class="fa-solid fa-spinner fa-spin text-lg mb-2"></i>
+            <p>Syncing live kitchen orders...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. MENU MANAGEMENT TAB ================= -->
+      <section id="section-menu" class="hidden space-y-4">
+        
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-base">FoodWorld Menu & Stock Control</h3>
+            <p class="text-xs text-slate-400">Toggle Veg/Non-Veg, mark dishes Sold Out in 1-tap, upload dish photos from gallery</p>
+          </div>
+          <button onclick="openDishModal('create')" class="w-full sm:w-auto min-h-[44px] px-4 py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-500/20 transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> Add New Dish
+          </button>
+        </div>
+
+        <!-- Menu Cards Grid -->
+        <div id="menuCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <div class="col-span-full p-8 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200">
+            Loading menu items...
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. REPORTS & COD TAB ================= -->
+      <section id="section-reports" class="hidden space-y-5">
+        
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Orders</p>
+            <h4 class="text-xl sm:text-2xl font-black text-slate-800 mt-1" id="repTotalOrders">0</h4>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Delivered & Collected</p>
+            <h4 class="text-xl sm:text-2xl font-black text-emerald-600 mt-1" id="repDeliveredRevenue">₹0</h4>
+            <span class="text-[10px] text-emerald-600 font-bold" id="repDeliveredCount">0 delivered</span>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cooking / In Transit</p>
+            <h4 class="text-xl sm:text-2xl font-black text-amber-600 mt-1" id="repPendingRevenue">₹0</h4>
+            <span class="text-[10px] text-amber-600 font-bold" id="repPendingCount">0 ongoing</span>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cancelled Loss</p>
+            <h4 class="text-xl sm:text-2xl font-black text-rose-600 mt-1" id="repCancelledRevenue">₹0</h4>
+            <span class="text-[10px] text-rose-600 font-bold" id="repCancelledCount">0 orders</span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden space-y-3">
+          <div class="p-4 border-b border-slate-100">
+            <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-clock-rotate-left text-brand-500"></i> Completed Sales History
+            </h4>
+          </div>
+          <div id="salesHistoryMobileFeed" class="divide-y divide-slate-100">
+            <div class="p-6 text-center text-slate-400 text-xs">No completed orders yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. PROFILE & BANK SETTINGS TAB (READ-ONLY + TOP-RIGHT PENCIL EDIT) ================= -->
+      <section id="section-profile" class="hidden space-y-4 max-w-2xl mx-auto">
+        
+        <!-- 1. READ-ONLY KITCHEN CARD (DEFAULT) -->
+        <div id="restProfileViewCard" class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-black text-slate-900 text-base">Kitchen Profile & Bank</h3>
+              <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Verified Merchant Restaurant Card</p>
+            </div>
+            <!-- ✏️ TOP-RIGHT PENCIL ICON BUTTON -->
+            <button type="button" onclick="toggleRestProfileEdit(true)" class="w-10 h-10 rounded-2xl bg-brand-50 hover:bg-brand-100 text-brand-600 flex items-center justify-center text-sm shadow-xs transition active:scale-95 border border-brand-200" title="Edit Profile">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          </div>
+
+          <!-- Center Kitchen Photo / Banner -->
+          <div class="text-center space-y-2">
+            <div class="relative w-28 h-28 mx-auto rounded-3xl ring-4 ring-orange-500/20 shadow-md overflow-hidden bg-slate-100 flex items-center justify-center">
+              <img id="viewRestPhoto" src="" class="w-full h-full object-cover hidden" alt="Kitchen Banner">
+              <div id="viewRestPlaceholder" class="w-full h-full bg-brand-500 text-white flex items-center justify-center text-3xl">
+                <i class="fa-solid fa-fire-burner"></i>
+              </div>
+            </div>
+            <h4 class="font-black text-lg text-slate-900" id="viewRestName">Restaurant Name</h4>
+            <p class="text-xs font-bold text-brand-600" id="viewRestCuisine">Biryani, North Indian</p>
+            <p class="text-[11px] text-slate-400" id="viewRestHours"><i class="fa-solid fa-clock mr-1"></i> 10:00 AM - 11:00 PM</p>
+          </div>
+
+          <div class="space-y-2.5 text-xs border-t border-slate-100 pt-3">
+            <div class="p-3 bg-slate-50 rounded-2xl flex justify-between items-center">
+              <span class="text-slate-400 font-bold">Contact Phone:</span>
+              <span class="font-bold text-slate-800" id="viewRestPhone">+91 0000000000</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-2xl flex justify-between items-center">
+              <span class="text-slate-400 font-bold">Business Email:</span>
+              <span class="font-bold text-slate-800" id="viewRestEmail">kitchen@foodworld.com</span>
+            </div>
+
+            <!-- Address with GPS Pin Indicator & Map Link -->
+            <div class="p-3 bg-slate-50 rounded-2xl space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400 font-bold">Kitchen Address:</span>
+                <span id="viewRestGpsBadge" class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">
+                  <i class="fa-solid fa-location-dot"></i> GPS Pinned
+                </span>
+              </div>
+              <p class="font-bold text-slate-800 leading-relaxed" id="viewRestAddress">Address details</p>
+              <div id="viewRestMapLinkBox" class="pt-1 hidden">
+                <a id="viewRestMapLink" href="#" target="_blank" class="text-[11px] text-blue-600 font-bold hover:underline flex items-center gap-1">
+                  <i class="fa-solid fa-map-location-dot"></i> अपनी दुकान की लोकेशन मैप पर देखें ➔
+                </a>
+              </div>
+            </div>
+
+            <!-- Bank Details (Read-Only) -->
+            <div class="p-3.5 bg-slate-900 text-white rounded-2xl space-y-1.5 mt-2">
+              <div class="flex items-center justify-between text-[10px] text-amber-400 font-mono border-b border-slate-800 pb-1">
+                <span class="font-bold" id="viewRestBankName">Bank Name</span>
+                <span class="text-emerald-400 font-black" id="viewRestIfsc">IFSC: HDFC0001234</span>
+              </div>
+              <p class="font-mono text-xs font-black flex justify-between pt-0.5">
+                <span>A/C: <span id="viewRestBankAcc">••••••••</span></span>
+                <span class="text-[10px] font-sans text-slate-300 font-bold" id="viewRestAccHolder">Holder Name</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. EDIT KITCHEN CARD (OPENS ON PENCIL TAP) -->
+        <div id="restProfileEditCard" class="hidden bg-white p-5 sm:p-6 rounded-3xl border border-brand-300 shadow-md space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-black text-slate-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-pen-to-square text-brand-500"></i> Edit Kitchen Details & Bank
+            </h3>
+            <button type="button" onclick="toggleRestProfileEdit(false)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <form onsubmit="handleUpdateProfile(event)" class="space-y-3.5">
+            <!-- Kitchen Photo / Logo Upload with Gallery/Camera + Base64 Compressor -->
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
+              <label class="block text-xs font-bold text-slate-700">Kitchen Logo / Profile Photo</label>
+              <div class="flex items-center gap-3">
+                <div class="w-16 h-16 rounded-2xl bg-white border-2 border-brand-200 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-xs relative">
+                  <img id="editRestPhotoPreview" src="" class="w-full h-full object-cover hidden" alt="Preview">
+                  <div id="editRestPhotoPlaceholder" class="text-slate-300 text-xl"><i class="fa-solid fa-camera"></i></div>
+                </div>
+                <div class="flex-1 space-y-1.5 min-w-0">
+                  <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-xl text-xs font-extrabold cursor-pointer active:scale-95 transition border border-brand-200">
+                    <i class="fa-solid fa-image"></i> <span>गैलरी / कैमरा से चुनें</span>
+                    <input type="file" accept="image/*" class="hidden" onchange="processImageUpload(this, 'profImageUrlInput', 'editRestPhotoPreview', 'editRestPhotoPlaceholder')">
+                  </label>
+                  <input type="url" id="profImageUrlInput" oninput="previewPhotoUrl(this.value, 'editRestPhotoPreview', 'editRestPhotoPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="या इमेज लिंक (URL) डालें...">
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Restaurant Name</label>
+              <input type="text" id="profName" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Phone</label>
+                <input type="tel" id="profPhone" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Hours</label>
+                <input type="text" id="profHours" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Cuisine</label>
+              <input type="text" id="profCuisine" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
+            </div>
+
+            <!-- Address with Auto-Detect Live GPS -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-600">Kitchen Address & GPS Pin</label>
+                <button type="button" onclick="detectRestaurantLocation('profAddress', 'profGpsStatus')" class="text-[11px] text-brand-600 hover:text-brand-700 font-extrabold flex items-center gap-1 active:scale-95 transition">
+                  <i class="fa-solid fa-location-crosshairs text-brand-500"></i>
+                  <span id="profGpsStatus">Live GPS डिटेक्ट करें</span>
+                </button>
+              </div>
+              <textarea id="profAddress" rows="2" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none" placeholder="दुकान संख्या, लैंडमार्क, शहर..."></textarea>
+            </div>
+
+            <!-- Bank Inputs -->
+            <div class="p-3 bg-brand-50/70 border border-brand-200 rounded-2xl space-y-2 text-xs font-bold">
+              <span class="text-brand-900 block text-[11px]"><i class="fa-solid fa-building-columns mr-1"></i> Bank Account for Payouts</span>
+              <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="profBankName" required placeholder="Bank Name" class="p-2 bg-white rounded-lg border border-slate-200 text-xs">
+                <input type="text" id="profAccHolder" required placeholder="Holder Name" class="p-2 bg-white rounded-lg border border-slate-200 text-xs">
+              </div>
+              <input type="text" id="profBankAcc" required placeholder="Account Number" class="w-full p-2 bg-white rounded-lg border border-slate-200 text-xs font-mono">
+              <input type="text" id="profIfsc" required placeholder="IFSC Code" class="w-full p-2 bg-white rounded-lg border border-slate-200 text-xs font-mono uppercase">
+            </div>
+
+            <div class="flex gap-2 pt-1">
+              <button type="button" onclick="toggleRestProfileEdit(false)" class="flex-1 min-h-[44px] py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs active:scale-95 transition">Cancel</button>
+              <button type="submit" id="saveProfBtn" class="flex-1 min-h-[44px] py-2 bg-brand-600 hover:bg-brand-500 text-white font-black rounded-xl text-xs shadow-md active:scale-95 transition">Save Kitchen</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================= DISH MODAL (WITH GALLERY / CAMERA UPLOAD) ================= -->
+  <div id="dishModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl p-5 sm:p-6 space-y-4 shadow-2xl">
+      
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="font-extrabold text-slate-900 text-sm" id="dishModalTitle">Add Menu Item</h3>
+        <button onclick="closeDishModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 text-xs">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="dishForm" onsubmit="handleSaveDish(event)" class="space-y-3">
+        <input type="hidden" id="dishItemId">
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Item / Dish Name</label>
+          <input type="text" id="dishName" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="e.g. Chicken Dum Biryani">
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Price (₹)</label>
+            <input type="number" id="dishPrice" min="1" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="250">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Food Type</label>
+            <select id="dishFoodType" class="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+              <option value="VEG">🟢 Veg</option>
+              <option value="NONVEG">🔴 Non-Veg</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Stock Status</label>
+            <select id="dishAvailable" class="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+              <option value="true">In Stock</option>
+              <option value="false">Sold Out</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Dish Photo (Gallery / Camera + Base64 Compressor + URL) -->
+        <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
+          <label class="block text-xs font-bold text-slate-700">Dish Photo</label>
+          <div class="flex items-center gap-3">
+            <div class="w-16 h-16 rounded-2xl bg-white border-2 border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-xs relative">
+              <img id="dishImgPreview" src="" class="w-full h-full object-cover hidden" alt="Preview">
+              <i id="dishImgPlaceholder" class="fa-solid fa-utensils text-slate-300 text-xl"></i>
+            </div>
+            <div class="flex-1 space-y-1.5 min-w-0">
+              <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-xl text-xs font-extrabold cursor-pointer active:scale-95 transition border border-brand-200">
+                <i class="fa-solid fa-camera"></i>
+                <span>गैलरी / कैमरा से डिश फोटो चुनें</span>
+                <input type="file" accept="image/*" class="hidden" onchange="processImageUpload(this, 'dishImageUrlInput', 'dishImgPreview', 'dishImgPlaceholder')">
+              </label>
+              <input type="url" id="dishImageUrlInput" oninput="previewPhotoUrl(this.value, 'dishImgPreview', 'dishImgPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="या ऑनलाइन इमेज लिंक डालें...">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Description / Ingredients</label>
+          <textarea id="dishDescription" rows="2" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Served with raita and salan..."></textarea>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closeDishModal()" class="flex-1 min-h-[44px] py-2.5 bg-slate-100 active:scale-95 text-slate-700 font-bold rounded-xl text-xs">Cancel</button>
+          <button type="submit" id="saveDishBtn" class="flex-1 min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-bold rounded-xl text-xs shadow-md">Save Dish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= UPDATE POPUP MODAL ================= -->
+  <div id="updateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
+    <div style="background:#1e1e1e; border:1px solid #333; padding:25px; border-radius:16px; width:85%; max-width:320px; text-align:center; color:#fff;">
+      <div style="font-size:36px; margin-bottom:10px;">👨‍🍳</div>
+      <h3 style="margin:0 0 10px; font-size:18px;">Kitchen App Update!</h3>
+      <p id="updateDesc" style="font-size:13px; color:#aaa; margin-bottom:20px;">Naye features aur fast order alert ke liye app update karein.</p>
+      <button id="btnUpdateNow" style="background:#ea580c; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">Update Now</button>
+      <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
+    </div>
+  </div>
+<!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    // 1. FIREBASE CONFIGURATION
+    const firebaseConfig = {
+      apiKey: "AIzaSyABmYgOsai5ppKsAqxGr212nZiMu9tsCjo",
+      authDomain: "foodworldfixed.firebaseapp.com",
+      databaseURL: "https://foodworldfixed-default-rtdb.firebaseio.com",
+      projectId: "foodworldfixed",
+      storageBucket: "foodworldfixed.firebasestorage.app",
+      messagingSenderId: "357094358614",
+      appId: "1:357094358614:web:e405d802735e15f4fbc5f7"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+    // 2. PRODUCTION BACKEND URL (VERCEL)
+    const BACKEND_URL = "https://foodworld-backend.vercel.app";
+
+    // 3. STATE VARIABLES & STEP-BY-STEP NAVIGATION STACK
+    let currentPartner = null, cachedOrders = {}, cachedMenu = {}, cachedDeliveryPartners = {}, isRoleChecking = false;
+    let knownOrderIds = new Set();
+    let currentActiveTab = 'orders';
+    let navHistoryStack = ['orders'];
+    let toastTimeout = null;
+    let audioCtx = null;
+    let wakeLockSentinel = null;
+
+    // GPS State Variables
+    let restaurantLat = null;
+    let restaurantLng = null;
+
+    // ---------------- SYSTEM PUSH NOTIFICATION ----------------
+    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission().catch(() => {});
+    }
+
+    function sendSystemNotification(title, body) {
+      if ("Notification" in window && Notification.permission === "granted") {
+        try {
+          new Notification(title, { 
+            body, 
+            icon: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png" 
+          });
+        } catch(e) {}
+      }
+    }
+
+    // ---------------- SCREEN WAKE LOCK (STAY AWAKE ON DUTY) ----------------
+    async function requestScreenWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLockSentinel = await navigator.wakeLock.request('screen');
+          document.getElementById('wakeLockBadge').classList.remove('hidden');
+          wakeLockSentinel.addEventListener('release', () => {
+            document.getElementById('wakeLockBadge').classList.add('hidden');
+          });
+        }
+      } catch (err) {
+        console.log("WakeLock error:", err);
+      }
+    }
+
+    function releaseScreenWakeLock() {
+      if (wakeLockSentinel) {
+        wakeLockSentinel.release().catch(() => {});
+        wakeLockSentinel = null;
+        document.getElementById('wakeLockBadge').classList.add('hidden');
+      }
+    }
+
+    // ---------------- AUDIO CHIME CONTROLLERS ----------------
+    function initGlobalAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+    }
+    window.addEventListener('click', initGlobalAudioContext, { once: true });
+    window.addEventListener('touchstart', initGlobalAudioContext, { once: true });
+
+    function playModernNotifChime() {
+      try {
+        initGlobalAudioContext();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1174.66, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+        
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.35);
+      } catch (e) {}
+    }
+
+    function playKitchenLoudChime() {
+      try {
+        initGlobalAudioContext();
+        if (!audioCtx) return;
+        for (let i = 0; i < 3; i++) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.setValueAtTime(880, audioCtx.currentTime + (i * 0.3));
+          osc.frequency.setValueAtTime(1174.66, audioCtx.currentTime + (i * 0.3) + 0.15);
+          gain.gain.setValueAtTime(0.4, audioCtx.currentTime + (i * 0.3));
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (i * 0.3) + 0.28);
+          osc.start(audioCtx.currentTime + (i * 0.3));
+          osc.stop(audioCtx.currentTime + (i * 0.3) + 0.28);
+        }
+      } catch (e) {}
+    }
+
+    function testKitchenSound() {
+      playKitchenLoudChime();
+      showModernFloatingToast("Kitchen Chime", "Loud kitchen order chime tested successfully!", "fa-solid fa-volume-high");
+    }
+
+    // ---------------- FLOATING TOAST ----------------
+    function showModernFloatingToast(title, message, iconClass = 'fa-solid fa-bell', isAlert = false) {
+      playModernNotifChime();
+      sendSystemNotification(title, message);
+      const toast = document.getElementById('modernFloatingToast');
+      const tagEl = document.getElementById('toastTag');
+      const bodyEl = document.getElementById('toastBody');
+      const iconBox = document.getElementById('toastIconBox');
+
+      tagEl.innerText = title;
+      bodyEl.innerText = message;
+      iconBox.innerHTML = `<i class="${iconClass}"></i>`;
+
+      if (isAlert) {
+        iconBox.className = "w-10 h-10 rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-base flex-shrink-0";
+      } else {
+        iconBox.className = "w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-base flex-shrink-0";
+      }
+
+      toast.classList.remove('hidden', 'toast-exit');
+      toast.classList.add('toast-enter');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        dismissFloatingToast();
+      }, 5000);
+    }
+
+    function dismissFloatingToast() {
+      const toast = document.getElementById('modernFloatingToast');
+      toast.classList.remove('toast-enter');
+      toast.classList.add('toast-exit');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 300);
+    }
+
+    // =========================================================
+    // 📸 UNIVERSAL IMAGE COMPRESSOR (CANVAS BASE64)
+    // =========================================================
+    function processImageUpload(input, targetInputId, previewImgId, placeholderId) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const MAX_SIZE = 400; // 400px Max Dimensions
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+          } else {
+            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // 40-60 KB Base64 String
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+          document.getElementById(targetInputId).value = compressedBase64;
+          previewPhotoUrl(compressedBase64, previewImgId, placeholderId);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewPhotoUrl(url, previewImgId, placeholderId) {
+      const preview = document.getElementById(previewImgId);
+      const placeholder = document.getElementById(placeholderId);
+      if (url && url.trim().length > 10) {
+        preview.src = url.trim();
+        preview.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      } else {
+        preview.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
+    }
+
+    // =========================================================
+    // 📍 AUTO-DETECT LIVE GPS FOR RESTAURANT
+    // =========================================================
+    function detectRestaurantLocation(textareaId, statusSpanId) {
+      const statusEl = document.getElementById(statusSpanId);
+      const textarea = document.getElementById(textareaId);
+
+      if (!navigator.geolocation) {
+        alert("आपके डिवाइस/ब्राउज़र में GPS सपोर्ट नहीं है।");
+        return;
+      }
+
+      statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> लोकेशन लॉक हो रही है...';
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          restaurantLat = position.coords.latitude;
+          restaurantLng = position.coords.longitude;
+
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${restaurantLat}&lon=${restaurantLng}`, {
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            const data = await res.json();
+
+            if (data && data.display_name) {
+              textarea.value = data.display_name;
+            } else {
+              textarea.value = `Kitchen Location (GPS: ${restaurantLat.toFixed(6)}, ${restaurantLng.toFixed(6)})`;
+            }
+
+            statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> GPS सेट हो गया!</span>';
+            showModernFloatingToast("GPS Locked", `सटीक लोकेशन पिन हो गई (${restaurantLat.toFixed(4)}, ${restaurantLng.toFixed(4)})`, "fa-solid fa-location-dot");
+          } catch (e) {
+            if (!textarea.value) {
+              textarea.value = `GPS Pin: ${restaurantLat.toFixed(6)}, ${restaurantLng.toFixed(6)}`;
+            }
+            statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> GPS सेट ✓</span>';
+          }
+        },
+        (error) => {
+          statusEl.innerHTML = '<span class="text-rose-600 font-bold">GPS अनुमति दें</span>';
+          alert("कृपया मोबाइल/ब्राउज़र में Location Permission (GPS) ऑन करें: " + error.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    // ---------------- FORGOT PASSWORD ----------------
+    function openPartnerForgotModal() {
+      const email = document.getElementById('loginEmail').value.trim();
+      if (email) document.getElementById('partnerResetEmail').value = email;
+      document.getElementById('partnerResetError').classList.add('hidden');
+      document.getElementById('partnerForgotModal').classList.remove('hidden');
+    }
+
+    function closePartnerForgotModal() {
+      document.getElementById('partnerForgotModal').classList.add('hidden');
+    }
+
+    function openPartnerEmailSuccessModal(email) {
+      document.getElementById('partnerSuccessEmailPreview').innerText = email;
+      document.getElementById('partnerEmailSentSuccessModal').classList.remove('hidden');
+    }
+
+    function closePartnerEmailSuccessModal() {
+      document.getElementById('partnerEmailSentSuccessModal').classList.add('hidden');
+    }
+
+    async function handlePartnerPasswordReset(e) {
+      e.preventDefault();
+      const email = document.getElementById('partnerResetEmail').value.trim();
+      const btn = document.getElementById('partnerResetBtn');
+      const errBox = document.getElementById('partnerResetError');
+      errBox.classList.add('hidden');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+      try {
+        const actionCodeSettings = {
+          url: 'https://foodworldgo.netlify.app/reset-password.html',
+          handleCodeInApp: true
+        };
+        await auth.sendPasswordResetEmail(email, actionCodeSettings);
+        closePartnerForgotModal();
+        showModernFloatingToast("Recovery Sent", `Password reset email dispatched to ${email}`, "fa-solid fa-envelope-circle-check");
+        openPartnerEmailSuccessModal(email);
+      } catch (err) {
+        errBox.innerText = err.message || "Failed to send reset link.";
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Send Link";
+      }
+    }
+
+    // =========================================================
+    // 🔄 STEP-BY-STEP BACK NAVIGATION STACK
+    // =========================================================
+    function pushNavState(stateName) {
+      history.pushState({ screen: stateName }, '');
+    }
+    pushNavState('root_orders');
+
+    window.addEventListener('popstate', function () {
+      handleStepByStepBack();
+    });
+
+    function handleStepByStepBack() {
+      const openModals = ['dishModal', 'partnerForgotModal', 'partnerEmailSentSuccessModal', 'exitAppModal'];
+      for (let mId of openModals) {
+        const m = document.getElementById(mId);
+        if (m && !m.classList.contains('hidden')) {
+          m.classList.add('hidden');
+          return;
+        }
+      }
+
+      const editProfileCard = document.getElementById('restProfileEditCard');
+      if (editProfileCard && !editProfileCard.classList.contains('hidden')) {
+        toggleRestProfileEdit(false);
+        return;
+      }
+
+      if (navHistoryStack.length > 1) {
+        navHistoryStack.pop();
+        const previousTab = navHistoryStack[navHistoryStack.length - 1];
+        switchTab(previousTab, true);
+        return;
+      }
+
+      openExitAppModal();
+    }
+
+    function openExitAppModal() {
+      document.getElementById('exitAppModal').classList.remove('hidden');
+    }
+
+    function cancelExitApp() {
+      document.getElementById('exitAppModal').classList.add('hidden');
+    }
+
+    function confirmExitApp() {
+      if (navigator.app && navigator.app.exitApp) {
+        navigator.app.exitApp();
+      } else if (navigator.device && navigator.device.exitApp) {
+        navigator.device.exitApp();
+      } else {
+        window.close();
+      }
+    }
+
+    // ---------------- AUTHENTICATION CONTROLLER ----------------
+    function toggleAuthMode(mode) {
+      const loginForm = document.getElementById('partnerLoginForm');
+      const signupForm = document.getElementById('partnerSignupForm');
+      const tabLogin = document.getElementById('authTabLogin');
+      const tabSignup = document.getElementById('authTabSignup');
+
+      if (mode === 'signup') {
+        loginForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+        tabSignup.classList.add('bg-white', 'text-brand-600', 'shadow-sm');
+        tabSignup.classList.remove('text-slate-500');
+        tabLogin.classList.remove('bg-white', 'text-brand-600', 'shadow-sm');
+        tabLogin.classList.add('text-slate-500');
+      } else {
+        signupForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+        tabLogin.classList.add('bg-white', 'text-brand-600', 'shadow-sm');
+        tabLogin.classList.remove('text-slate-500');
+        tabSignup.classList.remove('bg-white', 'text-brand-600', 'shadow-sm');
+        tabSignup.classList.add('text-slate-500');
+      }
+    }
+
+    async function handlePartnerLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const btn = document.getElementById('loginBtn');
+      document.getElementById('loginError').classList.add('hidden');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+      } catch (err) {
+        document.getElementById('loginError').classList.remove('hidden');
+        document.getElementById('loginErrorMsg').innerText = err.message || 'Login failed.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Sign In to Kitchen</span> <i class="fa-solid fa-arrow-right"></i>';
+      }
+    }
+
+    async function handlePartnerSignup(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const hours = document.getElementById('regHours').value.trim();
+      const imageUrl = document.getElementById('regImageUrl').value.trim() || "";
+      const cuisine = document.getElementById('regCuisine').value.trim();
+      const address = document.getElementById('regAddress').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      
+      const bankName = document.getElementById('regBankName').value.trim();
+      const accountHolderName = document.getElementById('regAccHolder').value.trim();
+      const bankAccountNo = document.getElementById('regBankAcc').value.trim();
+      const ifscCode = document.getElementById('regIfsc').value.trim().toUpperCase();
+
+      const btn = document.getElementById('signupBtn');
+      document.getElementById('signupError').classList.add('hidden');
+
+      if (!bankName || !accountHolderName || !bankAccountNo || !ifscCode) {
+        document.getElementById('signupError').classList.remove('hidden');
+        document.getElementById('signupErrorMsg').innerText = "All Bank Account details are mandatory for payouts.";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registering...';
+
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        await db.ref(`restaurants/${userCredential.user.uid}`).set({
+          name, email, phone, hours, cuisine, address, imageUrl, 
+          restaurantLat: restaurantLat || null,
+          restaurantLng: restaurantLng || null,
+          bankName, accountHolderName, bankAccountNo, ifscCode,
+          approved: false, 
+          isOpen: true, 
+          createdAt: Date.now()
+        });
+      } catch (err) {
+        document.getElementById('signupError').classList.remove('hidden');
+        document.getElementById('signupErrorMsg').innerText = err.message || 'Registration failed.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit for Verification</span> <i class="fa-solid fa-paper-plane"></i>';
+      }
+    }
+
+    function handleLogout() {
+      releaseScreenWakeLock();
+      auth.signOut().catch(err => alert("Logout error: " + err.message));
+    }
+
+    // ---------------- AUTH STATE & LISTENERS ----------------
+    auth.onAuthStateChanged(async (user) => {
+      const splash = document.getElementById('splashScreen');
+      if (isRoleChecking) return;
+      if (user) {
+        isRoleChecking = true;
+        try {
+          const snap = await db.ref(`restaurants/${user.uid}`).once('value');
+          if (!snap.exists()) {
+            await auth.signOut();
+            document.getElementById('loginError').classList.remove('hidden');
+            document.getElementById('loginErrorMsg').innerText = "Access Denied: Not registered as Restaurant Partner.";
+            splash.classList.add('hidden');
+            return;
+          }
+          document.getElementById('authView').classList.add('hidden');
+          document.getElementById('dashboardView').classList.remove('hidden');
+          listenToRestaurantData(user.uid);
+        } catch (err) {
+          await auth.signOut();
+        } finally {
+          isRoleChecking = false;
+          splash.classList.add('hidden');
+        }
+      } else {
+        document.getElementById('dashboardView').classList.add('hidden');
+        document.getElementById('authView').classList.remove('hidden');
+        splash.classList.add('hidden');
+        currentPartner = null;
+        releaseScreenWakeLock();
+        detachListeners();
+      }
+    });
+
+    function detachListeners() {
+      if (currentPartner && currentPartner.uid) {
+        db.ref(`restaurants/${currentPartner.uid}`).off();
+        db.ref('orders').off();
+        db.ref(`menus/${currentPartner.uid}`).off();
+        db.ref('deliveryPartners').off();
+      }
+    }
+
+    // =========================================================
+    // 👤 KITCHEN PROFILE (READ-ONLY + PENCIL EDIT LOGIC)
+    // =========================================================
+    function toggleRestProfileEdit(showEdit) {
+      document.getElementById('restProfileViewCard').classList.toggle('hidden', showEdit);
+      document.getElementById('restProfileEditCard').classList.toggle('hidden', !showEdit);
+      if (showEdit && currentPartner && currentPartner.imageUrl) {
+        previewPhotoUrl(currentPartner.imageUrl, 'editRestPhotoPreview', 'editRestPhotoPlaceholder');
+      }
+    }
+
+    function listenToRestaurantData(uid) {
+      db.ref(`restaurants/${uid}`).on('value', snap => {
+        currentPartner = snap.val() || {};
+        currentPartner.uid = uid;
+
+        document.getElementById('topRestaurantName').innerText = currentPartner.name || 'Kitchen Partner';
+        document.getElementById('topRestaurantCuisine').innerText = `${currentPartner.cuisine || 'Multi-Cuisine'} • ${currentPartner.hours || 'Open'}`;
+
+        // Topbar Avatar with Safe Onload / Onerror
+        const avatar = document.getElementById('topRestaurantAvatar');
+        const icon = document.getElementById('topRestaurantIcon');
+        if (currentPartner.imageUrl && currentPartner.imageUrl.trim().length > 10) {
+          avatar.src = currentPartner.imageUrl;
+          avatar.onload = () => { avatar.classList.remove('hidden'); icon.classList.add('hidden'); };
+          avatar.onerror = () => { avatar.classList.add('hidden'); icon.classList.remove('hidden'); };
+        } else {
+          avatar.classList.add('hidden');
+          icon.classList.remove('hidden');
+        }
+
+        const badge = document.getElementById('approvalBadge');
+        const warnBanner = document.getElementById('approvalWarningBanner');
+        if (currentPartner.approved === true) {
+          badge.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800";
+          badge.innerText = "Verified Partner";
+          warnBanner.classList.add('hidden');
+        } else {
+          badge.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800";
+          badge.innerText = "Pending Approval";
+          warnBanner.classList.remove('hidden');
+        }
+
+        const isOpen = (currentPartner.isOpen !== false);
+        updateKitchenStoreUI(isOpen);
+        if (isOpen) requestScreenWakeLock();
+        else releaseScreenWakeLock();
+
+        // 1. Read-Only Kitchen Profile कार्ड भरें
+        document.getElementById('viewRestName').innerText = currentPartner.name || 'Kitchen';
+        document.getElementById('viewRestCuisine').innerText = currentPartner.cuisine || 'Multi-Cuisine';
+        document.getElementById('viewRestHours').innerHTML = `<i class="fa-solid fa-clock mr-1"></i> ${currentPartner.hours || 'Hours not set'}`;
+        document.getElementById('viewRestPhone').innerText = currentPartner.phone || '';
+        document.getElementById('viewRestEmail').innerText = currentPartner.email || auth.currentUser?.email || '';
+        document.getElementById('viewRestAddress').innerText = currentPartner.address || 'Address not set';
+        document.getElementById('viewRestBankName').innerText = currentPartner.bankName || 'Bank Name';
+        document.getElementById('viewRestIfsc').innerText = `IFSC: ${currentPartner.ifscCode || 'N/A'}`;
+        document.getElementById('viewRestBankAcc').innerText = currentPartner.bankAccountNo || '••••••••';
+        document.getElementById('viewRestAccHolder').innerText = currentPartner.accountHolderName || '';
+
+        // Read-Only Card Photo
+        const restPhoto = document.getElementById('viewRestPhoto');
+        const restPh = document.getElementById('viewRestPlaceholder');
+        if (currentPartner.imageUrl && currentPartner.imageUrl.trim().length > 10) {
+          restPhoto.src = currentPartner.imageUrl;
+          restPhoto.onload = () => { restPhoto.classList.remove('hidden'); restPh.classList.add('hidden'); };
+          restPhoto.onerror = () => { restPhoto.classList.add('hidden'); restPh.classList.remove('hidden'); };
+        } else {
+          restPhoto.classList.add('hidden');
+          restPh.classList.remove('hidden');
+        }
+
+        // Live GPS Pin Status & Map Preview Link
+        restaurantLat = currentPartner.restaurantLat || null;
+        restaurantLng = currentPartner.restaurantLng || null;
+        const gpsBadge = document.getElementById('viewRestGpsBadge');
+        const mapBox = document.getElementById('viewRestMapLinkBox');
+        const mapLink = document.getElementById('viewRestMapLink');
+
+        if (restaurantLat && restaurantLng) {
+          gpsBadge.className = "px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800";
+          gpsBadge.innerHTML = '<i class="fa-solid fa-check text-emerald-600 mr-0.5"></i> GPS Pinned';
+          mapLink.href = `https://www.google.com/maps?q=${restaurantLat},${restaurantLng}`;
+          mapBox.classList.remove('hidden');
+        } else {
+          gpsBadge.className = "px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-800";
+          gpsBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-600 mr-0.5"></i> No GPS Pin';
+          mapBox.classList.add('hidden');
+        }
+
+        // 2. Edit Kitchen Profile इनपुट्स भरें
+        document.getElementById('profName').value = currentPartner.name || '';
+        document.getElementById('profPhone').value = currentPartner.phone || '';
+        document.getElementById('profHours').value = currentPartner.hours || '';
+        document.getElementById('profCuisine').value = currentPartner.cuisine || '';
+        document.getElementById('profAddress').value = currentPartner.address || '';
+        document.getElementById('profImageUrlInput').value = currentPartner.imageUrl || '';
+        
+        document.getElementById('profBankName').value = currentPartner.bankName || '';
+        document.getElementById('profAccHolder').value = currentPartner.accountHolderName || '';
+        document.getElementById('profBankAcc').value = currentPartner.bankAccountNo || '';
+        document.getElementById('profIfsc').value = currentPartner.ifscCode || '';
+      });
+
+      db.ref('deliveryPartners').on('value', snap => {
+        cachedDeliveryPartners = snap.val() || {};
+        renderOrdersFeed();
+      });
+
+      // Limit to last 50 orders using .indexOn
+      db.ref('orders').orderByChild('restaurantId').equalTo(uid).limitToLast(50).on('value', snap => {
+        const orders = snap.val() || {};
+        Object.keys(orders).forEach(id => {
+          if (!knownOrderIds.has(id) && orders[id]?.status === 'PLACED') {
+            playKitchenLoudChime();
+            showModernFloatingToast("New Order!", `Order #${id.slice(-6)} received in kitchen.`, "fa-solid fa-bell-concierge");
+          }
+          knownOrderIds.add(id);
+        });
+
+        cachedOrders = orders;
+        renderOrdersFeed();
+        renderReports();
+      });
+
+      db.ref(`menus/${uid}`).on('value', snap => {
+        cachedMenu = snap.val() || {};
+        renderMenuCards();
+      });
+    }
+
+    // ---------------- STORE ONLINE/OFFLINE TOGGLE ----------------
+    function toggleKitchenStoreStatus() {
+      if (!currentPartner) return;
+      const newStatus = !(currentPartner.isOpen !== false);
+      db.ref(`restaurants/${currentPartner.uid}`).update({ isOpen: newStatus })
+        .then(() => {
+          if (newStatus) requestScreenWakeLock();
+          else releaseScreenWakeLock();
+        })
+        .catch(err => alert("Failed to change store status: " + err.message));
+    }
+
+    function updateKitchenStoreUI(isOpen) {
+      const btn = document.getElementById('storeStatusBtn');
+      if (isOpen) {
+        btn.className = "min-h-[38px] px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-2 transition active:scale-95 shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-300";
+        btn.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> <span>Accepting Orders</span>';
+      } else {
+        btn.className = "min-h-[38px] px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-2 transition active:scale-95 shadow-sm bg-rose-100 text-rose-800 border border-rose-300";
+        btn.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> <span>Kitchen Paused</span>';
+      }
+    }
+
+    const STATUS_THEMES = {
+      PLACED: { bg: 'bg-orange-50 text-orange-800 border-orange-200', label: '🔴 New Incoming Order' },
+      ACCEPTED: { bg: 'bg-indigo-50 text-indigo-800 border-indigo-200', label: '👨‍🍳 Accepted / Cooking' },
+      PREPARING: { bg: 'bg-amber-50 text-amber-800 border-amber-200', label: '🔥 Preparing Dishes' },
+      READY_FOR_PICKUP: { bg: 'bg-purple-50 text-purple-800 border-purple-200', label: '📦 Packed & Ready' },
+      PICKED_UP: { bg: 'bg-cyan-50 text-cyan-800 border-cyan-200', label: '🛵 Picked Up by Rider' },
+      OUT_FOR_DELIVERY: { bg: 'bg-blue-50 text-blue-800 border-blue-200', label: 'Out for Delivery' },
+      DELIVERED: { bg: 'bg-emerald-50 text-emerald-800 border-emerald-200', label: 'Delivered' },
+      CANCELLED: { bg: 'bg-rose-50 text-rose-800 border-rose-200', label: 'Cancelled / Rejected' }
+    };
+
+    function toggleChefCheck(el) {
+      el.classList.toggle('line-through');
+      el.classList.toggle('text-slate-400');
+    }
+
+    // =========================================================
+    // 👨‍🍳 KITCHEN KOT PIPELINE (GHOST-ORDER FILTERED)
+    // =========================================================
+    function renderOrdersFeed() {
+      const container = document.getElementById('ordersFeedContainer');
+      const filter = document.getElementById('ordersFilterSelect').value;
+      const orderKeys = Object.keys(cachedOrders).reverse();
+
+      let activeCount = 0, html = '';
+
+      orderKeys.forEach(id => {
+        const o = cachedOrders[id];
+        if (!o) return;
+
+        // Ghost order shield
+        if (o.status === 'PAYMENT_PENDING') return;
+
+        const isClosed = o.status === 'DELIVERED' || o.status === 'CANCELLED';
+        if (!isClosed) activeCount++;
+
+        if (filter === 'ACTIVE' && isClosed) return;
+        if (filter === 'PLACED' && o.status !== 'PLACED') return;
+        if (filter === 'ACCEPTED' && (o.status !== 'ACCEPTED' && o.status !== 'PREPARING')) return;
+        if (filter === 'READY_FOR_PICKUP' && o.status !== 'READY_FOR_PICKUP') return;
+
+        const theme = STATUS_THEMES[o.status] || { bg: 'bg-slate-100 text-slate-700 border-slate-200', label: o.status };
+        const isOnlinePay = (o.paymentMethod === 'ONLINE');
+
+        let customerMapPin = (o.customerLat && o.customerLng) ? 
+          `https://www.google.com/maps?q=${o.customerLat},${o.customerLng}` : '';
+
+        let riderStatusHtml = '';
+        if (o.deliveryUid && cachedDeliveryPartners[o.deliveryUid]) {
+          const rider = cachedDeliveryPartners[o.deliveryUid];
+          riderStatusHtml = `
+            <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs"><i class="fa-solid fa-motorcycle"></i></div>
+                <div>
+                  <p class="font-black text-emerald-900">${escapeHtml(rider.name || 'Rider')}</p>
+                  <p class="text-[10px] text-slate-500 font-mono">${escapeHtml(rider.vehicle || 'Bike')} • ${escapeHtml(rider.phone || '')}</p>
+                </div>
+              </div>
+              ${rider.phone ? `<a href="tel:${escapeHtml(rider.phone)}" class="min-h-[32px] px-3 py-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black rounded-xl flex items-center gap-1 text-[11px] shadow-xs"><i class="fa-solid fa-phone"></i> Call</a>` : ''}
+            </div>
+          `;
+        } else if (!isClosed) {
+          riderStatusHtml = `
+            <div class="p-2.5 bg-orange-50 border border-orange-200 rounded-2xl flex items-center gap-2 text-xs font-black text-orange-700">
+              <span class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping flex-shrink-0"></span>
+              <span>Broadcasting to nearby FoodWorld delivery fleet...</span>
+            </div>
+          `;
+        }
+
+        let actionButtons = '';
+        if (o.status === 'PLACED') {
+          actionButtons = `
+            <div class="grid grid-cols-2 gap-2 pt-2">
+              <button onclick="rejectOrder('${id}')" class="min-h-[44px] py-2 px-3 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-2xl text-xs font-black transition border border-rose-200">
+                <i class="fa-solid fa-xmark"></i> Reject
+              </button>
+              <button onclick="updateOrderStatus('${id}', 'ACCEPTED')" class="min-h-[44px] py-2 px-3 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white rounded-2xl text-xs font-black shadow-md shadow-brand-500/20 transition">
+                <i class="fa-solid fa-check"></i> Accept Order
+              </button>
+            </div>
+          `;
+        } else if (o.status === 'ACCEPTED') {
+          actionButtons = `
+            <button onclick="updateOrderStatus('${id}', 'PREPARING')" class="w-full min-h-[44px] py-2.5 bg-amber-500 hover:bg-amber-600 active:scale-98 text-white rounded-2xl text-xs font-black shadow-md transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-kitchen-set"></i> Start Cooking (Kitchen Prep)
+            </button>
+          `;
+        } else if (o.status === 'PREPARING') {
+          actionButtons = `
+            <button onclick="updateOrderStatus('${id}', 'READY_FOR_PICKUP')" class="w-full min-h-[44px] py-2.5 bg-purple-600 hover:bg-purple-500 active:scale-98 text-white rounded-2xl text-xs font-black shadow-md transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-bag-shopping"></i> Food Ready (Call Rider for Pickup)
+            </button>
+          `;
+        } else if (o.status === 'READY_FOR_PICKUP') {
+          actionButtons = `
+            <div class="p-2.5 rounded-2xl bg-purple-50 border border-purple-100 text-center text-xs font-black text-purple-800">
+              <i class="fa-solid fa-motorcycle animate-bounce"></i> Food Packed: Waiting for Rider Arrival
+            </div>
+          `;
+        }
+
+        html += `
+          <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-xs space-y-3.5 flex flex-col justify-between ${o.status === 'PLACED' ? 'new-order-pulse border-orange-300' : ''}">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <div>
+                  <span class="font-mono font-black text-slate-900 text-sm">Order #${id.slice(-6)}</span>
+                  <p class="text-[10px] text-slate-400 font-mono">${new Date(o.createdAt || Date.now()).toLocaleTimeString()}</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black border ${theme.bg}">
+                  ${theme.label}
+                </span>
+              </div>
+
+              <div class="text-xs text-slate-600 space-y-1">
+                <div class="flex items-center justify-between">
+                  <p class="font-black text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-user text-slate-400 text-[10px]"></i> ${escapeHtml(o.phone || 'Customer')}
+                  </p>
+                  ${o.phone ? `<a href="tel:${escapeHtml(o.phone)}" class="text-brand-600 font-bold text-[11px] hover:underline"><i class="fa-solid fa-phone"></i> Call</a>` : ''}
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-500">
+                  <p class="truncate flex-1 mr-2"><i class="fa-solid fa-location-dot text-brand-500 text-[10px]"></i> ${escapeHtml(o.address || 'Address provided')}</p>
+                  ${customerMapPin ? `<a href="${customerMapPin}" target="_blank" class="text-blue-600 font-bold text-[10px] hover:underline flex-shrink-0"><i class="fa-solid fa-map-pin"></i> Pin</a>` : ''}
+                </div>
+                ${o.cancelReason ? `<p class="text-[10px] text-rose-600 font-bold bg-rose-50 p-1.5 rounded-xl"><i class="fa-solid fa-circle-info"></i> ${escapeHtml(o.cancelReason)}</p>` : ''}
+              </div>
+
+              <!-- Chef KOT Checklist Section -->
+              <div class="bg-slate-50 p-3 rounded-2xl text-xs space-y-1.5 border border-slate-100">
+                <div class="flex items-center justify-between border-b border-slate-200/60 pb-1 text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                  <span>Chef Items (Tap to check)</span>
+                  <span>Amount</span>
+                </div>
+                ${o.items ? o.items.map(it => `
+                  <div onclick="toggleChefCheck(this)" class="flex items-center justify-between pt-1 cursor-pointer transition select-none">
+                    <div class="flex items-center gap-2">
+                      <span class="w-4 h-4 rounded-md border border-slate-300 bg-white flex items-center justify-center text-[10px] text-brand-600"><i class="fa-solid fa-check"></i></span>
+                      <span class="font-extrabold text-slate-800">${escapeHtml(it.name)} <span class="text-brand-600 font-black">x${it.qty}</span></span>
+                    </div>
+                    <span class="font-bold text-slate-700">₹${(it.price * it.qty)}</span>
+                  </div>
+                `).join('') : ''}
+              </div>
+
+              ${riderStatusHtml}
+
+              <!-- Payment Mode & Razorpay Status -->
+              <div class="p-2 rounded-xl bg-slate-50 border border-slate-100 text-xs flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-slate-500">Payment: <strong class="${isOnlinePay ? 'text-blue-700' : 'text-emerald-700'} font-black">${isOnlinePay ? 'Prepaid Online' : 'Cash on Delivery'}</strong></span>
+                  <span class="font-black text-sm text-emerald-700">₹${o.totalAmount || 0}</span>
+                </div>
+                ${o.razorpayPaymentId ? `
+                  <div class="text-[10px] font-mono text-blue-800 bg-blue-50 p-1.5 rounded-lg border border-blue-200 flex items-center justify-between">
+                    <span><i class="fa-solid fa-shield-halved mr-1"></i> Razorpay: <strong>${escapeHtml(o.razorpayPaymentId)}</strong></span>
+                    <span class="font-bold uppercase text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">Paid Online ✓</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <div>
+              ${actionButtons}
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('activeOrdersBadge').innerText = activeCount;
+      container.innerHTML = html || `<div class="col-span-full p-8 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200">No orders match the selected filter.</div>`;
+    }
+
+    function updateOrderStatus(orderId, newStatus) {
+      db.ref(`orders/${orderId}`).update({
+        status: newStatus,
+        updatedAt: Date.now()
+      }).then(() => {
+        showModernFloatingToast("Status Updated", `Order #${orderId.slice(-6)} set to ${newStatus}.`, "fa-solid fa-check");
+      }).catch(err => alert('Failed to update status: ' + err.message));
+    }
+
+    // =========================================================
+    // 💳 SAFE AUTO-REFUND ON ORDER REJECTION
+    // =========================================================
+    async function rejectOrder(orderId) {
+      if (!confirm(`Reject order #${orderId.slice(-6)}? If paid online, customer will receive a refund.`)) return;
+
+      try {
+        // 1. Mark CANCELLED directly in Firebase Realtime Database
+        await db.ref(`orders/${orderId}`).update({
+          status: 'CANCELLED',
+          cancelReason: 'Rejected by restaurant kitchen',
+          updatedAt: Date.now()
+        });
+
+        // 2. Remove from unassigned queue
+        await db.ref(`unassignedOrders/${orderId}`).remove();
+
+        // 3. Trigger backend refund API
+        const res = await fetch(`${BACKEND_URL}/api/refund-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: orderId, reason: 'Rejected by restaurant kitchen' })
+        });
+        const data = await res.json();
+
+        showModernFloatingToast(
+          "Order Rejected", 
+          data.refundId ? "Order rejected & refund initiated to customer!" : "Order rejected.", 
+          "fa-solid fa-ban", 
+          true
+        );
+      } catch (err) {
+        alert('Failed: ' + err.message);
+      }
+    }
+
+    // =========================================================
+    // 🍲 MENU & STOCK CONTROLLER (WITH GALLERY UPLOADS)
+    // =========================================================
+    function renderMenuCards() {
+      const container = document.getElementById('menuCardsContainer');
+      const itemKeys = Object.keys(cachedMenu);
+
+      if (itemKeys.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full p-8 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200 space-y-2">
+            <i class="fa-solid fa-utensils text-2xl text-slate-300"></i>
+            <p>Your menu is empty. Click "+ Add New Dish" to list food items.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      itemKeys.forEach(itemId => {
+        const item = cachedMenu[itemId];
+        if (!item) return;
+        const isAvail = item.available !== false;
+        const isNonVeg = item.foodType === 'NONVEG';
+        const imgUrl = item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80';
+
+        html += `
+          <div class="bg-white p-3.5 rounded-3xl border border-slate-200 shadow-xs space-y-3 flex flex-col justify-between">
+            <div class="flex gap-3">
+              <img src="${imgUrl}" alt="${escapeHtml(item.name)}" class="w-20 h-20 rounded-2xl object-cover border border-slate-100 flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80'">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 mb-0.5">
+                  <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'}"></span>
+                  <span class="text-[9px] font-black uppercase text-slate-400">${isNonVeg ? 'Non-Veg' : 'Veg'}</span>
+                </div>
+                <h4 class="font-extrabold text-xs text-slate-900 truncate">${escapeHtml(item.name)}</h4>
+                <p class="text-xs font-black text-brand-600 mt-0.5">₹${item.price}</p>
+                <p class="text-[11px] text-slate-400 line-clamp-2 mt-0.5">${escapeHtml(item.description || '')}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+              <button onclick="toggleDishAvailability('${itemId}', ${!isAvail})" class="min-h-[34px] px-3 py-1 rounded-xl text-xs font-black active:scale-95 transition ${isAvail ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}">
+                <i class="fa-solid fa-power-off text-[10px] mr-1"></i> ${isAvail ? 'In Stock' : 'Sold Out Today'}
+              </button>
+              
+              <div class="flex items-center gap-1.5">
+                <button onclick="openDishModal('edit', '${itemId}')" class="min-h-[34px] min-w-[34px] rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-600 text-xs flex items-center justify-center" title="Edit Dish">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button onclick="deleteDish('${itemId}')" class="min-h-[34px] min-w-[34px] rounded-xl bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 text-xs flex items-center justify-center" title="Delete Dish">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function openDishModal(mode, itemId = '') {
+      const modal = document.getElementById('dishModal');
+      const title = document.getElementById('dishModalTitle');
+      const idInput = document.getElementById('dishItemId');
+      const nameInput = document.getElementById('dishName');
+      const priceInput = document.getElementById('dishPrice');
+      const foodTypeSelect = document.getElementById('dishFoodType');
+      const availSelect = document.getElementById('dishAvailable');
+      const descInput = document.getElementById('dishDescription');
+      const urlInput = document.getElementById('dishImageUrlInput');
+      const preview = document.getElementById('dishImgPreview');
+      const placeholder = document.getElementById('dishImgPlaceholder');
+
+      if (mode === 'edit' && cachedMenu[itemId]) {
+        const d = cachedMenu[itemId];
+        title.innerText = 'Edit Dish';
+        idInput.value = itemId;
+        nameInput.value = d.name || '';
+        priceInput.value = d.price || '';
+        foodTypeSelect.value = d.foodType || 'VEG';
+        availSelect.value = d.available !== false ? 'true' : 'false';
+        descInput.value = d.description || '';
+        urlInput.value = d.imageUrl || '';
+        previewPhotoUrl(d.imageUrl || '', 'dishImgPreview', 'dishImgPlaceholder');
+      } else {
+        title.innerText = 'Add New Dish';
+        idInput.value = '';
+        nameInput.value = '';
+        priceInput.value = '';
+        foodTypeSelect.value = 'VEG';
+        availSelect.value = 'true';
+        descInput.value = '';
+        urlInput.value = '';
+        preview.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeDishModal() {
+      document.getElementById('dishModal').classList.add('hidden');
+    }
+
+    async function handleSaveDish(e) {
+      e.preventDefault();
+      const itemId = document.getElementById('dishItemId').value;
+      const name = document.getElementById('dishName').value.trim();
+      const price = Number(document.getElementById('dishPrice').value) || 0;
+      const foodType = document.getElementById('dishFoodType').value;
+      const available = document.getElementById('dishAvailable').value === 'true';
+      let imageUrl = document.getElementById('dishImageUrlInput').value.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80';
+      const description = document.getElementById('dishDescription').value.trim();
+      const btn = document.getElementById('saveDishBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving Dish...';
+
+      try {
+        const dishData = {
+          name, price, foodType, available, imageUrl, description, updatedAt: Date.now()
+        };
+
+        if (itemId) {
+          await db.ref(`menus/${auth.currentUser.uid}/${itemId}`).update(dishData);
+        } else {
+          await db.ref(`menus/${auth.currentUser.uid}`).push(dishData);
+        }
+
+        closeDishModal();
+        showModernFloatingToast("Dish Saved", `${name} updated in menu.`, "fa-solid fa-utensils");
+      } catch (err) {
+        alert('Failed to save dish: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Save Dish';
+      }
+    }
+
+    function toggleDishAvailability(itemId, newAvail) {
+      db.ref(`menus/${auth.currentUser.uid}/${itemId}`).update({ available: newAvail })
+        .catch(err => alert("Failed to update availability: " + err.message));
+    }
+
+    function deleteDish(itemId) {
+      if (confirm('Are you sure you want to delete this menu item?')) {
+        db.ref(`menus/${auth.currentUser.uid}/${itemId}`).remove()
+          .then(() => showModernFloatingToast("Dish Deleted", "Menu item removed successfully.", "fa-solid fa-trash-can"))
+          .catch(err => alert("Failed to delete dish: " + err.message));
+      }
+    }
+
+    // =========================================================
+    // 📊 SALES REPORTS & COD
+    // =========================================================
+    function renderReports() {
+      let totalOrders = 0, deliveredRev = 0, deliveredCount = 0, pendingRev = 0, pendingCount = 0, cancelledRev = 0, cancelledCount = 0;
+      const orderKeys = Object.keys(cachedOrders);
+
+      let salesHtml = '';
+
+      orderKeys.reverse().forEach(id => {
+        const o = cachedOrders[id];
+        if (!o) return;
+
+        if (o.status === 'PAYMENT_PENDING') return;
+
+        totalOrders++;
+        const amt = Number(o.totalAmount) || 0;
+        const isOnlinePay = (o.paymentMethod === 'ONLINE');
+
+        if (o.status === 'DELIVERED') {
+          deliveredRev += amt;
+          deliveredCount++;
+        } else if (o.status === 'CANCELLED') {
+          cancelledRev += amt;
+          cancelledCount++;
+        } else {
+          pendingRev += amt;
+          pendingCount++;
+        }
+
+        const itemsList = o.items ? o.items.map(i => `${i.name} (x${i.qty})`).join(', ') : 'Items';
+        salesHtml += `
+          <div class="p-3.5 flex items-center justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5">
+                <span class="font-mono font-black text-xs text-slate-800">#${id.slice(-6)}</span>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold ${o.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}">${o.status}</span>
+                <span class="text-[9px] font-bold ${isOnlinePay ? 'text-blue-700' : 'text-slate-500'}">(${isOnlinePay ? 'Prepaid Online' : 'COD'})</span>
+              </div>
+              <p class="text-xs text-slate-700 truncate mt-0.5">${escapeHtml(itemsList)}</p>
+              <p class="text-[10px] text-slate-400 font-mono">${new Date(o.createdAt || Date.now()).toLocaleDateString()} • ${escapeHtml(o.phone || 'Customer')}</p>
+            </div>
+            <span class="font-black text-xs text-emerald-700 flex-shrink-0">+₹${amt}</span>
+          </div>
+        `;
+      });
+
+      document.getElementById('repTotalOrders').innerText = totalOrders;
+      document.getElementById('repDeliveredRevenue').innerText = `₹${deliveredRev.toLocaleString('en-IN')}`;
+      document.getElementById('repDeliveredCount').innerText = `${deliveredCount} delivered`;
+      document.getElementById('repPendingRevenue').innerText = `₹${pendingRev.toLocaleString('en-IN')}`;
+      document.getElementById('repPendingCount').innerText = `${pendingCount} ongoing`;
+      document.getElementById('repCancelledRevenue').innerText = `₹${cancelledRev.toLocaleString('en-IN')}`;
+      document.getElementById('repCancelledCount').innerText = `${cancelledCount} cancelled`;
+
+      document.getElementById('salesHistoryMobileFeed').innerHTML = salesHtml || `<div class="p-6 text-center text-slate-400 text-xs">No orders recorded yet.</div>`;
+    }
+
+    // =========================================================
+    // 💾 PROFILE UPDATE HANDLER (PHOTO + GPS + DETAILS)
+    // =========================================================
+    async function handleUpdateProfile(e) {
+      e.preventDefault();
+      const name = document.getElementById('profName').value.trim();
+      const phone = document.getElementById('profPhone').value.trim();
+      const hours = document.getElementById('profHours').value.trim();
+      const cuisine = document.getElementById('profCuisine').value.trim();
+      const address = document.getElementById('profAddress').value.trim();
+      const imageUrl = document.getElementById('profImageUrlInput').value.trim() || "";
+      
+      const bankName = document.getElementById('profBankName').value.trim();
+      const accountHolderName = document.getElementById('profAccHolder').value.trim();
+      const bankAccountNo = document.getElementById('profBankAcc').value.trim();
+      const ifscCode = document.getElementById('profIfsc').value.trim().toUpperCase();
+
+      const btn = document.getElementById('saveProfBtn');
+
+      if (!bankName || !accountHolderName || !bankAccountNo || !ifscCode) {
+        alert('Please fill all Bank Account details (Bank Name, Account Holder Name, Account No, IFSC).');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+      try {
+        await db.ref(`restaurants/${auth.currentUser.uid}`).update({
+          name, phone, hours, cuisine, address, imageUrl,
+          restaurantLat: restaurantLat || null,
+          restaurantLng: restaurantLng || null,
+          bankName, accountHolderName, bankAccountNo, ifscCode
+        });
+        toggleRestProfileEdit(false);
+        showModernFloatingToast("Profile Saved", "Kitchen profile, photo & GPS location updated successfully.", "fa-solid fa-circle-check");
+      } catch (err) {
+        alert('Failed to update profile: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Save Kitchen';
+      }
+    }
+
+    // ---------------- TAB SWITCHER ----------------
+    function switchTab(tabId, isBackAction = false) {
+      if (currentActiveTab === tabId && !isBackAction) return;
+
+      if (!isBackAction) {
+        navHistoryStack.push(tabId);
+        pushNavState(`tab_${tabId}`);
+      }
+
+      currentActiveTab = tabId;
+      ['orders', 'menu', 'reports', 'profile'].forEach(t => {
+        const sec = document.getElementById(`section-${t}`);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (t === tabId) {
+          sec.classList.remove('hidden');
+          btn.classList.add('border-brand-600', 'text-brand-600');
+          btn.classList.remove('border-transparent', 'text-slate-500');
+        } else {
+          sec.classList.add('hidden');
+          btn.classList.remove('border-brand-600', 'text-brand-600');
+          btn.classList.add('border-transparent', 'text-slate-500');
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+  </script>
+
+  <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
+  <script>
+    const CURRENT_APP_VERSION = "1.0.0";
+    async function checkForAppUpdate() {
+      try {
+        const response = await fetch("https://foodworldgo.netlify.app/version.json?t=" + new Date().getTime());
+        if (!response.ok) return;
+        const data = await response.json();
+        const serverVersion = data.restaurant_version || data.kitchen_version || data.latest_version;
+        if (serverVersion && serverVersion !== CURRENT_APP_VERSION) {
+          if (data.restaurant_message || data.message) {
+            document.getElementById("updateDesc").innerText = data.restaurant_message || data.message;
+          }
+          document.getElementById("updateModal").style.display = "flex";
+          document.getElementById("btnUpdateNow").onclick = function() {
+            const downloadUrl = data.restaurant_apk || data.apk_url || data.update_url;
+            if (downloadUrl) window.location.href = downloadUrl;
+          };
+        }
+      } catch (err) {}
+    }
+    window.addEventListener("DOMContentLoaded", checkForAppUpdate);
+  </script>
+</body>
+</html>
