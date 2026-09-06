@@ -284,15 +284,27 @@
               </button>
             </div>
           </div>
+
+          <div>
+            <span class="px-3 text-[10px] font-black uppercase tracking-wider text-slate-500">Account & Security</span>
+            <div class="mt-1 space-y-1">
+              <!-- 🌟 NEW DEDICATED ADMIN PROFILE TAB -->
+              <button onclick="switchTab('profile')" id="nav-profile" class="tab-btn w-full min-h-[42px] flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 transition active:scale-95">
+                <i class="fa-solid fa-id-badge w-4 text-center text-brand-400"></i>
+                <span>Admin Profile</span>
+              </button>
+            </div>
+          </div>
         </nav>
       </div>
 
       <div class="p-4 border-t border-slate-900 bg-slate-950/80">
-        <div class="flex items-center gap-3 p-2.5 rounded-2xl bg-slate-900/60 mb-2.5 border border-slate-800/60">
-          <div class="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center font-bold text-xs">
-            <i class="fa-solid fa-user-shield"></i>
+        <div onclick="switchTab('profile')" class="cursor-pointer flex items-center gap-3 p-2.5 rounded-2xl bg-slate-900/60 mb-2.5 border border-slate-800/60 hover:bg-slate-900 transition">
+          <div class="relative w-9 h-9 rounded-xl overflow-hidden bg-brand-500/20 text-brand-400 flex items-center justify-center font-bold text-xs border border-brand-500/30 flex-shrink-0">
+            <img id="adminAvatarSidebarImg" src="" class="w-full h-full object-cover hidden" alt="Avatar">
+            <i id="adminAvatarSidebarIcon" class="fa-solid fa-user-shield"></i>
           </div>
-          <div class="overflow-hidden">
+          <div class="overflow-hidden flex-1">
             <p class="text-xs font-bold text-white truncate" id="adminUserEmail">Admin</p>
             <span class="text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Super Admin
@@ -327,6 +339,24 @@
       </header>
 
       <div class="p-3.5 sm:p-6 space-y-5 max-w-7xl w-full mx-auto pb-16">
+
+        <!-- ================= 0. USER / PARTNER FULL DETAILS INSPECTION VIEW ================= -->
+        <section id="section-detail-view" class="hidden space-y-4">
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <button onclick="closeDetailView()" class="w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 flex items-center justify-center text-slate-700 text-sm transition">
+                <i class="fa-solid fa-arrow-left"></i>
+              </button>
+              <div>
+                <h3 class="font-black text-base text-slate-900 leading-tight" id="detailEntityTitle">User Details</h3>
+                <p class="text-[11px] text-slate-400 font-mono" id="detailEntitySubtitle">ID: #000000</p>
+              </div>
+            </div>
+            <!-- Action Buttons (Includes Functional Delete) -->
+            <div id="detailActionButtons" class="flex items-center gap-2"></div>
+          </div>
+          <div id="detailContentBody" class="space-y-4"></div>
+        </section>
 
         <!-- 1. OVERVIEW TAB -->
         <section id="section-overview" class="space-y-4 sm:space-y-6">
@@ -392,7 +422,7 @@
           </div>
         </section>
 
-        <!-- 2. LIVE ORDERS TAB (WITH REAL-TIME GPS & RAZORPAY ID) -->
+        <!-- 2. LIVE ORDERS TAB -->
         <section id="section-orders" class="hidden space-y-4">
           <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
@@ -502,7 +532,7 @@
           <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h3 class="font-black text-slate-900 text-base">Kitchen Restaurant Partners & Bank Accounts</h3>
-              <p class="text-[11px] text-slate-400">Verify kitchen partners, access bank account numbers & IFSC codes for payouts</p>
+              <p class="text-[11px] text-slate-400">Tap card to inspect details, menus, bank accounts or delete account</p>
             </div>
             <input type="text" id="restaurantSearch" onkeyup="filterRestaurants()" placeholder="Search kitchen or bank..." class="w-full sm:w-64 px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
           </div>
@@ -516,8 +546,8 @@
         <section id="section-delivery" class="hidden space-y-4">
           <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <h3 class="font-black text-slate-900 text-base">Delivery Fleet Riders & Bank Accounts</h3>
-              <p class="text-[11px] text-slate-400">Manage fleet registration, duty status, bank accounts & IFSC for COD/earnings settlements</p>
+              <h3 class="font-black text-slate-900 text-base">Delivery Fleet Riders & Cash Settlement</h3>
+              <p class="text-[11px] text-slate-400">Tap rider card to view trips, settle cash, or permanently delete</p>
             </div>
             <input type="text" id="deliverySearch" onkeyup="filterDelivery()" placeholder="Search rider or bank..." class="w-full sm:w-64 px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
           </div>
@@ -531,7 +561,7 @@
         <section id="section-customers" class="hidden space-y-4">
           <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs">
             <h3 class="font-black text-slate-900 text-base">Registered Customer Base</h3>
-            <p class="text-[11px] text-slate-400">Customer directory with saved address and phone</p>
+            <p class="text-[11px] text-slate-400">Tap customer card to inspect order history or click delete</p>
           </div>
 
           <div id="customersCardsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -598,6 +628,98 @@
           </div>
         </section>
 
+        <!-- ================= 9. ADMIN PROFILE TAB (READ-ONLY + PENCIL EDIT) ================= -->
+        <section id="section-profile" class="hidden space-y-4 max-w-2xl mx-auto">
+          
+          <!-- 1. READ-ONLY ADMIN CARD (DEFAULT) -->
+          <div id="adminProfileViewCard" class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 class="font-black text-slate-900 text-base">Super Admin Profile</h3>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Root Authority Credentials</p>
+              </div>
+              <!-- ✏️ TOP-RIGHT PENCIL ICON BUTTON -->
+              <button type="button" onclick="toggleAdminProfileEdit(true)" class="w-10 h-10 rounded-2xl bg-brand-50 hover:bg-brand-100 text-brand-600 flex items-center justify-center text-sm shadow-xs transition active:scale-95 border border-brand-200" title="Edit Admin Profile">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+            </div>
+
+            <!-- Center Photo & Role -->
+            <div class="text-center space-y-2">
+              <div class="relative w-24 h-24 mx-auto rounded-full ring-4 ring-brand-500/20 shadow-md overflow-hidden bg-slate-900 flex items-center justify-center text-brand-400 text-3xl font-black">
+                <img id="viewAdminPhoto" src="" class="w-full h-full object-cover hidden" alt="Admin">
+                <i id="viewAdminPlaceholder" class="fa-solid fa-user-shield"></i>
+              </div>
+              <h4 class="font-black text-base text-slate-900" id="viewAdminName">Super Admin</h4>
+              <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-[10px] font-black uppercase tracking-wider">
+                <i class="fa-solid fa-shield-halved mr-1"></i> Root Administrator
+              </span>
+            </div>
+
+            <!-- Read-Only Details List -->
+            <div class="space-y-2.5 text-xs border-t border-slate-100 pt-3">
+              <div class="p-3 bg-slate-50 rounded-2xl flex justify-between items-center">
+                <span class="text-slate-400 font-bold">Admin Email:</span>
+                <span class="font-bold text-slate-800 font-mono" id="viewAdminEmail">admin@foodworld.com</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-2xl flex justify-between items-center">
+                <span class="text-slate-400 font-bold">Admin Phone:</span>
+                <span class="font-bold text-slate-800" id="viewAdminPhone">+91 0000000000</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-2xl flex justify-between items-center">
+                <span class="text-slate-400 font-bold">Security Clearance:</span>
+                <span class="font-mono font-bold text-brand-600">Level-5 Super User</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. EDIT ADMIN CARD (OPENS ON PENCIL TAP) -->
+          <div id="adminProfileEditCard" class="hidden bg-white p-5 sm:p-6 rounded-3xl border border-brand-300 shadow-md space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 class="font-black text-slate-900 text-base flex items-center gap-2">
+                <i class="fa-solid fa-user-gear text-brand-500"></i> Edit Admin Profile
+              </h3>
+              <button type="button" onclick="toggleAdminProfileEdit(false)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <form onsubmit="handleUpdateAdminProfile(event)" class="space-y-3.5">
+              <!-- Admin Photo Upload (Gallery / Camera + Base64 Compressor) -->
+              <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
+                <label class="block text-xs font-bold text-slate-700">Admin Avatar / Photo</label>
+                <div class="flex items-center gap-3">
+                  <div class="w-16 h-16 rounded-full bg-slate-900 border-2 border-brand-300 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-xs relative text-brand-400">
+                    <img id="editAdminPhotoPreview" src="" class="w-full h-full object-cover hidden" alt="Preview">
+                    <i id="editAdminPlaceholder" class="fa-solid fa-user-shield text-xl"></i>
+                  </div>
+                  <div class="flex-1 space-y-1.5">
+                    <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-xl text-xs font-extrabold cursor-pointer active:scale-95 transition border border-brand-200">
+                      <i class="fa-solid fa-camera"></i> <span>गैलरी / कैमरा से चुनें</span>
+                      <input type="file" accept="image/*" class="hidden" onchange="processImageUpload(this, 'adminPhotoInput', 'editAdminPhotoPreview', 'editAdminPlaceholder')">
+                    </label>
+                    <input type="url" id="adminPhotoInput" oninput="previewPhotoUrl(this.value, 'editAdminPhotoPreview', 'editAdminPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="या फोटो लिंक (URL) डालें...">
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Admin Display Name</label>
+                <input type="text" id="profAdminName" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Contact Phone</label>
+                <input type="tel" id="profAdminPhone" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
+              </div>
+
+              <div class="flex gap-2 pt-1">
+                <button type="button" onclick="toggleAdminProfileEdit(false)" class="flex-1 min-h-[44px] py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs active:scale-95 transition">Cancel</button>
+                <button type="submit" id="saveAdminProfBtn" class="flex-1 min-h-[44px] py-2 bg-brand-600 hover:bg-brand-500 text-white font-black rounded-xl text-xs shadow-md active:scale-95 transition">Save Profile</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
       </div>
     </main>
   </div>
@@ -623,7 +745,7 @@
     </div>
   </div>
 
-  <!-- ================= UPDATE POPUP MODAL ================= -->
+  <!-- UPDATE POPUP MODAL -->
   <div id="updateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
     <div style="background:#1e1e1e; border:1px solid #333; padding:25px; border-radius:16px; width:85%; max-width:320px; text-align:center; color:#fff;">
       <div style="font-size:36px; margin-bottom:10px;">⚡</div>
@@ -633,9 +755,9 @@
       <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
     </div>
   </div>
-
-  <!-- ================= JAVASCRIPT LOGIC ================= -->
+<!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
+    // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyABmYgOsai5ppKsAqxGr212nZiMu9tsCjo",
       authDomain: "foodworldfixed.firebaseapp.com",
@@ -651,9 +773,16 @@
     const db = firebase.database();
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
+    // 2. LIVE PRODUCTION BACKEND URL (VERCEL)
+    const BACKEND_URL = "https://foodworld-backend.vercel.app";
+
+    // 3. STATE VARIABLES & NAVIGATION STACK
     let cachedRestaurants = {}, cachedDelivery = {}, cachedCustomers = {}, cachedOrders = {}, cachedNotifications = {}, cachedTickets = {};
+    let currentAdminData = {};
     let isRoleChecking = false;
     let currentActiveTab = 'overview';
+    let adminTabHistory = ['overview'];
+    let activeDetailEntity = null;
     let toastTimeout = null;
     let audioCtx = null;
     const ADMIN_EMAILS = ["abhiikuanr@gmail.com", "superadmin@foodworld.com"];
@@ -711,6 +840,56 @@
       setTimeout(() => toast.classList.add('hidden'), 300);
     }
 
+    // =========================================================
+    // 📸 UNIVERSAL IMAGE COMPRESSOR (CANVAS BASE64)
+    // =========================================================
+    function processImageUpload(input, targetInputId, previewImgId, placeholderId) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const MAX_SIZE = 400; // 400px Max Dimensions
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+          } else {
+            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // 40-60 KB Base64 String
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+          document.getElementById(targetInputId).value = compressedBase64;
+          previewPhotoUrl(compressedBase64, previewImgId, placeholderId);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewPhotoUrl(url, previewImgId, placeholderId) {
+      const preview = document.getElementById(previewImgId);
+      const placeholder = document.getElementById(placeholderId);
+      if (url && url.trim().length > 10) {
+        preview.src = url.trim();
+        preview.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      } else {
+        preview.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
+    }
+
     // ---------------- FORGOT PASSWORD ----------------
     function openForgotPasswordModal() {
       const loginEmail = document.getElementById('loginEmail').value.trim();
@@ -760,44 +939,50 @@
       }
     }
 
-    // ---------------- HARDWARE BACK BUTTON ----------------
-    function pushHistoryState() {
-      history.pushState({ app: 'foodworld_admin' }, null, location.href);
+    // =========================================================
+    // 🔄 STEP-BY-STEP BACK NAVIGATION STACK
+    // =========================================================
+    function pushNavState(stateName) {
+      history.pushState({ view: stateName }, '');
     }
-    pushHistoryState();
+    pushNavState('root_overview');
 
     window.addEventListener('popstate', function () {
-      pushHistoryState();
       handleHardwareBack();
     });
 
     function handleHardwareBack() {
-      const emailSentM = document.getElementById('emailSentSuccessModal');
-      if (emailSentM && !emailSentM.classList.contains('hidden')) {
-        closeEmailSentSuccessModal();
+      const openModals = ['reassignModal', 'forgotPasswordModal', 'emailSentSuccessModal', 'exitAppModal'];
+      for (let mId of openModals) {
+        const m = document.getElementById(mId);
+        if (m && !m.classList.contains('hidden')) {
+          m.classList.add('hidden');
+          return;
+        }
+      }
+
+      const editAdminCard = document.getElementById('adminProfileEditCard');
+      if (editAdminCard && !editAdminCard.classList.contains('hidden')) {
+        toggleAdminProfileEdit(false);
         return;
       }
 
-      const forgotM = document.getElementById('forgotPasswordModal');
-      if (forgotM && !forgotM.classList.contains('hidden')) {
-        closeForgotPasswordModal();
-        return;
-      }
-
-      const reassignM = document.getElementById('reassignModal');
-      if (reassignM && !reassignM.classList.contains('hidden')) {
-        closeReassignModal();
+      const detailView = document.getElementById('section-detail-view');
+      if (detailView && !detailView.classList.contains('hidden')) {
+        closeDetailView();
         return;
       }
 
       const sidebar = document.getElementById('sidebar');
-      if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+      if (sidebar && !sidebar.classList.contains('-translate-x-full') && window.innerWidth < 768) {
         toggleMobileSidebar();
         return;
       }
 
-      if (currentActiveTab !== 'overview') {
-        switchTab('overview');
+      if (adminTabHistory.length > 1) {
+        adminTabHistory.pop();
+        const prevTab = adminTabHistory[adminTabHistory.length - 1];
+        switchTab(prevTab, true);
         return;
       }
 
@@ -810,7 +995,6 @@
 
     function cancelExitApp() {
       document.getElementById('exitAppModal').classList.add('hidden');
-      switchTab('overview');
     }
 
     function confirmExitApp() {
@@ -850,6 +1034,8 @@
           document.getElementById('authView').classList.add('hidden');
           document.getElementById('dashboardView').classList.remove('hidden');
           document.getElementById('adminUserEmail').innerText = user.email || 'Admin';
+          
+          listenAdminProfile(user.uid);
           initRealtimeListeners();
         } catch (err) {
           await auth.signOut();
@@ -905,6 +1091,7 @@
       db.ref('admin/notifications').off();
       db.ref('settings/support').off();
       db.ref('supportTickets').off();
+      if (auth.currentUser) db.ref(`admins/${auth.currentUser.uid}`).off();
     }
 
     function initRealtimeListeners() {
@@ -928,7 +1115,6 @@
         updateStats();
       });
 
-      // SAFE SPARKLIMIT: Limit to last 50 orders (using .indexOn)
       db.ref('orders').orderByChild('createdAt').limitToLast(50).on('value', snap => {
         cachedOrders = snap.val() || {};
         renderRecentOrders();
@@ -980,7 +1166,6 @@
       orderKeys.forEach(k => {
         const o = cachedOrders[k];
         if (!o) return;
-        // Don't count raw un-paid orders or closed orders in active radar
         if (o.status !== 'DELIVERED' && o.status !== 'CANCELLED' && o.status !== 'PAYMENT_PENDING') {
           activeOrdersCount++;
         }
@@ -1026,6 +1211,441 @@
       }
     }
 
+    // =========================================================
+    // 👤 ADMIN PROFILE (READ-ONLY + PENCIL EDIT LOGIC)
+    // =========================================================
+    function toggleAdminProfileEdit(showEdit) {
+      document.getElementById('adminProfileViewCard').classList.toggle('hidden', showEdit);
+      document.getElementById('adminProfileEditCard').classList.toggle('hidden', !showEdit);
+      if (showEdit && currentAdminData && currentAdminData.photoUrl) {
+        previewPhotoUrl(currentAdminData.photoUrl, 'editAdminPhotoPreview', 'editAdminPlaceholder');
+      }
+    }
+
+    function listenAdminProfile(uid) {
+      db.ref(`admins/${uid}`).on('value', snap => {
+        currentAdminData = snap.val() || {};
+
+        document.getElementById('viewAdminName').innerText = currentAdminData.name || 'Super Admin';
+        document.getElementById('viewAdminEmail').innerText = currentAdminData.email || auth.currentUser?.email || 'admin@foodworld.com';
+        document.getElementById('viewAdminPhone').innerText = currentAdminData.phone || '+91 Not Set';
+
+        document.getElementById('profAdminName').value = currentAdminData.name || '';
+        document.getElementById('profAdminPhone').value = currentAdminData.phone || '';
+        document.getElementById('adminPhotoInput').value = currentAdminData.photoUrl || '';
+
+        // 1. Read-Only Avatar
+        const viewImg = document.getElementById('viewAdminPhoto');
+        const viewPh = document.getElementById('viewAdminPlaceholder');
+        if (currentAdminData.photoUrl && currentAdminData.photoUrl.trim().length > 10) {
+          viewImg.src = currentAdminData.photoUrl;
+          viewImg.onload = () => { viewImg.classList.remove('hidden'); viewPh.classList.add('hidden'); };
+          viewImg.onerror = () => { viewImg.classList.add('hidden'); viewPh.classList.remove('hidden'); };
+        } else {
+          viewImg.classList.add('hidden');
+          viewPh.classList.remove('hidden');
+        }
+
+        // 2. Sidebar Footer Avatar
+        const sbImg = document.getElementById('adminAvatarSidebarImg');
+        const sbIcon = document.getElementById('adminAvatarSidebarIcon');
+        if (currentAdminData.photoUrl && currentAdminData.photoUrl.trim().length > 10) {
+          sbImg.src = currentAdminData.photoUrl;
+          sbImg.onload = () => { sbImg.classList.remove('hidden'); sbIcon.classList.add('hidden'); };
+          sbImg.onerror = () => { sbImg.classList.add('hidden'); sbIcon.classList.remove('hidden'); };
+        } else {
+          sbImg.classList.add('hidden');
+          sbIcon.classList.remove('hidden');
+        }
+      });
+    }
+
+    async function handleUpdateAdminProfile(e) {
+      e.preventDefault();
+      const name = document.getElementById('profAdminName').value.trim();
+      const phone = document.getElementById('profAdminPhone').value.trim();
+      const photoUrl = document.getElementById('adminPhotoInput').value.trim() || "";
+      const btn = document.getElementById('saveAdminProfBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+      try {
+        await db.ref(`admins/${auth.currentUser.uid}`).update({
+          name, phone, photoUrl, updatedAt: Date.now()
+        });
+        toggleAdminProfileEdit(false);
+        showModernFloatingToast("Profile Updated", "Admin credentials & photo updated successfully!", "fa-solid fa-circle-check");
+      } catch (err) {
+        alert("Update failed: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Save Profile';
+      }
+    }
+
+    // =========================================================
+    // 🗑️ 100% FUNCTIONAL USER PERMANENT DELETION
+    // =========================================================
+    async function deleteUserPermanently(uid, role, name) {
+      const roleLabels = {
+        customer: 'कस्टमर (Customer)',
+        restaurant: 'किचन रेस्टोरेंट (Restaurant)',
+        delivery: 'डिलीवरी राइडर (Delivery Rider)'
+      };
+      const roleName = roleLabels[role] || 'यूज़र';
+
+      const confirmed = confirm(
+        `⚠️ चेतावनी: क्या आप वाकई ${roleName} "${name}" को हमेशा के लिए हटाना चाहते हैं?\n\n` +
+        `• इसका पूरा डेटा मिट जाएगा।\n` +
+        `• इसका लॉगिन खाता नष्ट हो जाएगा।\n` +
+        `• यह क्रिया वापस (Undo) नहीं की जा सकती!`
+      );
+
+      if (!confirmed) return;
+
+      try {
+        const updates = {};
+        if (role === 'restaurant') {
+          updates[`restaurants/${uid}`] = null;
+          updates[`menus/${uid}`] = null; // Clean up restaurant's menus
+        } else if (role === 'delivery') {
+          updates[`deliveryPartners/${uid}`] = null;
+          updates[`deviceTokens/riders/${uid}`] = null;
+        } else if (role === 'customer') {
+          updates[`customers/${uid}`] = null;
+          updates[`deviceTokens/customers/${uid}`] = null;
+        }
+
+        // 1. Direct Realtime Database purge
+        await db.ref().update(updates);
+
+        // 2. Server-side Firebase Auth purge
+        fetch(`${BACKEND_URL}/api/delete-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uid: uid, role: role })
+        }).catch(err => console.warn("Backend auth deletion warning:", err));
+
+        closeDetailView();
+        showModernFloatingToast("Deleted", `"${name}" का खाता और डेटा पूरी तरह साफ कर दिया गया।`, "fa-solid fa-trash-can", true);
+
+      } catch (err) {
+        alert("डिलीट करने में विफल: " + err.message);
+      }
+    }
+
+    // =========================================================
+    // 🔍 DEEP DETAILS INSPECTION CONTROLLER
+    // =========================================================
+    function closeDetailView() {
+      document.getElementById('section-detail-view').classList.add('hidden');
+      document.getElementById(`section-${currentActiveTab}`).classList.remove('hidden');
+      activeDetailEntity = null;
+    }
+
+    function openRestaurantDetail(uid) {
+      const r = cachedRestaurants[uid];
+      if (!r) return;
+      activeDetailEntity = { type: 'restaurant', uid };
+      pushNavState(`restaurant_detail_${uid}`);
+
+      document.getElementById(`section-${currentActiveTab}`).classList.add('hidden');
+      const view = document.getElementById('section-detail-view');
+      view.classList.remove('hidden');
+
+      document.getElementById('detailEntityTitle').innerText = r.name || 'Restaurant';
+      document.getElementById('detailEntitySubtitle').innerText = `Kitchen Partner UID: ${uid}`;
+
+      document.getElementById('detailActionButtons').innerHTML = `
+        ${r.phone ? `<a href="tel:${escapeHtml(r.phone)}" class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-black flex items-center gap-1.5 active:scale-95 transition"><i class="fa-solid fa-phone"></i> Call</a>` : ''}
+        <button onclick="deleteUserPermanently('${uid}', 'restaurant', '${escapeHtml(r.name || 'Kitchen')}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black border border-rose-200 flex items-center gap-1.5 transition"><i class="fa-solid fa-trash-can"></i> Delete</button>
+      `;
+
+      let totalOrders = 0, deliveredOrders = 0, totalRevenue = 0, ordersListHtml = '';
+      Object.keys(cachedOrders).forEach(id => {
+        const o = cachedOrders[id];
+        if (o && o.restaurantId === uid) {
+          totalOrders++;
+          if (o.status === 'DELIVERED') {
+            deliveredOrders++;
+            totalRevenue += (Number(o.totalAmount) || 0);
+          }
+          ordersListHtml += `
+            <div class="p-3 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between text-xs">
+              <div>
+                <span class="font-mono font-black text-slate-900">#${id.slice(-6)}</span>
+                <span class="px-2 py-0.5 rounded text-[9px] font-bold ${o.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${o.status}</span>
+                <p class="text-[10px] text-slate-400 font-mono mt-0.5">${new Date(o.createdAt || Date.now()).toLocaleString()}</p>
+              </div>
+              <span class="font-black text-emerald-700">₹${o.totalAmount || 0}</span>
+            </div>
+          `;
+        }
+      });
+
+      const photoSrc = r.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300';
+
+      document.getElementById('detailContentBody').innerHTML = `
+        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center gap-4">
+          <img src="${photoSrc}" class="w-24 h-24 rounded-2xl object-cover border border-slate-200 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100'">
+          <div class="flex-1 text-center sm:text-left space-y-1">
+            <div class="flex items-center justify-center sm:justify-start gap-2">
+              <h4 class="text-lg font-black text-slate-900">${escapeHtml(r.name || '')}</h4>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${r.approved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${r.approved ? 'Approved' : 'Pending'}</span>
+            </div>
+            <p class="text-xs text-brand-600 font-bold">${escapeHtml(r.cuisine || 'Multi-Cuisine')} • ${escapeHtml(r.hours || 'Hours not set')}</p>
+            <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(r.address || 'Address not provided')}</p>
+            <p class="text-[11px] text-slate-400 font-mono">Email: ${escapeHtml(r.email || 'N/A')} | Phone: ${escapeHtml(r.phone || 'N/A')}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-xs text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Total Orders</span>
+            <h4 class="text-xl font-black text-slate-900 mt-1">${totalOrders}</h4>
+          </div>
+          <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-xs text-center">
+            <span class="text-[10px] font-bold text-emerald-600 uppercase">Delivered</span>
+            <h4 class="text-xl font-black text-emerald-700 mt-1">${deliveredOrders}</h4>
+          </div>
+          <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-xs text-center">
+            <span class="text-[10px] font-bold text-blue-600 uppercase">Total Sales</span>
+            <h4 class="text-xl font-black text-blue-700 mt-1">₹${totalRevenue.toLocaleString('en-IN')}</h4>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 text-white p-5 rounded-3xl shadow-md space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span class="text-xs font-black text-amber-400"><i class="fa-solid fa-building-columns mr-1"></i> Partner Bank Payout Details</span>
+            <span class="text-emerald-400 font-mono text-xs font-black">IFSC: ${escapeHtml(r.ifscCode || 'N/A')}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+            <div><span class="text-slate-400 text-[10px] block">Bank Name</span><span class="font-bold">${escapeHtml(r.bankName || 'Not updated')}</span></div>
+            <div><span class="text-slate-400 text-[10px] block">Account Holder</span><span class="font-bold">${escapeHtml(r.accountHolderName || r.name || 'N/A')}</span></div>
+          </div>
+          <div class="pt-1">
+            <span class="text-slate-400 text-[10px] block">Bank Account Number</span>
+            <span class="font-mono text-sm font-black text-slate-100">${escapeHtml(r.bankAccountNo || 'Not updated')}</span>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-3">
+          <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Kitchen Order History (${totalOrders})</h4>
+          <div class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar">
+            ${ordersListHtml || '<p class="text-xs text-slate-400 text-center py-4">No orders placed with this kitchen yet.</p>'}
+          </div>
+        </div>
+      `;
+    }
+
+    function openRiderDetail(uid) {
+      const d = cachedDelivery[uid];
+      if (!d) return;
+      activeDetailEntity = { type: 'delivery', uid };
+      pushNavState(`rider_detail_${uid}`);
+
+      document.getElementById(`section-${currentActiveTab}`).classList.add('hidden');
+      const view = document.getElementById('section-detail-view');
+      view.classList.remove('hidden');
+
+      document.getElementById('detailEntityTitle').innerText = d.name || 'Rider';
+      document.getElementById('detailEntitySubtitle').innerText = `Fleet Rider UID: ${uid}`;
+
+      document.getElementById('detailActionButtons').innerHTML = `
+        ${d.phone ? `<a href="tel:${escapeHtml(d.phone)}" class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-black flex items-center gap-1.5 active:scale-95 transition"><i class="fa-solid fa-phone"></i> Call</a>` : ''}
+        <button onclick="deleteUserPermanently('${uid}', 'delivery', '${escapeHtml(d.name || 'Rider')}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black border border-rose-200 flex items-center gap-1.5 transition"><i class="fa-solid fa-trash-can"></i> Delete</button>
+      `;
+
+      let totalTrips = 0, completedTrips = 0, pendingCod = 0, tripsHtml = '';
+      const lastSettledAt = d.lastSettledAt || 0;
+
+      Object.keys(cachedOrders).forEach(id => {
+        const o = cachedOrders[id];
+        if (o && o.deliveryUid === uid) {
+          totalTrips++;
+          if (o.status === 'DELIVERED') {
+            completedTrips++;
+            const deliveredTime = o.updatedAt || o.createdAt || 0;
+            if (o.paymentMethod !== 'ONLINE' && deliveredTime > lastSettledAt) {
+              pendingCod += (Number(o.totalAmount) || 0);
+            }
+          }
+          tripsHtml += `
+            <div class="p-3 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between text-xs">
+              <div>
+                <span class="font-mono font-black text-slate-900">#${id.slice(-6)}</span>
+                <span class="px-2 py-0.5 rounded text-[9px] font-bold ${o.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">${o.status}</span>
+                <p class="text-[10px] text-slate-400 font-mono mt-0.5">${o.paymentMethod === 'ONLINE' ? 'Prepaid Online' : `COD ₹${o.totalAmount}`}</p>
+              </div>
+              <span class="font-black text-slate-800">₹${o.totalAmount || 0}</span>
+            </div>
+          `;
+        }
+      });
+
+      const riderPhoto = d.photoUrl || '';
+
+      document.getElementById('detailContentBody').innerHTML = `
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center gap-4">
+          <div class="w-20 h-20 rounded-full overflow-hidden bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl font-black flex-shrink-0 border-2 border-emerald-500/30 shadow-xs">
+            ${riderPhoto ? `<img src="${riderPhoto}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-person-biking"></i>`}
+          </div>
+          <div class="flex-1 text-center sm:text-left space-y-1">
+            <div class="flex items-center justify-center sm:justify-start gap-2">
+              <h4 class="text-lg font-black text-slate-900">${escapeHtml(d.name || '')}</h4>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${d.approved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${d.approved ? 'Verified' : 'Pending'}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${d.online !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}">${d.online !== false ? 'Online Duty' : 'Offline'}</span>
+            </div>
+            <p class="text-xs text-slate-600 font-bold"><i class="fa-solid fa-motorcycle text-brand-500 mr-1"></i> ${escapeHtml(d.vehicle || 'Bike')}</p>
+            <p class="text-[11px] text-slate-400 font-mono">Email: ${escapeHtml(d.email || 'N/A')} | Phone: ${escapeHtml(d.phone || 'N/A')}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="bg-white p-4 rounded-3xl border border-slate-200 text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Assigned Trips</span>
+            <h4 class="text-xl font-black text-slate-900 mt-1">${totalTrips}</h4>
+          </div>
+          <div class="bg-white p-4 rounded-3xl border border-slate-200 text-center">
+            <span class="text-[10px] font-bold text-emerald-600 uppercase">Delivered</span>
+            <h4 class="text-xl font-black text-emerald-700 mt-1">${completedTrips}</h4>
+          </div>
+          <div class="col-span-2 bg-amber-50 p-4 rounded-3xl border border-amber-200 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-amber-800 uppercase block">Pending COD Cash</span>
+              <h4 class="text-2xl font-black text-amber-950">₹${pendingCod}</h4>
+            </div>
+            ${pendingCod > 0 ? `
+              <button onclick="settleRiderCash('${uid}', '${escapeHtml(d.name || 'Rider')}', ${pendingCod})" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-sm active:scale-95 transition">
+                Cash Received ✓
+              </button>
+            ` : `<span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">All Clear</span>`}
+          </div>
+        </div>
+
+        <div class="bg-slate-900 text-white p-5 rounded-3xl shadow-md space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span class="text-xs font-black text-amber-400"><i class="fa-solid fa-building-columns mr-1"></i> Rider Payout Bank Details</span>
+            <span class="text-emerald-400 font-mono text-xs font-black">IFSC: ${escapeHtml(d.ifscCode || 'N/A')}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+            <div><span class="text-slate-400 text-[10px] block">Bank Name</span><span class="font-bold">${escapeHtml(d.bankName || 'N/A')}</span></div>
+            <div><span class="text-slate-400 text-[10px] block">Account Holder</span><span class="font-bold">${escapeHtml(d.accountHolderName || d.name || 'N/A')}</span></div>
+          </div>
+          <div class="pt-1">
+            <span class="text-slate-400 text-[10px] block">Account Number</span>
+            <span class="font-mono text-sm font-black text-slate-100">${escapeHtml(d.bankAccountNo || 'Not updated')}</span>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-3">
+          <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Delivery Trips (${totalTrips})</h4>
+          <div class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar">
+            ${tripsHtml || '<p class="text-xs text-slate-400 text-center py-4">No trips completed by this rider yet.</p>'}
+          </div>
+        </div>
+      `;
+    }
+
+    function openCustomerDetail(uid) {
+      const c = cachedCustomers[uid];
+      if (!c) return;
+      activeDetailEntity = { type: 'customer', uid };
+      pushNavState(`customer_detail_${uid}`);
+
+      document.getElementById(`section-${currentActiveTab}`).classList.add('hidden');
+      const view = document.getElementById('section-detail-view');
+      view.classList.remove('hidden');
+
+      document.getElementById('detailEntityTitle').innerText = c.name || 'Customer';
+      document.getElementById('detailEntitySubtitle').innerText = `Customer UID: ${uid}`;
+
+      document.getElementById('detailActionButtons').innerHTML = `
+        ${c.phone ? `<a href="tel:${escapeHtml(c.phone)}" class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-black flex items-center gap-1.5 active:scale-95 transition"><i class="fa-solid fa-phone"></i> Call</a>` : ''}
+        <button onclick="deleteUserPermanently('${uid}', 'customer', '${escapeHtml(c.name || 'Customer')}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black border border-rose-200 flex items-center gap-1.5 transition"><i class="fa-solid fa-trash-can"></i> Delete</button>
+      `;
+
+      let orderCount = 0, totalSpend = 0, customerOrdersHtml = '';
+      Object.keys(cachedOrders).forEach(id => {
+        const o = cachedOrders[id];
+        if (o && o.customerUid === uid) {
+          orderCount++;
+          if (o.status === 'DELIVERED') totalSpend += (Number(o.totalAmount) || 0);
+          customerOrdersHtml += `
+            <div class="p-3 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between text-xs">
+              <div>
+                <span class="font-mono font-black text-slate-900">#${id.slice(-6)}</span>
+                <span class="px-2 py-0.5 rounded text-[9px] font-bold ${o.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}">${o.status}</span>
+                <p class="text-[10px] text-slate-400 font-mono mt-0.5">${new Date(o.createdAt || Date.now()).toLocaleDateString()}</p>
+              </div>
+              <span class="font-black text-emerald-700">₹${o.totalAmount || 0}</span>
+            </div>
+          `;
+        }
+      });
+
+      const custPhoto = c.photoUrl || '';
+
+      document.getElementById('detailContentBody').innerHTML = `
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs flex items-center gap-4">
+          <div class="w-16 h-16 rounded-full overflow-hidden bg-brand-100 text-brand-600 flex items-center justify-center text-2xl font-black flex-shrink-0 border-2 border-brand-500/30 shadow-xs">
+            ${custPhoto ? `<img src="${custPhoto}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-user"></i>`}
+          </div>
+          <div class="flex-1 space-y-1">
+            <h4 class="text-base font-black text-slate-900">${escapeHtml(c.name || 'Customer')}</h4>
+            <p class="text-xs text-slate-500 font-mono">${escapeHtml(c.phone || 'No phone')} • ${escapeHtml(c.email || 'No email')}</p>
+            <p class="text-xs text-slate-600"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(c.address || 'Address not provided')}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-white p-4 rounded-3xl border border-slate-200 text-center">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Total Orders Placed</span>
+            <h4 class="text-xl font-black text-slate-900 mt-1">${orderCount}</h4>
+          </div>
+          <div class="bg-white p-4 rounded-3xl border border-slate-200 text-center">
+            <span class="text-[10px] font-bold text-emerald-600 uppercase">Total Lifetime Spend</span>
+            <h4 class="text-xl font-black text-emerald-700 mt-1">₹${totalSpend.toLocaleString('en-IN')}</h4>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-3">
+          <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Order History (${orderCount})</h4>
+          <div class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar">
+            ${customerOrdersHtml || '<p class="text-xs text-slate-400 text-center py-4">Customer has not placed any orders yet.</p>'}
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================
+    // 💵 1-CLICK COD CASH SETTLEMENT
+    // =========================================================
+    function settleRiderCash(riderUid, riderName, pendingAmount) {
+      if (pendingAmount <= 0) {
+        alert(`${riderName} के पास कोई पेंडिंग COD कैश नहीं है।`);
+        return;
+      }
+
+      if (!confirm(`क्या आपको ${riderName} से ₹${pendingAmount} कैश प्राप्त हो गया है? इससे राइडर का कैश तुरंत ₹0 हो जाएगा और ₹3,000 की लिमिट अनलॉक हो जाएगी।`)) {
+        return;
+      }
+
+      db.ref(`deliveryPartners/${riderUid}`).update({
+        lastSettledAt: Date.now(),
+        lastSettledAmount: pendingAmount
+      }).then(() => {
+        showModernFloatingToast("Cash Settled", `${riderName} का ₹${pendingAmount} कैश सेटल हो गया और लिमिट रीसेट हो गई!`, "fa-solid fa-hand-holding-dollar");
+        if (activeDetailEntity && activeDetailEntity.type === 'delivery' && activeDetailEntity.uid === riderUid) {
+          openRiderDetail(riderUid);
+        }
+      }).catch(err => {
+        alert("Settlement failed: " + err.message);
+      });
+    }
+
+    // ---------------- HELPDESK & SUPPORT CONFIG ----------------
     async function handleSaveSupportConfig(e) {
       e.preventDefault();
       const phone = document.getElementById('suppPhone').value.trim();
@@ -1238,8 +1858,8 @@
           `<div class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center font-black text-sm flex-shrink-0">${name.charAt(0).toUpperCase()}</div>`;
 
         html += `
-          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 flex flex-col justify-between">
-            <div>
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 flex flex-col justify-between hover:shadow-md transition">
+            <div onclick="openRestaurantDetail('${uid}')" class="cursor-pointer">
               <div class="flex items-start justify-between gap-2">
                 <div class="flex items-center gap-2.5 min-w-0">
                   ${logoHtml}
@@ -1252,17 +1872,21 @@
                   ${isApproved ? 'Approved' : 'Pending'}
                 </span>
               </div>
-              
               <p class="text-[11px] text-slate-500 mt-2 line-clamp-1"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(r.address || 'N/A')}</p>
-              
               ${bankHtml}
             </div>
 
-            <div class="pt-2 border-t border-slate-100">
-              ${!isApproved 
-                ? `<button onclick="setRestaurantApproval('${uid}', true)" class="w-full min-h-[38px] py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black shadow-sm transition"><i class="fa-solid fa-check"></i> Approve Kitchen</button>`
-                : `<button onclick="setRestaurantApproval('${uid}', false)" class="w-full min-h-[38px] py-2 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black transition border border-rose-200"><i class="fa-solid fa-ban"></i> Suspend Kitchen</button>`
-              }
+            <!-- Action Buttons with Functional Delete -->
+            <div class="pt-2 border-t border-slate-100 flex gap-2">
+              <div class="flex-1">
+                ${!isApproved 
+                  ? `<button onclick="setRestaurantApproval('${uid}', true)" class="w-full min-h-[38px] py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black shadow-sm transition"><i class="fa-solid fa-check"></i> Approve</button>`
+                  : `<button onclick="setRestaurantApproval('${uid}', false)" class="w-full min-h-[38px] py-2 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 rounded-xl text-xs font-black transition border border-amber-200"><i class="fa-solid fa-ban"></i> Suspend</button>`
+                }
+              </div>
+              <button onclick="deleteUserPermanently('${uid}', 'restaurant', '${escapeHtml(name)}')" class="w-10 min-h-[38px] bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black transition border border-rose-200 flex items-center justify-center" title="हमेशा के लिए हटाएं">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
             </div>
           </div>
         `;
@@ -1298,6 +1922,18 @@
 
         if (filterText && !name.toLowerCase().includes(filterText.toLowerCase()) && !d.phone?.includes(filterText) && !d.bankAccountNo?.includes(filterText) && !d.ifscCode?.toLowerCase().includes(filterText.toLowerCase())) return;
 
+        const lastSettledAt = d.lastSettledAt || 0;
+        let pendingCod = 0;
+        Object.keys(cachedOrders).forEach(id => {
+          const o = cachedOrders[id];
+          if (o && o.deliveryUid === uid && o.status === 'DELIVERED' && o.paymentMethod !== 'ONLINE') {
+            const deliveredTime = o.updatedAt || o.createdAt || 0;
+            if (deliveredTime > lastSettledAt) {
+              pendingCod += (Number(o.totalAmount) || 0);
+            }
+          }
+        });
+
         const hasBank = d.bankAccountNo && d.ifscCode;
         const bankHtml = hasBank ? `
           <div class="p-2.5 rounded-2xl bg-slate-900 text-white space-y-1 text-[11px] mt-2">
@@ -1316,14 +1952,16 @@
           </div>
         `;
 
+        const riderAvatar = d.photoUrl ?
+          `<img src="${escapeHtml(d.photoUrl)}" class="w-10 h-10 rounded-full object-cover border border-slate-200 flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'">` :
+          `<div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-base flex-shrink-0"><i class="fa-solid fa-motorcycle"></i></div>`;
+
         html += `
-          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 flex flex-col justify-between">
-            <div>
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3 flex flex-col justify-between hover:shadow-md transition">
+            <div onclick="openRiderDetail('${uid}')" class="cursor-pointer">
               <div class="flex items-start justify-between gap-2">
                 <div class="flex items-center gap-2.5 min-w-0">
-                  <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-base flex-shrink-0">
-                    <i class="fa-solid fa-motorcycle"></i>
-                  </div>
+                  ${riderAvatar}
                   <div class="min-w-0">
                     <h4 class="font-black text-xs sm:text-sm text-slate-900 truncate">${escapeHtml(name)}</h4>
                     <p class="text-[10px] text-slate-400 font-mono truncate">${escapeHtml(d.phone || 'N/A')}</p>
@@ -1335,18 +1973,36 @@
               </div>
 
               <div class="flex items-center justify-between text-[11px] text-slate-600 mt-2">
-                <span><i class="fa-solid fa-car text-slate-400 mr-1"></i> ${escapeHtml(d.vehicle || 'Bike')}</span>
+                <span><i class="fa-solid fa-motorcycle text-slate-400 mr-1"></i> ${escapeHtml(d.vehicle || 'Bike')}</span>
                 <span class="font-black ${d.online !== false ? 'text-emerald-600' : 'text-slate-400'}">● ${d.online !== false ? 'Online Duty' : 'Offline'}</span>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-between mt-2">
+                <div>
+                  <span class="text-[10px] text-amber-800 font-bold uppercase block">Pending COD Cash</span>
+                  <span class="text-sm font-black text-amber-950">₹${pendingCod}</span>
+                </div>
+                ${pendingCod > 0 ? `
+                  <button onclick="event.stopPropagation(); settleRiderCash('${uid}', '${escapeHtml(name)}', ${pendingCod})" class="min-h-[30px] px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-xs active:scale-95 transition">
+                    Cash Received
+                  </button>
+                ` : `<span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">All Clear ✓</span>`}
               </div>
 
               ${bankHtml}
             </div>
 
-            <div class="pt-2 border-t border-slate-100">
-              ${!isApproved 
-                ? `<button onclick="setDeliveryApproval('${uid}', true)" class="w-full min-h-[38px] py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black shadow-sm transition"><i class="fa-solid fa-check"></i> Approve Rider</button>`
-                : `<button onclick="setDeliveryApproval('${uid}', false)" class="w-full min-h-[38px] py-2 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black transition border border-rose-200"><i class="fa-solid fa-ban"></i> Suspend Rider</button>`
-              }
+            <!-- Action Buttons with Functional Delete -->
+            <div class="pt-2 border-t border-slate-100 flex gap-2">
+              <div class="flex-1">
+                ${!isApproved 
+                  ? `<button onclick="setDeliveryApproval('${uid}', true)" class="w-full min-h-[38px] py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black shadow-sm transition"><i class="fa-solid fa-check"></i> Approve</button>`
+                  : `<button onclick="setDeliveryApproval('${uid}', false)" class="w-full min-h-[38px] py-2 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 rounded-xl text-xs font-black transition border border-amber-200"><i class="fa-solid fa-ban"></i> Suspend</button>`
+                }
+              </div>
+              <button onclick="deleteUserPermanently('${uid}', 'delivery', '${escapeHtml(name)}')" class="w-10 min-h-[38px] bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black transition border border-rose-200 flex items-center justify-center" title="राइडर हटाएं">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
             </div>
           </div>
         `;
@@ -1365,7 +2021,7 @@
     }
 
     // =========================================================================
-    // REAL-TIME LIVE GPS & RAZORPAY ORDERS RADAR
+    // REAL-TIME ORDERS RADAR
     // =========================================================================
     function renderOrdersTable() {
       const container = document.getElementById('ordersCardsContainer');
@@ -1390,9 +2046,9 @@
         if (o.deliveryUid && cachedDelivery[o.deliveryUid]) {
           deliveryBoyInfo = `<span class="text-emerald-700 font-bold"><i class="fa-solid fa-person-biking mr-1"></i> Rider: ${escapeHtml(cachedDelivery[o.deliveryUid].name)} (${escapeHtml(cachedDelivery[o.deliveryUid].phone || '')})</span>`;
         } else if (!isClosed && o.status !== 'PAYMENT_PENDING') {
-          deliveryBoyInfo = `<span class="text-orange-600 font-black flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span> Live Broadcast (Waiting for Rider Lock)</span>`;
+          deliveryBoyInfo = `<span class="text-orange-600 font-black flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span> Live Broadcast (Waiting for Rider)</span>`;
         } else if (o.status === 'PAYMENT_PENDING') {
-          deliveryBoyInfo = `<span class="text-amber-600 font-bold"><i class="fa-solid fa-hourglass-half mr-1"></i> Awaiting Razorpay Payment Completion</span>`;
+          deliveryBoyInfo = `<span class="text-amber-600 font-bold"><i class="fa-solid fa-hourglass-half mr-1"></i> Awaiting Razorpay Payment</span>`;
         } else {
           deliveryBoyInfo = `<span class="text-slate-400 font-bold">Unassigned</span>`;
         }
@@ -1402,7 +2058,6 @@
           `<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-50 text-blue-700 border border-blue-200">RAZORPAY ONLINE</span>` : 
           `<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">COD</span>`;
 
-        // REAL-TIME LIVE GPS COORDINATES PIN FOR RIDER
         let riderGpsMapUrl = o.locationLink;
         if (!riderGpsMapUrl && o.riderLat && o.riderLng) {
           riderGpsMapUrl = `https://www.google.com/maps?q=${o.riderLat},${o.riderLng}`;
@@ -1440,7 +2095,6 @@
                 ${customerMapUrl ? `<a href="${customerMapUrl}" target="_blank" class="text-blue-600 font-bold text-[10px] hover:underline flex-shrink-0"><i class="fa-solid fa-map-pin"></i> Drop Pin</a>` : ''}
               </div>
               
-              <!-- Razorpay Payment Status Bar -->
               ${o.paymentMethod === 'ONLINE' ? `
                 <div class="p-2.5 rounded-2xl bg-blue-50/70 border border-blue-200 flex items-center justify-between text-[11px]">
                   <div>
@@ -1453,7 +2107,6 @@
                 </div>
               ` : ''}
 
-              <!-- Real-Time Live GPS Radar Link -->
               <div class="flex items-center justify-between pt-1">
                 <div class="text-[11px]">${deliveryBoyInfo}</div>
                 ${riderGpsMapUrl ? `
@@ -1484,18 +2137,31 @@
       container.innerHTML = html || `<div class="p-6 text-center text-slate-400 text-xs bg-white rounded-3xl border border-slate-200">No orders match filter.</div>`;
     }
 
+    // =========================================================
+    // 💳 SAFE AUTO-REFUND ON CANCEL ORDER
+    // =========================================================
     async function cancelOrder(orderId) {
-      if (!confirm(`Cancel order #${orderId.slice(-6)}?`)) return;
+      if (!confirm(`Cancel order #${orderId.slice(-6)}? If paid online, it will trigger an automated refund.`)) return;
       try {
-        const updates = {};
-        updates[`orders/${orderId}/status`] = 'CANCELLED';
-        updates[`orders/${orderId}/cancelledBy`] = 'ADMIN';
-        updates[`orders/${orderId}/cancelReason`] = 'Cancelled by Super Admin';
-        updates[`orders/${orderId}/updatedAt`] = Date.now();
-        updates[`unassignedOrders/${orderId}`] = null;
+        // 1. Mark CANCELLED directly in Firebase Realtime Database
+        await db.ref(`orders/${orderId}`).update({
+          status: 'CANCELLED',
+          cancelReason: 'Cancelled by Super Admin',
+          updatedAt: Date.now()
+        });
 
-        await db.ref().update(updates);
-        showModernFloatingToast("Order Cancelled", `Order #${orderId.slice(-6)} was cancelled by Admin.`, "fa-solid fa-ban", true);
+        // 2. Remove from unassigned queue
+        await db.ref(`unassignedOrders/${orderId}`).remove();
+
+        // 3. Trigger refund API
+        const res = await fetch(`${BACKEND_URL}/api/refund-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: orderId, reason: 'Cancelled by Super Admin' })
+        });
+        const data = await res.json();
+
+        showModernFloatingToast("Order Cancelled", data.refundId ? "Order cancelled and online refund initiated!" : "Order cancelled.", "fa-solid fa-ban", true);
       } catch (err) {
         alert("Failed to cancel order: " + err.message);
       }
@@ -1555,11 +2221,30 @@
       keys.forEach(uid => {
         const c = cachedCustomers[uid];
         if (!c) return;
+
+        const custPhoto = c.photoUrl ? 
+          `<img src="${escapeHtml(c.photoUrl)}" class="w-10 h-10 rounded-full object-cover border border-slate-200 flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'">` : 
+          `<div class="w-10 h-10 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-xs flex-shrink-0">${(c.name || 'C').charAt(0).toUpperCase()}</div>`;
+
         html += `
-          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-1.5">
-            <h4 class="font-black text-xs sm:text-sm text-slate-900">${escapeHtml(c.name || 'Customer')}</h4>
-            <p class="text-[11px] text-slate-500 font-mono">${escapeHtml(c.phone || 'No phone')} • ${escapeHtml(c.email || '')}</p>
-            <p class="text-[11px] text-slate-600 line-clamp-2"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(c.address || 'No address set')}</p>
+          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-2 flex flex-col justify-between hover:shadow-md transition">
+            <div onclick="openCustomerDetail('${uid}')" class="cursor-pointer">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  ${custPhoto}
+                  <div class="min-w-0">
+                    <h4 class="font-black text-xs sm:text-sm text-slate-900 truncate">${escapeHtml(c.name || 'Customer')}</h4>
+                    <p class="text-[10px] text-slate-400 font-mono truncate">${escapeHtml(c.phone || 'No phone')}</p>
+                  </div>
+                </div>
+                <!-- 🗑️ Functional Delete Button on Card -->
+                <button onclick="event.stopPropagation(); deleteUserPermanently('${uid}', 'customer', '${escapeHtml(c.name || 'Customer')}')" class="min-h-[32px] px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-xs font-bold active:scale-95 transition border border-rose-200 flex items-center gap-1" title="कस्टमर हटाएं">
+                  <i class="fa-solid fa-trash-can"></i>
+                  <span>हटाएं</span>
+                </button>
+              </div>
+              <p class="text-[11px] text-slate-600 line-clamp-2 mt-2"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(c.address || 'No address set')}</p>
+            </div>
           </div>
         `;
       });
@@ -1690,9 +2375,21 @@
       }
     }
 
-    function switchTab(tabId) {
+    // =========================================================
+    // 🔀 DYNAMIC TAB SWITCHER (INCLUDES 'PROFILE')
+    // =========================================================
+    function switchTab(tabId, isBackAction = false) {
+      if (currentActiveTab === tabId && !isBackAction) return;
+
+      closeDetailView();
+
+      if (!isBackAction) {
+        adminTabHistory.push(tabId);
+        pushNavState(`tab_${tabId}`);
+      }
+
       currentActiveTab = tabId;
-      const sections = ['overview', 'orders', 'support', 'restaurants', 'delivery', 'customers', 'notifications', 'reports'];
+      const sections = ['overview', 'orders', 'support', 'restaurants', 'delivery', 'customers', 'notifications', 'reports', 'profile'];
       sections.forEach(s => {
         const secEl = document.getElementById(`section-${s}`);
         const navEl = document.getElementById(`nav-${s}`);
@@ -1717,7 +2414,8 @@
         delivery: 'Delivery Fleet Riders & Bank Accounts',
         customers: 'Customer Directory',
         notifications: 'Push Broadcasts',
-        reports: 'Razorpay, COD & Revenue Pulse'
+        reports: 'Razorpay, COD & Revenue Pulse',
+        profile: 'Super Admin Profile'
       };
       document.getElementById('pageTitle').innerText = titleMap[tabId] || 'Admin';
       if (window.innerWidth < 768) {
@@ -1747,7 +2445,7 @@
           }
           document.getElementById("updateModal").style.display = "flex";
           document.getElementById("btnUpdateNow").onclick = function() {
-            const downloadUrl = data.admin_apk || data.apk_url;
+            const downloadUrl = data.admin_apk || data.apk_url || data.update_url;
             if (downloadUrl) window.location.href = downloadUrl;
           };
         }

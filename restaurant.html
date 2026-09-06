@@ -238,7 +238,7 @@
         </button>
       </form>
 
-      <!-- Signup Form with Mandatory Bank Details -->
+      <!-- Signup Form with Auto-Detect GPS & Mandatory Bank Details -->
       <form id="partnerSignupForm" onsubmit="handlePartnerSignup(event)" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Restaurant / Kitchen Name</label>
@@ -266,9 +266,17 @@
           <label class="block text-xs font-bold text-slate-600 mb-1">Cuisine Specialities</label>
           <input type="text" id="regCuisine" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Biryani, North Indian, Chinese">
         </div>
+
+        <!-- Address with Auto-Detect GPS -->
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Full Kitchen Address</label>
-          <textarea id="regAddress" rows="2" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Shop 4, Market Square, MG Road..."></textarea>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-600">Full Kitchen Address</label>
+            <button type="button" onclick="detectRestaurantLocation('regAddress', 'regGpsStatus')" class="text-[11px] text-brand-600 hover:text-brand-700 font-extrabold flex items-center gap-1 active:scale-95 transition">
+              <i class="fa-solid fa-crosshairs text-brand-500"></i>
+              <span id="regGpsStatus">Auto-Detect GPS</span>
+            </button>
+          </div>
+          <textarea id="regAddress" rows="2" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="दुकान/किचन का पूरा पता..."></textarea>
         </div>
 
         <!-- MANDATORY BANK DETAILS SECTION -->
@@ -322,7 +330,7 @@
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs px-4 sm:px-6 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3 overflow-hidden">
         <div class="w-11 h-11 rounded-2xl bg-brand-500 text-white flex items-center justify-center font-black text-lg shadow-md shadow-brand-500/30 overflow-hidden flex-shrink-0">
-          <img id="topRestaurantAvatar" src="" class="w-full h-full object-cover hidden" alt="Kitchen Logo" onerror="this.classList.add('hidden'); document.getElementById('topRestaurantIcon').classList.remove('hidden');">
+          <img id="topRestaurantAvatar" src="" class="w-full h-full object-cover hidden" alt="Kitchen Logo">
           <i id="topRestaurantIcon" class="fa-solid fa-fire-burner"></i>
         </div>
         <div class="overflow-hidden">
@@ -425,7 +433,7 @@
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <h3 class="font-extrabold text-slate-900 text-base">FoodWorld Menu & Stock Control</h3>
-            <p class="text-xs text-slate-400">Toggle Veg/Non-Veg, mark dishes Sold Out in 1-tap, input dish photo URLs</p>
+            <p class="text-xs text-slate-400">Toggle Veg/Non-Veg, mark dishes Sold Out in 1-tap, upload dish photos from gallery</p>
           </div>
           <button onclick="openDishModal('create')" class="w-full sm:w-auto min-h-[44px] px-4 py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-500/20 transition flex items-center justify-center gap-1.5">
             <i class="fa-solid fa-plus"></i> Add New Dish
@@ -480,88 +488,151 @@
         </div>
       </section>
 
-      <!-- ================= 4. PROFILE & BANK SETTINGS TAB ================= -->
-      <section id="section-profile" class="hidden space-y-4">
-        <div class="bg-white p-4 sm:p-6 rounded-3xl border border-slate-200 shadow-xs max-w-2xl">
-          <h3 class="font-extrabold text-slate-900 text-base mb-0.5">Restaurant Information & Bank Details</h3>
-          <p class="text-xs text-slate-400 mb-4">Manage kitchen photo URL & bank account details for payouts</p>
+      <!-- ================= 4. PROFILE & BANK SETTINGS TAB (READ-ONLY + TOP-RIGHT PENCIL EDIT) ================= -->
+      <section id="section-profile" class="hidden space-y-4 max-w-2xl mx-auto">
+        
+        <!-- 1. READ-ONLY KITCHEN CARD (DEFAULT) -->
+        <div id="restProfileViewCard" class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-black text-slate-900 text-base">Kitchen Profile & Bank</h3>
+              <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Verified Merchant Restaurant Card</p>
+            </div>
+            <!-- ✏️ TOP-RIGHT PENCIL ICON BUTTON -->
+            <button type="button" onclick="toggleRestProfileEdit(true)" class="w-10 h-10 rounded-2xl bg-brand-50 hover:bg-brand-100 text-brand-600 flex items-center justify-center text-sm shadow-xs transition active:scale-95 border border-brand-200" title="Edit Profile">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          </div>
 
-          <form onsubmit="handleUpdateProfile(event)" class="space-y-4">
-            
+          <!-- Center Kitchen Photo / Banner -->
+          <div class="text-center space-y-2">
+            <div class="relative w-28 h-28 mx-auto rounded-3xl ring-4 ring-orange-500/20 shadow-md overflow-hidden bg-slate-100 flex items-center justify-center">
+              <img id="viewRestPhoto" src="" class="w-full h-full object-cover hidden" alt="Kitchen Banner">
+              <div id="viewRestPlaceholder" class="w-full h-full bg-brand-500 text-white flex items-center justify-center text-3xl">
+                <i class="fa-solid fa-fire-burner"></i>
+              </div>
+            </div>
+            <h4 class="font-black text-lg text-slate-900" id="viewRestName">Restaurant Name</h4>
+            <p class="text-xs font-bold text-brand-600" id="viewRestCuisine">Biryani, North Indian</p>
+            <p class="text-[11px] text-slate-400" id="viewRestHours"><i class="fa-solid fa-clock mr-1"></i> 10:00 AM - 11:00 PM</p>
+          </div>
+
+          <div class="space-y-2.5 text-xs border-t border-slate-100 pt-3">
+            <div class="p-3 bg-slate-50 rounded-2xl flex justify-between items-center">
+              <span class="text-slate-400 font-bold">Contact Phone:</span>
+              <span class="font-bold text-slate-800" id="viewRestPhone">+91 0000000000</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-2xl flex justify-between items-center">
+              <span class="text-slate-400 font-bold">Business Email:</span>
+              <span class="font-bold text-slate-800" id="viewRestEmail">kitchen@foodworld.com</span>
+            </div>
+
+            <!-- Address with GPS Pin Indicator & Map Link -->
+            <div class="p-3 bg-slate-50 rounded-2xl space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400 font-bold">Kitchen Address:</span>
+                <span id="viewRestGpsBadge" class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">
+                  <i class="fa-solid fa-location-dot"></i> GPS Pinned
+                </span>
+              </div>
+              <p class="font-bold text-slate-800 leading-relaxed" id="viewRestAddress">Address details</p>
+              <div id="viewRestMapLinkBox" class="pt-1 hidden">
+                <a id="viewRestMapLink" href="#" target="_blank" class="text-[11px] text-blue-600 font-bold hover:underline flex items-center gap-1">
+                  <i class="fa-solid fa-map-location-dot"></i> अपनी दुकान की लोकेशन मैप पर देखें ➔
+                </a>
+              </div>
+            </div>
+
+            <!-- Bank Details (Read-Only) -->
+            <div class="p-3.5 bg-slate-900 text-white rounded-2xl space-y-1.5 mt-2">
+              <div class="flex items-center justify-between text-[10px] text-amber-400 font-mono border-b border-slate-800 pb-1">
+                <span class="font-bold" id="viewRestBankName">Bank Name</span>
+                <span class="text-emerald-400 font-black" id="viewRestIfsc">IFSC: HDFC0001234</span>
+              </div>
+              <p class="font-mono text-xs font-black flex justify-between pt-0.5">
+                <span>A/C: <span id="viewRestBankAcc">••••••••</span></span>
+                <span class="text-[10px] font-sans text-slate-300 font-bold" id="viewRestAccHolder">Holder Name</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. EDIT KITCHEN CARD (OPENS ON PENCIL TAP) -->
+        <div id="restProfileEditCard" class="hidden bg-white p-5 sm:p-6 rounded-3xl border border-brand-300 shadow-md space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-black text-slate-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-pen-to-square text-brand-500"></i> Edit Kitchen Details & Bank
+            </h3>
+            <button type="button" onclick="toggleRestProfileEdit(false)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <form onsubmit="handleUpdateProfile(event)" class="space-y-3.5">
+            <!-- Kitchen Photo / Logo Upload with Gallery/Camera + Base64 Compressor -->
             <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
-              <label class="block text-xs font-bold text-slate-700">Kitchen Photo / Logo (Image URL)</label>
+              <label class="block text-xs font-bold text-slate-700">Kitchen Logo / Profile Photo</label>
               <div class="flex items-center gap-3">
-                <div class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-xs">
-                  <img id="profImgPreview" src="" class="w-full h-full object-cover hidden" alt="Kitchen Preview" onerror="this.classList.add('hidden'); document.getElementById('profImgPlaceholder').classList.remove('hidden');">
-                  <i id="profImgPlaceholder" class="fa-solid fa-store text-2xl text-slate-300"></i>
+                <div class="w-16 h-16 rounded-2xl bg-white border-2 border-brand-200 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-xs relative">
+                  <img id="editRestPhotoPreview" src="" class="w-full h-full object-cover hidden" alt="Preview">
+                  <div id="editRestPhotoPlaceholder" class="text-slate-300 text-xl"><i class="fa-solid fa-camera"></i></div>
                 </div>
-                <div class="flex-1 min-w-0">
-                  <input type="url" id="profImageUrlInput" oninput="previewProfileImageUrl(this.value)" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="https://images.unsplash.com/photo-...">
-                  <p class="text-[10px] text-slate-400 mt-1">Paste any direct image URL link (Unsplash, Imgur, Cloudinary, etc.)</p>
+                <div class="flex-1 space-y-1.5 min-w-0">
+                  <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-xl text-xs font-extrabold cursor-pointer active:scale-95 transition border border-brand-200">
+                    <i class="fa-solid fa-image"></i> <span>गैलरी / कैमरा से चुनें</span>
+                    <input type="file" accept="image/*" class="hidden" onchange="processImageUpload(this, 'profImageUrlInput', 'editRestPhotoPreview', 'editRestPhotoPlaceholder')">
+                  </label>
+                  <input type="url" id="profImageUrlInput" oninput="previewPhotoUrl(this.value, 'editRestPhotoPreview', 'editRestPhotoPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="या इमेज लिंक (URL) डालें...">
                 </div>
               </div>
             </div>
 
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">Restaurant Name</label>
-              <input type="text" id="profName" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+              <input type="text" id="profName" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
             </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Registered Business Email</label>
-              <input type="email" id="profEmail" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 text-slate-500 rounded-xl text-xs cursor-not-allowed">
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="grid grid-cols-2 gap-2">
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Contact Phone</label>
-                <input type="tel" id="profPhone" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Phone</label>
+                <input type="tel" id="profPhone" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Operating Hours</label>
-                <input type="text" id="profHours" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="10:00 AM - 11:30 PM">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Hours</label>
+                <input type="text" id="profHours" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
               </div>
             </div>
-
             <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Cuisines / Specialties</label>
-              <input type="text" id="profCuisine" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Biryani, North Indian, Desserts">
+              <label class="block text-xs font-bold text-slate-600 mb-1">Cuisine</label>
+              <input type="text" id="profCuisine" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
             </div>
 
+            <!-- Address with Auto-Detect Live GPS -->
             <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Kitchen Address</label>
-              <textarea id="profAddress" rows="2" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none"></textarea>
-            </div>
-
-            <!-- MANDATORY BANK DETAILS IN PROFILE -->
-            <div class="p-3.5 bg-brand-50/70 border border-brand-200 rounded-2xl space-y-2.5">
-              <div class="flex items-center gap-1.5 text-xs font-black text-brand-800">
-                <i class="fa-solid fa-building-columns text-brand-600"></i>
-                <span>Kitchen Bank Account Details (Payout Settlements)</span>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-600">Kitchen Address & GPS Pin</label>
+                <button type="button" onclick="detectRestaurantLocation('profAddress', 'profGpsStatus')" class="text-[11px] text-brand-600 hover:text-brand-700 font-extrabold flex items-center gap-1 active:scale-95 transition">
+                  <i class="fa-solid fa-location-crosshairs text-brand-500"></i>
+                  <span id="profGpsStatus">Live GPS डिटेक्ट करें</span>
+                </button>
               </div>
+              <textarea id="profAddress" rows="2" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none" placeholder="दुकान संख्या, लैंडमार्क, शहर..."></textarea>
+            </div>
+
+            <!-- Bank Inputs -->
+            <div class="p-3 bg-brand-50/70 border border-brand-200 rounded-2xl space-y-2 text-xs font-bold">
+              <span class="text-brand-900 block text-[11px]"><i class="fa-solid fa-building-columns mr-1"></i> Bank Account for Payouts</span>
               <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Name</label>
-                  <input type="text" id="profBankName" required class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="e.g. HDFC Bank">
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Account Holder Name</label>
-                  <input type="text" id="profAccHolder" required class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Name as per bank">
-                </div>
+                <input type="text" id="profBankName" required placeholder="Bank Name" class="p-2 bg-white rounded-lg border border-slate-200 text-xs">
+                <input type="text" id="profAccHolder" required placeholder="Holder Name" class="p-2 bg-white rounded-lg border border-slate-200 text-xs">
               </div>
-              <div>
-                <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Account Number</label>
-                <input type="text" id="profBankAcc" required class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Bank account no.">
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank IFSC Code</label>
-                <input type="text" id="profIfsc" required oninput="this.value = this.value.toUpperCase()" class="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="HDFC0001234">
-              </div>
+              <input type="text" id="profBankAcc" required placeholder="Account Number" class="w-full p-2 bg-white rounded-lg border border-slate-200 text-xs font-mono">
+              <input type="text" id="profIfsc" required placeholder="IFSC Code" class="w-full p-2 bg-white rounded-lg border border-slate-200 text-xs font-mono uppercase">
             </div>
 
-            <button type="submit" id="saveProfBtn" class="w-full min-h-[48px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-md shadow-brand-500/30 transition">
-              Save Kitchen Profile & Bank Details
-            </button>
+            <div class="flex gap-2 pt-1">
+              <button type="button" onclick="toggleRestProfileEdit(false)" class="flex-1 min-h-[44px] py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs active:scale-95 transition">Cancel</button>
+              <button type="submit" id="saveProfBtn" class="flex-1 min-h-[44px] py-2 bg-brand-600 hover:bg-brand-500 text-white font-black rounded-xl text-xs shadow-md active:scale-95 transition">Save Kitchen</button>
+            </div>
           </form>
         </div>
       </section>
@@ -569,7 +640,7 @@
     </main>
   </div>
 
-  <!-- ================= DISH MODAL ================= -->
+  <!-- ================= DISH MODAL (WITH GALLERY / CAMERA UPLOAD) ================= -->
   <div id="dishModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl p-5 sm:p-6 space-y-4 shadow-2xl">
       
@@ -609,17 +680,21 @@
           </div>
         </div>
 
-        <!-- Dish Photo URL Box -->
-        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-          <label class="block text-xs font-bold text-slate-700">Dish Photo (Image URL)</label>
+        <!-- Dish Photo (Gallery / Camera + Base64 Compressor + URL) -->
+        <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
+          <label class="block text-xs font-bold text-slate-700">Dish Photo</label>
           <div class="flex items-center gap-3">
-            <div class="w-16 h-16 rounded-xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-xs">
-              <img id="dishImgPreview" src="" class="w-full h-full object-cover hidden" alt="Preview" onerror="this.classList.add('hidden'); document.getElementById('dishImgPlaceholder').classList.remove('hidden');">
+            <div class="w-16 h-16 rounded-2xl bg-white border-2 border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-xs relative">
+              <img id="dishImgPreview" src="" class="w-full h-full object-cover hidden" alt="Preview">
               <i id="dishImgPlaceholder" class="fa-solid fa-utensils text-slate-300 text-xl"></i>
             </div>
-            <div class="flex-1 min-w-0">
-              <input type="url" id="dishImageUrlInput" oninput="previewDishImageUrl(this.value)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="https://images.unsplash.com/photo-...">
-              <p class="text-[10px] text-slate-400 mt-1">Paste web image URL (Leave blank for default food image)</p>
+            <div class="flex-1 space-y-1.5 min-w-0">
+              <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-xl text-xs font-extrabold cursor-pointer active:scale-95 transition border border-brand-200">
+                <i class="fa-solid fa-camera"></i>
+                <span>गैलरी / कैमरा से डिश फोटो चुनें</span>
+                <input type="file" accept="image/*" class="hidden" onchange="processImageUpload(this, 'dishImageUrlInput', 'dishImgPreview', 'dishImgPlaceholder')">
+              </label>
+              <input type="url" id="dishImageUrlInput" oninput="previewPhotoUrl(this.value, 'dishImgPreview', 'dishImgPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="या ऑनलाइन इमेज लिंक डालें...">
             </div>
           </div>
         </div>
@@ -647,9 +722,9 @@
       <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
     </div>
   </div>
-
-  <!-- ================= JAVASCRIPT LOGIC ================= -->
+<!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
+    // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyABmYgOsai5ppKsAqxGr212nZiMu9tsCjo",
       authDomain: "foodworldfixed.firebaseapp.com",
@@ -665,14 +740,23 @@
     const db = firebase.database();
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
+    // 2. PRODUCTION BACKEND URL (VERCEL)
+    const BACKEND_URL = "https://foodworld-backend.vercel.app";
+
+    // 3. STATE VARIABLES & STEP-BY-STEP NAVIGATION STACK
     let currentPartner = null, cachedOrders = {}, cachedMenu = {}, cachedDeliveryPartners = {}, isRoleChecking = false;
     let knownOrderIds = new Set();
     let currentActiveTab = 'orders';
+    let navHistoryStack = ['orders'];
     let toastTimeout = null;
     let audioCtx = null;
     let wakeLockSentinel = null;
 
-    // ---------------- SYSTEM PUSH NOTIFICATION REQUEST ----------------
+    // GPS State Variables
+    let restaurantLat = null;
+    let restaurantLng = null;
+
+    // ---------------- SYSTEM PUSH NOTIFICATION ----------------
     if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
       Notification.requestPermission().catch(() => {});
     }
@@ -711,7 +795,7 @@
       }
     }
 
-    // ---------------- GLOBAL AUDIO UNLOCK CONTROLLER ----------------
+    // ---------------- AUDIO CHIME CONTROLLERS ----------------
     function initGlobalAudioContext() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx && audioCtx.state === 'suspended') {
@@ -801,6 +885,107 @@
       }, 300);
     }
 
+    // =========================================================
+    // 📸 UNIVERSAL IMAGE COMPRESSOR (CANVAS BASE64)
+    // =========================================================
+    function processImageUpload(input, targetInputId, previewImgId, placeholderId) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const MAX_SIZE = 400; // 400px Max Dimensions
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+          } else {
+            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // 40-60 KB Base64 String
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+          document.getElementById(targetInputId).value = compressedBase64;
+          previewPhotoUrl(compressedBase64, previewImgId, placeholderId);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewPhotoUrl(url, previewImgId, placeholderId) {
+      const preview = document.getElementById(previewImgId);
+      const placeholder = document.getElementById(placeholderId);
+      if (url && url.trim().length > 10) {
+        preview.src = url.trim();
+        preview.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      } else {
+        preview.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      }
+    }
+
+    // =========================================================
+    // 📍 AUTO-DETECT LIVE GPS FOR RESTAURANT
+    // =========================================================
+    function detectRestaurantLocation(textareaId, statusSpanId) {
+      const statusEl = document.getElementById(statusSpanId);
+      const textarea = document.getElementById(textareaId);
+
+      if (!navigator.geolocation) {
+        alert("आपके डिवाइस/ब्राउज़र में GPS सपोर्ट नहीं है।");
+        return;
+      }
+
+      statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> लोकेशन लॉक हो रही है...';
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          restaurantLat = position.coords.latitude;
+          restaurantLng = position.coords.longitude;
+
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${restaurantLat}&lon=${restaurantLng}`, {
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            const data = await res.json();
+
+            if (data && data.display_name) {
+              textarea.value = data.display_name;
+            } else {
+              textarea.value = `Kitchen Location (GPS: ${restaurantLat.toFixed(6)}, ${restaurantLng.toFixed(6)})`;
+            }
+
+            statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> GPS सेट हो गया!</span>';
+            showModernFloatingToast("GPS Locked", `सटीक लोकेशन पिन हो गई (${restaurantLat.toFixed(4)}, ${restaurantLng.toFixed(4)})`, "fa-solid fa-location-dot");
+          } catch (e) {
+            if (!textarea.value) {
+              textarea.value = `GPS Pin: ${restaurantLat.toFixed(6)}, ${restaurantLng.toFixed(6)}`;
+            }
+            statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> GPS सेट ✓</span>';
+          }
+        },
+        (error) => {
+          statusEl.innerHTML = '<span class="text-rose-600 font-bold">GPS अनुमति दें</span>';
+          alert("कृपया मोबाइल/ब्राउज़र में Location Permission (GPS) ऑन करें: " + error.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
     // ---------------- FORGOT PASSWORD ----------------
     function openPartnerForgotModal() {
       const email = document.getElementById('loginEmail').value.trim();
@@ -850,38 +1035,38 @@
       }
     }
 
-    // ---------------- ANDROID BACK BUTTON ----------------
-    function pushHistoryState() {
-      history.pushState({ app: 'foodworld_restaurant' }, null, location.href);
+    // =========================================================
+    // 🔄 STEP-BY-STEP BACK NAVIGATION STACK
+    // =========================================================
+    function pushNavState(stateName) {
+      history.pushState({ screen: stateName }, '');
     }
-    pushHistoryState();
+    pushNavState('root_orders');
 
     window.addEventListener('popstate', function () {
-      pushHistoryState();
-      handleHardwareBack();
+      handleStepByStepBack();
     });
 
-    function handleHardwareBack() {
-      const emailSentM = document.getElementById('partnerEmailSentSuccessModal');
-      if (emailSentM && !emailSentM.classList.contains('hidden')) {
-        closePartnerEmailSuccessModal();
+    function handleStepByStepBack() {
+      const openModals = ['dishModal', 'partnerForgotModal', 'partnerEmailSentSuccessModal', 'exitAppModal'];
+      for (let mId of openModals) {
+        const m = document.getElementById(mId);
+        if (m && !m.classList.contains('hidden')) {
+          m.classList.add('hidden');
+          return;
+        }
+      }
+
+      const editProfileCard = document.getElementById('restProfileEditCard');
+      if (editProfileCard && !editProfileCard.classList.contains('hidden')) {
+        toggleRestProfileEdit(false);
         return;
       }
 
-      const forgotM = document.getElementById('partnerForgotModal');
-      if (forgotM && !forgotM.classList.contains('hidden')) {
-        closePartnerForgotModal();
-        return;
-      }
-
-      const dishM = document.getElementById('dishModal');
-      if (dishM && !dishM.classList.contains('hidden')) {
-        closeDishModal();
-        return;
-      }
-
-      if (currentActiveTab !== 'orders') {
-        switchTab('orders');
+      if (navHistoryStack.length > 1) {
+        navHistoryStack.pop();
+        const previousTab = navHistoryStack[navHistoryStack.length - 1];
+        switchTab(previousTab, true);
         return;
       }
 
@@ -894,7 +1079,6 @@
 
     function cancelExitApp() {
       document.getElementById('exitAppModal').classList.add('hidden');
-      switchTab('orders');
     }
 
     function confirmExitApp() {
@@ -907,33 +1091,7 @@
       }
     }
 
-    // ---------------- URL-BASED IMAGE PREVIEWS ----------------
-    function previewProfileImageUrl(url) {
-      const preview = document.getElementById('profImgPreview');
-      const placeholder = document.getElementById('profImgPlaceholder');
-      if (url && url.trim().length > 5) {
-        preview.src = url.trim();
-        preview.classList.remove('hidden');
-        placeholder.classList.add('hidden');
-      } else {
-        preview.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-      }
-    }
-
-    function previewDishImageUrl(url) {
-      const preview = document.getElementById('dishImgPreview');
-      const placeholder = document.getElementById('dishImgPlaceholder');
-      if (url && url.trim().length > 5) {
-        preview.src = url.trim();
-        preview.classList.remove('hidden');
-        placeholder.classList.add('hidden');
-      } else {
-        preview.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-      }
-    }
-
+    // ---------------- AUTHENTICATION CONTROLLER ----------------
     function toggleAuthMode(mode) {
       const loginForm = document.getElementById('partnerLoginForm');
       const signupForm = document.getElementById('partnerSignupForm');
@@ -999,7 +1157,7 @@
 
       if (!bankName || !accountHolderName || !bankAccountNo || !ifscCode) {
         document.getElementById('signupError').classList.remove('hidden');
-        document.getElementById('signupErrorMsg').innerText = "All Bank Account details are mandatory for verification and payouts.";
+        document.getElementById('signupErrorMsg').innerText = "All Bank Account details are mandatory for payouts.";
         return;
       }
 
@@ -1009,17 +1167,10 @@
       try {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         await db.ref(`restaurants/${userCredential.user.uid}`).set({
-          name, 
-          email, 
-          phone, 
-          hours, 
-          cuisine, 
-          address, 
-          imageUrl, 
-          bankName,
-          accountHolderName,
-          bankAccountNo,
-          ifscCode,
+          name, email, phone, hours, cuisine, address, imageUrl, 
+          restaurantLat: restaurantLat || null,
+          restaurantLng: restaurantLng || null,
+          bankName, accountHolderName, bankAccountNo, ifscCode,
           approved: false, 
           isOpen: true, 
           createdAt: Date.now()
@@ -1038,6 +1189,7 @@
       auth.signOut().catch(err => alert("Logout error: " + err.message));
     }
 
+    // ---------------- AUTH STATE & LISTENERS ----------------
     auth.onAuthStateChanged(async (user) => {
       const splash = document.getElementById('splashScreen');
       if (isRoleChecking) return;
@@ -1080,6 +1232,17 @@
       }
     }
 
+    // =========================================================
+    // 👤 KITCHEN PROFILE (READ-ONLY + PENCIL EDIT LOGIC)
+    // =========================================================
+    function toggleRestProfileEdit(showEdit) {
+      document.getElementById('restProfileViewCard').classList.toggle('hidden', showEdit);
+      document.getElementById('restProfileEditCard').classList.toggle('hidden', !showEdit);
+      if (showEdit && currentPartner && currentPartner.imageUrl) {
+        previewPhotoUrl(currentPartner.imageUrl, 'editRestPhotoPreview', 'editRestPhotoPlaceholder');
+      }
+    }
+
     function listenToRestaurantData(uid) {
       db.ref(`restaurants/${uid}`).on('value', snap => {
         currentPartner = snap.val() || {};
@@ -1088,12 +1251,13 @@
         document.getElementById('topRestaurantName').innerText = currentPartner.name || 'Kitchen Partner';
         document.getElementById('topRestaurantCuisine').innerText = `${currentPartner.cuisine || 'Multi-Cuisine'} • ${currentPartner.hours || 'Open'}`;
 
+        // Topbar Avatar with Safe Onload / Onerror
         const avatar = document.getElementById('topRestaurantAvatar');
         const icon = document.getElementById('topRestaurantIcon');
-        if (currentPartner.imageUrl) {
+        if (currentPartner.imageUrl && currentPartner.imageUrl.trim().length > 10) {
           avatar.src = currentPartner.imageUrl;
-          avatar.classList.remove('hidden');
-          icon.classList.add('hidden');
+          avatar.onload = () => { avatar.classList.remove('hidden'); icon.classList.add('hidden'); };
+          avatar.onerror = () => { avatar.classList.add('hidden'); icon.classList.remove('hidden'); };
         } else {
           avatar.classList.add('hidden');
           icon.classList.remove('hidden');
@@ -1113,21 +1277,59 @@
 
         const isOpen = (currentPartner.isOpen !== false);
         updateKitchenStoreUI(isOpen);
-        if (isOpen) {
-          requestScreenWakeLock();
+        if (isOpen) requestScreenWakeLock();
+        else releaseScreenWakeLock();
+
+        // 1. Read-Only Kitchen Profile कार्ड भरें
+        document.getElementById('viewRestName').innerText = currentPartner.name || 'Kitchen';
+        document.getElementById('viewRestCuisine').innerText = currentPartner.cuisine || 'Multi-Cuisine';
+        document.getElementById('viewRestHours').innerHTML = `<i class="fa-solid fa-clock mr-1"></i> ${currentPartner.hours || 'Hours not set'}`;
+        document.getElementById('viewRestPhone').innerText = currentPartner.phone || '';
+        document.getElementById('viewRestEmail').innerText = currentPartner.email || auth.currentUser?.email || '';
+        document.getElementById('viewRestAddress').innerText = currentPartner.address || 'Address not set';
+        document.getElementById('viewRestBankName').innerText = currentPartner.bankName || 'Bank Name';
+        document.getElementById('viewRestIfsc').innerText = `IFSC: ${currentPartner.ifscCode || 'N/A'}`;
+        document.getElementById('viewRestBankAcc').innerText = currentPartner.bankAccountNo || '••••••••';
+        document.getElementById('viewRestAccHolder').innerText = currentPartner.accountHolderName || '';
+
+        // Read-Only Card Photo
+        const restPhoto = document.getElementById('viewRestPhoto');
+        const restPh = document.getElementById('viewRestPlaceholder');
+        if (currentPartner.imageUrl && currentPartner.imageUrl.trim().length > 10) {
+          restPhoto.src = currentPartner.imageUrl;
+          restPhoto.onload = () => { restPhoto.classList.remove('hidden'); restPh.classList.add('hidden'); };
+          restPhoto.onerror = () => { restPhoto.classList.add('hidden'); restPh.classList.remove('hidden'); };
         } else {
-          releaseScreenWakeLock();
+          restPhoto.classList.add('hidden');
+          restPh.classList.remove('hidden');
         }
 
+        // Live GPS Pin Status & Map Preview Link
+        restaurantLat = currentPartner.restaurantLat || null;
+        restaurantLng = currentPartner.restaurantLng || null;
+        const gpsBadge = document.getElementById('viewRestGpsBadge');
+        const mapBox = document.getElementById('viewRestMapLinkBox');
+        const mapLink = document.getElementById('viewRestMapLink');
+
+        if (restaurantLat && restaurantLng) {
+          gpsBadge.className = "px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800";
+          gpsBadge.innerHTML = '<i class="fa-solid fa-check text-emerald-600 mr-0.5"></i> GPS Pinned';
+          mapLink.href = `https://www.google.com/maps?q=${restaurantLat},${restaurantLng}`;
+          mapBox.classList.remove('hidden');
+        } else {
+          gpsBadge.className = "px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-800";
+          gpsBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-600 mr-0.5"></i> No GPS Pin';
+          mapBox.classList.add('hidden');
+        }
+
+        // 2. Edit Kitchen Profile इनपुट्स भरें
         document.getElementById('profName').value = currentPartner.name || '';
-        document.getElementById('profEmail').value = currentPartner.email || auth.currentUser?.email || '';
         document.getElementById('profPhone').value = currentPartner.phone || '';
         document.getElementById('profHours').value = currentPartner.hours || '';
         document.getElementById('profCuisine').value = currentPartner.cuisine || '';
         document.getElementById('profAddress').value = currentPartner.address || '';
         document.getElementById('profImageUrlInput').value = currentPartner.imageUrl || '';
-        previewProfileImageUrl(currentPartner.imageUrl || '');
-
+        
         document.getElementById('profBankName').value = currentPartner.bankName || '';
         document.getElementById('profAccHolder').value = currentPartner.accountHolderName || '';
         document.getElementById('profBankAcc').value = currentPartner.bankAccountNo || '';
@@ -1139,11 +1341,10 @@
         renderOrdersFeed();
       });
 
-      // SAFE SPARKLIMIT: Limit to last 50 orders using .indexOn
+      // Limit to last 50 orders using .indexOn
       db.ref('orders').orderByChild('restaurantId').equalTo(uid).limitToLast(50).on('value', snap => {
         const orders = snap.val() || {};
         Object.keys(orders).forEach(id => {
-          // Play loud chime only when order is confirmed PLACED (not PAYMENT_PENDING)
           if (!knownOrderIds.has(id) && orders[id]?.status === 'PLACED') {
             playKitchenLoudChime();
             showModernFloatingToast("New Order!", `Order #${id.slice(-6)} received in kitchen.`, "fa-solid fa-bell-concierge");
@@ -1176,7 +1377,6 @@
 
     function updateKitchenStoreUI(isOpen) {
       const btn = document.getElementById('storeStatusBtn');
-
       if (isOpen) {
         btn.className = "min-h-[38px] px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-2 transition active:scale-95 shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-300";
         btn.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> <span>Accepting Orders</span>';
@@ -1202,9 +1402,9 @@
       el.classList.toggle('text-slate-400');
     }
 
-    // ==========================================
-    // RENDER ORDERS (GHOST-ORDER PROTECTED)
-    // ==========================================
+    // =========================================================
+    // 👨‍🍳 KITCHEN KOT PIPELINE (GHOST-ORDER FILTERED)
+    // =========================================================
     function renderOrdersFeed() {
       const container = document.getElementById('ordersFeedContainer');
       const filter = document.getElementById('ordersFilterSelect').value;
@@ -1216,7 +1416,7 @@
         const o = cachedOrders[id];
         if (!o) return;
 
-        // 🛑 GHOST-ORDER PROTECTION: Ignore unconfirmed / unpaid orders
+        // Ghost order shield
         if (o.status === 'PAYMENT_PENDING') return;
 
         const isClosed = o.status === 'DELIVERED' || o.status === 'CANCELLED';
@@ -1230,10 +1430,8 @@
         const theme = STATUS_THEMES[o.status] || { bg: 'bg-slate-100 text-slate-700 border-slate-200', label: o.status };
         const isOnlinePay = (o.paymentMethod === 'ONLINE');
 
-        let customerMapPin = "";
-        if (o.customerLat && o.customerLng) {
-          customerMapPin = `https://www.google.com/maps?q=${o.customerLat},${o.customerLng}`;
-        }
+        let customerMapPin = (o.customerLat && o.customerLng) ? 
+          `https://www.google.com/maps?q=${o.customerLat},${o.customerLng}` : '';
 
         let riderStatusHtml = '';
         if (o.deliveryUid && cachedDeliveryPartners[o.deliveryUid]) {
@@ -1292,7 +1490,6 @@
         }
 
         html += `
-          <!-- KITCHEN ORDER CARD -->
           <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-xs space-y-3.5 flex flex-col justify-between ${o.status === 'PLACED' ? 'new-order-pulse border-orange-300' : ''}">
             <div class="space-y-3">
               <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
@@ -1373,27 +1570,45 @@
       }).catch(err => alert('Failed to update status: ' + err.message));
     }
 
+    // =========================================================
+    // 💳 SAFE AUTO-REFUND ON ORDER REJECTION
+    // =========================================================
     async function rejectOrder(orderId) {
-      if (!confirm(`Reject order #${orderId.slice(-6)}?`)) return;
+      if (!confirm(`Reject order #${orderId.slice(-6)}? If paid online, customer will receive a refund.`)) return;
 
       try {
-        const updates = {};
-        updates[`orders/${orderId}/status`] = 'CANCELLED';
-        updates[`orders/${orderId}/cancelledBy`] = 'RESTAURANT';
-        updates[`orders/${orderId}/cancelReason`] = 'Rejected by restaurant kitchen';
-        updates[`orders/${orderId}/updatedAt`] = Date.now();
-        updates[`unassignedOrders/${orderId}`] = null;
+        // 1. Mark CANCELLED directly in Firebase Realtime Database
+        await db.ref(`orders/${orderId}`).update({
+          status: 'CANCELLED',
+          cancelReason: 'Rejected by restaurant kitchen',
+          updatedAt: Date.now()
+        });
 
-        await db.ref().update(updates);
-        showModernFloatingToast("Order Rejected", `Order #${orderId.slice(-6)} was rejected.`, "fa-solid fa-ban", true);
+        // 2. Remove from unassigned queue
+        await db.ref(`unassignedOrders/${orderId}`).remove();
+
+        // 3. Trigger backend refund API
+        const res = await fetch(`${BACKEND_URL}/api/refund-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: orderId, reason: 'Rejected by restaurant kitchen' })
+        });
+        const data = await res.json();
+
+        showModernFloatingToast(
+          "Order Rejected", 
+          data.refundId ? "Order rejected & refund initiated to customer!" : "Order rejected.", 
+          "fa-solid fa-ban", 
+          true
+        );
       } catch (err) {
-        alert('Failed to reject order: ' + err.message);
+        alert('Failed: ' + err.message);
       }
     }
 
-    // ==========================================
-    // MENU & STOCK CONTROLLER
-    // ==========================================
+    // =========================================================
+    // 🍲 MENU & STOCK CONTROLLER (WITH GALLERY UPLOADS)
+    // =========================================================
     function renderMenuCards() {
       const container = document.getElementById('menuCardsContainer');
       const itemKeys = Object.keys(cachedMenu);
@@ -1475,7 +1690,7 @@
         availSelect.value = d.available !== false ? 'true' : 'false';
         descInput.value = d.description || '';
         urlInput.value = d.imageUrl || '';
-        previewDishImageUrl(d.imageUrl || '');
+        previewPhotoUrl(d.imageUrl || '', 'dishImgPreview', 'dishImgPlaceholder');
       } else {
         title.innerText = 'Add New Dish';
         idInput.value = '';
@@ -1544,6 +1759,9 @@
       }
     }
 
+    // =========================================================
+    // 📊 SALES REPORTS & COD
+    // =========================================================
     function renderReports() {
       let totalOrders = 0, deliveredRev = 0, deliveredCount = 0, pendingRev = 0, pendingCount = 0, cancelledRev = 0, cancelledCount = 0;
       const orderKeys = Object.keys(cachedOrders);
@@ -1554,7 +1772,6 @@
         const o = cachedOrders[id];
         if (!o) return;
 
-        // Skip raw unconfirmed orders
         if (o.status === 'PAYMENT_PENDING') return;
 
         totalOrders++;
@@ -1600,7 +1817,9 @@
       document.getElementById('salesHistoryMobileFeed').innerHTML = salesHtml || `<div class="p-6 text-center text-slate-400 text-xs">No orders recorded yet.</div>`;
     }
 
-    // PROFILE & MANDATORY BANK DETAILS UPDATE
+    // =========================================================
+    // 💾 PROFILE UPDATE HANDLER (PHOTO + GPS + DETAILS)
+    // =========================================================
     async function handleUpdateProfile(e) {
       e.preventDefault();
       const name = document.getElementById('profName').value.trim();
@@ -1627,27 +1846,30 @@
 
       try {
         await db.ref(`restaurants/${auth.currentUser.uid}`).update({
-          name, 
-          phone, 
-          hours, 
-          cuisine, 
-          address, 
-          imageUrl,
-          bankName,
-          accountHolderName,
-          bankAccountNo,
-          ifscCode
+          name, phone, hours, cuisine, address, imageUrl,
+          restaurantLat: restaurantLat || null,
+          restaurantLng: restaurantLng || null,
+          bankName, accountHolderName, bankAccountNo, ifscCode
         });
-        showModernFloatingToast("Profile Saved", "Kitchen profile and bank details updated successfully.", "fa-solid fa-circle-check");
+        toggleRestProfileEdit(false);
+        showModernFloatingToast("Profile Saved", "Kitchen profile, photo & GPS location updated successfully.", "fa-solid fa-circle-check");
       } catch (err) {
         alert('Failed to update profile: ' + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = 'Save Kitchen Profile & Bank Details';
+        btn.innerHTML = 'Save Kitchen';
       }
     }
 
-    function switchTab(tabId) {
+    // ---------------- TAB SWITCHER ----------------
+    function switchTab(tabId, isBackAction = false) {
+      if (currentActiveTab === tabId && !isBackAction) return;
+
+      if (!isBackAction) {
+        navHistoryStack.push(tabId);
+        pushNavState(`tab_${tabId}`);
+      }
+
       currentActiveTab = tabId;
       ['orders', 'menu', 'reports', 'profile'].forEach(t => {
         const sec = document.getElementById(`section-${t}`);
@@ -1686,7 +1908,7 @@
           }
           document.getElementById("updateModal").style.display = "flex";
           document.getElementById("btnUpdateNow").onclick = function() {
-            const downloadUrl = data.restaurant_apk || data.apk_url;
+            const downloadUrl = data.restaurant_apk || data.apk_url || data.update_url;
             if (downloadUrl) window.location.href = downloadUrl;
           };
         }
