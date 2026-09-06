@@ -105,7 +105,7 @@
           <span id="toastTag" class="text-[10px] font-black uppercase tracking-wider text-brand-400">Notice</span>
           <span class="text-[9px] text-slate-400 font-mono">Just now</span>
         </div>
-        <p id="toastBody" class="text-xs font-semibold text-slate-100 truncate mt-0.5">Notification text goes here...</p>
+        <p id="toastBody" class="text-xs font-semibold text-slate-100 truncate mt-0.5">Notification text...</p>
       </div>
       <button onclick="dismissFloatingToast()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-400 hover:text-white transition flex-shrink-0 text-xs">
         <i class="fa-solid fa-xmark"></i>
@@ -130,7 +130,6 @@
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-
       <div id="notifCenterList" class="p-4 space-y-2.5 overflow-y-auto custom-scrollbar flex-1">
         <div class="p-8 text-center text-slate-400 text-xs">No announcements yet.</div>
       </div>
@@ -154,11 +153,9 @@
           <i class="fa-solid fa-xmark text-xs"></i>
         </button>
       </div>
-      
       <p class="text-xs text-slate-600 leading-relaxed">
-        Apna registered email address enter karein. Hum aapke email par password reset verification link bhejenge.
+        Apna registered email address enter karein. Hum aapke email par password reset link bhejenge.
       </p>
-
       <form onsubmit="handleCustomerPasswordReset(event)" class="space-y-3.5">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Customer Email</label>
@@ -167,9 +164,7 @@
             <input type="email" id="custResetEmail" required class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="you@example.com">
           </div>
         </div>
-
         <div id="custResetError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium"></div>
-
         <div class="flex gap-2 pt-1">
           <button type="button" onclick="closeCustomerForgotModal()" class="flex-1 min-h-[42px] py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs active:scale-95 transition">Cancel</button>
           <button type="submit" id="custResetBtn" class="flex-1 min-h-[42px] py-2 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-black rounded-xl text-xs shadow-md transition">Send Link</button>
@@ -188,7 +183,7 @@
         <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">Mail Sent</span>
         <h3 class="font-black text-slate-900 text-base mt-2">रिकवरी लिंक भेज दिया गया है!</h3>
         <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
-          FoodWorld password recovery link aapke email par bhej diya gaya hai. Kripya inbox check karke password reset karein.
+          FoodWorld password recovery link aapke email par bhej diya gaya hai. Inbox check karein.
         </p>
         <p class="text-xs font-mono font-bold text-brand-600 bg-brand-50 p-2 rounded-xl mt-2.5 truncate" id="custSuccessEmailPreview">you@example.com</p>
       </div>
@@ -220,7 +215,6 @@
   <!-- ================= AUTH VIEW (LOGIN / SIGNUP) ================= -->
   <div id="authView" class="hidden min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-brand-600 to-orange-500">
     <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
-      
       <div class="text-center mb-6">
         <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 text-2xl shadow-inner mb-2">
           <i class="fa-solid fa-bowl-food"></i>
@@ -255,7 +249,7 @@
         </div>
         <div id="loginAuthError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
           <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
-          <span id="loginErrorMsg">Error message</span>
+          <span id="loginErrorMsg">Error</span>
         </div>
         <button type="submit" id="loginBtn" class="w-full min-h-[48px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
           <span>Sign In</span>
@@ -292,7 +286,7 @@
         </div>
         <div id="signupAuthError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
           <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
-          <span id="signupErrorMsg">Error message</span>
+          <span id="signupErrorMsg">Error</span>
         </div>
         <button type="submit" id="signupBtn" class="w-full min-h-[48px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
           <span>Create Customer Account</span>
@@ -305,7 +299,7 @@
   <!-- ================= CUSTOMER APP VIEW ================= -->
   <div id="appView" class="hidden max-w-lg mx-auto bg-white min-h-screen relative shadow-2xl pb-safe flex flex-col">
 
-    <!-- Topbar Header with Live Address & Notifications Bell -->
+    <!-- Topbar Header -->
     <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 py-3 flex items-center justify-between shadow-xs">
       <div class="flex items-center gap-2.5 overflow-hidden">
         <div class="w-9 h-9 rounded-xl bg-brand-500 text-white flex items-center justify-center font-black text-sm shadow-md shadow-brand-500/30 flex-shrink-0">
@@ -373,9 +367,7 @@
             <h3 class="font-black text-xs sm:text-sm text-slate-900 truncate" id="menuRestName">Restaurant</h3>
             <p class="text-[10px] text-slate-400 font-medium truncate" id="menuRestCuisine">Dishes</p>
           </div>
-          <button onclick="document.getElementById('menuSearchInput').focus()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 flex items-center justify-center text-slate-700 text-xs transition">
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </button>
+          <div class="w-9"></div>
         </div>
 
         <div class="p-4 bg-white border-b border-slate-100 space-y-3">
@@ -389,12 +381,6 @@
               <span class="block text-xs font-black">4.5 ★</span>
               <span class="block text-[8px] uppercase tracking-wider font-bold text-white/80">Verified</span>
             </div>
-          </div>
-
-          <div class="flex items-center gap-3 pt-2 border-t border-slate-100 text-[11px] font-bold text-slate-600">
-            <span class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-brand-500"></i> 25-30 mins</span>
-            <span class="text-slate-300">•</span>
-            <span class="text-emerald-700 flex items-center gap-1"><i class="fa-solid fa-shield-halved"></i> 100% Secure Razorpay & COD</span>
           </div>
         </div>
 
@@ -416,11 +402,6 @@
         </div>
 
         <div class="p-4 space-y-3 flex-1">
-          <div class="flex items-center justify-between">
-            <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Recommended Menu Dishes</h4>
-            <span class="text-[10px] font-bold text-slate-400" id="dishCountBadge">0 Dishes</span>
-          </div>
-
           <div id="menuItemsContainer" class="space-y-3">
             <p class="text-xs text-slate-400 text-center py-8">Loading dishes...</p>
           </div>
@@ -451,7 +432,7 @@
         </div>
       </section>
 
-      <!-- ================= 4. CUSTOMER SUPPORT & HELPDESK TAB ================= -->
+      <!-- ================= 4. CUSTOMER SUPPORT & HELPDESK ================= -->
       <section id="tab-support" class="hidden p-4 space-y-4">
         <div>
           <h3 class="font-extrabold text-slate-900 text-base">24/7 Customer Helpdesk</h3>
@@ -466,9 +447,7 @@
             <div>
               <span class="px-2 py-0.5 rounded bg-brand-500/80 text-[9px] font-black uppercase tracking-wider">FoodWorld Official Helpdesk</span>
               <h4 class="font-extrabold text-sm sm:text-base mt-1" id="custSupportHours">24/7 Live Support</h4>
-              <p class="text-[11px] text-slate-300 mt-1 leading-relaxed" id="custSupportDesc">
-                Have a question about your order, food quality, refund, or delivery? FoodWorld Helpdesk is here for you 24/7.
-              </p>
+              <p class="text-[11px] text-slate-300 mt-1 leading-relaxed" id="custSupportDesc">Have an issue with your food or delivery? FoodWorld Helpdesk is here for you 24/7.</p>
             </div>
           </div>
 
@@ -488,7 +467,6 @@
           <h4 class="font-extrabold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-2">
             <i class="fa-solid fa-ticket text-brand-500"></i> Raise a Support Ticket
           </h4>
-          
           <form onsubmit="handleRaiseTicket(event)" class="space-y-3">
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">Select Issue Category</label>
@@ -509,7 +487,7 @@
 
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">Explain Your Issue in Detail</label>
-              <textarea id="ticketMessage" rows="3" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Please describe what happened so our FoodWorld team can resolve it immediately..."></textarea>
+              <textarea id="ticketMessage" rows="3" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Please describe what happened so our team can resolve it..."></textarea>
             </div>
 
             <button type="submit" id="submitTicketBtn" class="w-full min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-extrabold rounded-2xl text-xs shadow-md shadow-brand-500/20 transition flex items-center justify-center gap-2">
@@ -527,39 +505,97 @@
         </div>
       </section>
 
-      <!-- ================= 5. PROFILE TAB ================= -->
+      <!-- ================= 5. PROFILE TAB (READ-ONLY + TOP-RIGHT PENCIL EDIT) ================= -->
       <section id="tab-profile" class="hidden p-4 space-y-4">
-        <div>
-          <h3 class="font-extrabold text-slate-900 text-base">My Profile</h3>
-          <p class="text-[11px] text-slate-400">Manage address, GPS & contact details</p>
+        
+        <!-- 1. READ-ONLY VIEW CARD (DEFAULT) -->
+        <div id="custProfileViewCard" class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-5 space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-black text-slate-900 text-base">My Profile</h3>
+              <p class="text-[10px] text-slate-400">Account details & delivery location</p>
+            </div>
+            <!-- ✏️ TOP-RIGHT PENCIL ICON BUTTON -->
+            <button onclick="toggleCustomerProfileEdit(true)" class="w-10 h-10 rounded-2xl bg-brand-50 hover:bg-brand-100 text-brand-600 flex items-center justify-center text-sm shadow-xs transition active:scale-95" title="Edit Profile">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          </div>
+
+          <!-- Center Profile Photo / Avatar -->
+          <div class="text-center space-y-2">
+            <div class="relative w-24 h-24 mx-auto rounded-full ring-4 ring-brand-500/20 shadow-md overflow-hidden bg-slate-100 flex items-center justify-center">
+              <img id="viewCustPhoto" src="" class="w-full h-full object-cover hidden" alt="Profile" onerror="this.classList.add('hidden'); document.getElementById('viewCustPhotoPlaceholder').classList.remove('hidden');">
+              <div id="viewCustPhotoPlaceholder" class="w-full h-full bg-gradient-to-br from-brand-500 to-orange-600 text-white flex items-center justify-center text-3xl font-black">
+                <i class="fa-solid fa-user"></i>
+              </div>
+            </div>
+            <h4 class="font-black text-base text-slate-900" id="viewCustName">Customer Name</h4>
+            <p class="text-xs text-slate-400 font-mono" id="viewCustEmail">customer@foodworld.com</p>
+          </div>
+
+          <!-- Read-Only Information List -->
+          <div class="space-y-2.5 pt-2 border-t border-slate-100 text-xs">
+            <div class="p-3 bg-slate-50 rounded-2xl flex items-center justify-between">
+              <span class="text-slate-400 font-bold flex items-center gap-2"><i class="fa-solid fa-phone text-brand-500"></i> Phone Number</span>
+              <span class="font-bold text-slate-800" id="viewCustPhone">+91 0000000000</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-2xl space-y-1">
+              <span class="text-slate-400 font-bold flex items-center gap-2"><i class="fa-solid fa-location-dot text-brand-500"></i> Saved Delivery Address</span>
+              <p class="font-bold text-slate-800 leading-relaxed" id="viewCustAddress">No address set</p>
+            </div>
+          </div>
         </div>
 
-        <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+        <!-- 2. EDIT PROFILE CARD (HIDDEN BY DEFAULT - OPENS ON PENCIL TAP) -->
+        <div id="custProfileEditCard" class="hidden bg-white rounded-3xl border border-brand-300 shadow-md p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-black text-slate-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-user-pen text-brand-500"></i> Edit Profile
+            </h3>
+            <button onclick="toggleCustomerProfileEdit(false)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
           <form onsubmit="handleUpdateProfile(event)" class="space-y-3.5">
+            <!-- Profile Photo Input -->
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+              <label class="block text-xs font-bold text-slate-700">Profile Photo (Image URL)</label>
+              <div class="flex items-center gap-3">
+                <div class="w-14 h-14 rounded-full bg-white border border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-xs">
+                  <img id="editCustPhotoPreview" src="" class="w-full h-full object-cover hidden" onerror="this.classList.add('hidden'); document.getElementById('editCustPlaceholder').classList.remove('hidden');">
+                  <i id="editCustPlaceholder" class="fa-solid fa-camera text-slate-300"></i>
+                </div>
+                <input type="url" id="profPhotoUrl" oninput="previewCustPhoto(this.value)" class="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Paste direct image link...">
+              </div>
+            </div>
+
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
-              <input type="text" id="profName" required class="w-full px-3.5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              <input type="text" id="profName" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">Email</label>
-              <input type="email" id="profEmail" readonly class="w-full px-3.5 py-3 bg-slate-100 border border-slate-200 text-slate-500 rounded-xl text-xs cursor-not-allowed">
+              <input type="email" id="profEmail" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 text-slate-500 rounded-xl text-xs cursor-not-allowed">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">Phone Number</label>
-              <input type="tel" id="profPhone" required class="w-full px-3.5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+              <input type="tel" id="profPhone" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
             </div>
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="block text-xs font-bold text-slate-600">Default Delivery Address</label>
                 <button type="button" onclick="detectLiveLocation('profAddress', 'profGpsStatus')" class="text-[11px] text-brand-600 hover:text-brand-700 font-extrabold flex items-center gap-1">
-                  <i class="fa-solid fa-crosshairs text-brand-500"></i> <span id="profGpsStatus">Detect Live GPS</span>
+                  <i class="fa-solid fa-crosshairs text-brand-500"></i> <span id="profGpsStatus">Detect GPS</span>
                 </button>
               </div>
-              <textarea id="profAddress" rows="3" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+              <textarea id="profAddress" rows="2" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
             </div>
-            <button type="submit" id="saveProfBtn" class="w-full min-h-[44px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-md transition">
-              Save Changes
-            </button>
+
+            <div class="flex gap-2 pt-1">
+              <button type="button" onclick="toggleCustomerProfileEdit(false)" class="flex-1 min-h-[44px] py-2 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs active:scale-95 transition">Cancel</button>
+              <button type="submit" id="saveProfBtn" class="flex-1 min-h-[44px] py-2 bg-brand-600 hover:bg-brand-500 text-white font-black rounded-xl text-xs shadow-md transition active:scale-95">Save Profile</button>
+            </div>
           </form>
         </div>
 
@@ -568,6 +604,7 @@
           <span>Log Out</span>
         </button>
       </section>
+
     </main>
 
     <!-- FLOATING CART STRIP -->
@@ -609,7 +646,7 @@
     </nav>
   </div>
 
-  <!-- CHECKOUT MODAL (AUTOMATED RAZORPAY + COD) -->
+  <!-- ================= CHECKOUT MODAL (RAZORPAY + COD) ================= -->
   <div id="checkoutModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
       <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -641,7 +678,6 @@
 
         <div class="space-y-2">
           <h4 class="text-xs font-bold text-slate-700">Choose Payment Method</h4>
-          
           <div class="grid grid-cols-2 gap-2">
             <label onclick="selectPaymentMethod('COD')" id="payOptionCOD" class="p-3 rounded-2xl border-2 border-brand-500 bg-brand-50/50 cursor-pointer flex flex-col justify-between transition">
               <div class="flex items-center justify-between">
@@ -661,7 +697,7 @@
               </div>
               <div class="mt-2">
                 <span class="block text-xs font-black text-slate-900">Online Payment</span>
-                <span class="block text-[9px] text-slate-500">UPI, GPay, PhonePe, Cards</span>
+                <span class="block text-[9px] text-slate-500">UPI, GPay, Cards</span>
               </div>
             </label>
           </div>
@@ -676,7 +712,7 @@
             <span class="text-[10px] font-mono font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded" id="upiAmountTag">₹0</span>
           </div>
           <p class="text-[11px] text-slate-600 leading-tight">
-            "Confirm & Place Order" दबाते ही सुरक्षित Razorpay विंडो खुलेगी जहाँ आप Google Pay, PhonePe, Paytm, नेटबैंकिंग या कार्ड से 1-क्लिक में पेमेंट कर सकते हैं।
+            "Confirm & Place Order" दबाते ही सुरक्षित Razorpay विंडो खुलेगी जहाँ आप Google Pay, PhonePe, Paytm या कार्ड से भुगतान कर सकते हैं।
           </p>
         </div>
 
@@ -705,7 +741,7 @@
     </div>
   </div>
 
-  <!-- RATING MODAL -->
+  <!-- ================= RATING MODAL ================= -->
   <div id="ratingModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
       <div class="text-center space-y-1">
@@ -713,10 +749,8 @@
         <h3 class="font-extrabold text-base text-slate-900">Rate Your Food</h3>
         <p class="text-xs text-slate-400" id="ratingRestName">Restaurant</p>
       </div>
-
       <input type="hidden" id="ratingOrderId">
       <input type="hidden" id="ratingRestId">
-
       <div class="flex items-center justify-center gap-2 text-2xl text-amber-400 py-1">
         <button type="button" onclick="setStarRating(1)"><i class="fa-solid fa-star" id="star-1"></i></button>
         <button type="button" onclick="setStarRating(2)"><i class="fa-solid fa-star" id="star-2"></i></button>
@@ -724,9 +758,7 @@
         <button type="button" onclick="setStarRating(4)"><i class="fa-solid fa-star" id="star-4"></i></button>
         <button type="button" onclick="setStarRating(5)"><i class="fa-solid fa-star" id="star-5"></i></button>
       </div>
-
       <textarea id="ratingReviewText" rows="2" placeholder="Write feedback..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
-
       <div class="flex gap-2">
         <button onclick="closeRatingModal()" class="flex-1 min-h-[40px] py-2.5 bg-slate-100 active:scale-95 text-slate-700 font-bold rounded-xl text-xs transition">Cancel</button>
         <button onclick="submitOrderRating()" class="flex-1 min-h-[40px] py-2.5 bg-brand-600 active:scale-95 text-white font-bold rounded-xl text-xs shadow-md transition">Submit</button>
@@ -744,7 +776,7 @@
       <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
     </div>
   </div>
-<!-- ================= JAVASCRIPT LOGIC (100% GHOST-PROOF & SECURE) ================= -->
+<!-- ================= JAVASCRIPT LOGIC (GHOST-PROOF & STEP-BY-STEP BACK) ================= -->
   <script>
     // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
@@ -767,20 +799,21 @@
     const BACKEND_URL = "https://foodworld-backend-8tss-zeta.vercel.app";
     const RAZORPAY_KEY_ID = "rzp_live_TXVKN9bGeN4CAv";
 
-    // 3. STATE VARIABLES
+    // 3. STATE VARIABLES & NAVIGATION STACK
     let currentCustomer = null;
     let cachedRestaurants = {}, cachedMenus = {}, cachedDeliveryBoys = {}, cachedOrders = {};
     let cachedBroadcasts = {}, cachedMyTickets = {}, cachedSupportConfig = {};
     let activeRestaurantId = null, cart = {}, selectedRatingStars = 5, isRoleChecking = false;
     let customerLat = null, customerLng = null;
     let currentAppTab = 'home';
+    let navHistoryStack = ['home']; // 🔄 स्टेप-बाय-स्टेप बैक हिस्ट्री स्टैक
     let currentVegFilter = 'ALL';
-    let currentPaymentMethod = 'ONLINE'; // By default Online
+    let currentPaymentMethod = 'ONLINE';
     let knownNotifIds = new Set();
     let toastTimeout = null;
     let audioCtx = null;
 
-    // ---------------- SYSTEM PUSH NOTIFICATION REQUEST ----------------
+    // ---------------- SYSTEM NOTIFICATION REQUEST ----------------
     if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
       Notification.requestPermission().catch(() => {});
     }
@@ -796,14 +829,14 @@
       }
     }
 
-    // ---------------- 4-DIGIT UNIQUE DELIVERY OTP GENERATOR ----------------
+    // 4-DIGIT UNIQUE DELIVERY OTP GENERATOR
     function generateDeliveryOtp() {
       const array = new Uint32Array(1);
       window.crypto.getRandomValues(array);
-      return (1000 + (array[0] % 9000)).toString(); // 1000 - 9999
+      return (1000 + (array[0] % 9000)).toString();
     }
 
-    // ---------------- GLOBAL AUDIO UNLOCK CONTROLLER ----------------
+    // ---------------- AUDIO & TOAST CONTROLLERS ----------------
     function initGlobalAudioContext() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx && audioCtx.state === 'suspended') {
@@ -821,18 +854,15 @@
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        
         osc.frequency.setValueAtTime(880, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(1174.66, audioCtx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
-        
         osc.start(audioCtx.currentTime);
         osc.stop(audioCtx.currentTime + 0.35);
       } catch (e) {}
     }
 
-    // ---------------- FLOATING TOAST CONTROLLER ----------------
     function showModernFloatingToast(title, message, iconClass = 'fa-solid fa-bell', isAlert = false) {
       playModernNotifChime();
       sendSystemNotification(title, message);
@@ -844,29 +874,22 @@
       tagEl.innerText = title;
       bodyEl.innerText = message;
       iconBox.innerHTML = `<i class="${iconClass}"></i>`;
-
-      if (isAlert) {
-        iconBox.className = "w-10 h-10 rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-base flex-shrink-0";
-      } else {
-        iconBox.className = "w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-base flex-shrink-0";
-      }
+      iconBox.className = isAlert ? 
+        "w-10 h-10 rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-base flex-shrink-0" : 
+        "w-10 h-10 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-base flex-shrink-0";
 
       toast.classList.remove('hidden', 'toast-exit');
       toast.classList.add('toast-enter');
 
       if (toastTimeout) clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        dismissFloatingToast();
-      }, 5000);
+      toastTimeout = setTimeout(() => dismissFloatingToast(), 5000);
     }
 
     function dismissFloatingToast() {
       const toast = document.getElementById('modernFloatingToast');
       toast.classList.remove('toast-enter');
       toast.classList.add('toast-exit');
-      setTimeout(() => {
-        toast.classList.add('hidden');
-      }, 300);
+      setTimeout(() => toast.classList.add('hidden'), 300);
     }
 
     // ---------------- PAYMENT METHOD SELECTOR ----------------
@@ -878,9 +901,8 @@
       const checkONLINE = document.getElementById('radioCheckONLINE');
       const onlineBox = document.getElementById('onlineUpiBox');
 
-      const keys = Object.keys(cart);
       let subtotal = 0;
-      keys.forEach(k => { subtotal += (cart[k].price * cart[k].qty); });
+      Object.keys(cart).forEach(k => { subtotal += (cart[k].price * cart[k].qty); });
       const grandTotal = subtotal + DELIVERY_FEE;
 
       if (method === 'ONLINE') {
@@ -956,7 +978,7 @@
       }
     }
 
-    // ---------------- NOTIFICATION CENTER ----------------
+    // ---------------- NOTIFICATION DRAWER ----------------
     function toggleNotifCenter(show) {
       const drawer = document.getElementById('notifCenterDrawer');
       if (show) {
@@ -994,59 +1016,53 @@
       container.innerHTML = html;
     }
 
-    // ---------------- ANDROID HARDWARE BACK BUTTON & MODALS ----------------
-    function pushHistoryState() {
-      history.pushState({ app: 'foodworld_customer' }, null, location.href);
+    // =========================================================
+    // 🔄 UNIVERSAL STEP-BY-STEP BACK NAVIGATION STACK
+    // =========================================================
+    function pushNavState(stateName) {
+      history.pushState({ screen: stateName }, '');
     }
-    pushHistoryState();
+    pushNavState('root_home');
 
     window.addEventListener('popstate', function () {
-      pushHistoryState();
-      handleHardwareBack();
+      handleStepByStepBack();
     });
 
-    function handleHardwareBack() {
-      const emailSentM = document.getElementById('custEmailSentSuccessModal');
-      if (emailSentM && !emailSentM.classList.contains('hidden')) {
-        closeCustEmailSuccessModal();
-        return;
+    function handleStepByStepBack() {
+      // 1. अगर कोई भी मोडल खुला हो तो पहले सिर्फ मोडल बंद होगा
+      const openModals = ['checkoutModal', 'ratingModal', 'notifCenterDrawer', 'customerForgotModal', 'custEmailSentSuccessModal', 'exitAppModal'];
+      for (let mId of openModals) {
+        const m = document.getElementById(mId);
+        if (m && !m.classList.contains('hidden')) {
+          m.classList.add('hidden');
+          return;
+        }
       }
 
-      const forgotM = document.getElementById('customerForgotModal');
-      if (forgotM && !forgotM.classList.contains('hidden')) {
-        closeCustomerForgotModal();
-        return;
-      }
-
-      const notifD = document.getElementById('notifCenterDrawer');
-      if (notifD && !notifD.classList.contains('hidden')) {
-        toggleNotifCenter(false);
-        return;
-      }
-
-      const ratingM = document.getElementById('ratingModal');
-      if (ratingM && !ratingM.classList.contains('hidden')) {
-        closeRatingModal();
-        return;
-      }
-
-      const checkM = document.getElementById('checkoutModal');
-      if (checkM && !checkM.classList.contains('hidden')) {
-        closeCheckoutModal();
-        return;
-      }
-
-      const menuV = document.getElementById('tab-menu');
-      if (menuV && !menuV.classList.contains('hidden')) {
+      // 2. अगर रेस्टोरेंट का मेन्यू खुला है, तो मेन्यू बंद होकर वापस होम लिस्ट पर जाएगा
+      const menuView = document.getElementById('tab-menu');
+      if (menuView && !menuView.classList.contains('hidden')) {
         closeRestaurantMenu();
+        if (navHistoryStack[navHistoryStack.length - 1] === 'menu') navHistoryStack.pop();
         return;
       }
 
-      if (currentAppTab !== 'home') {
-        switchAppTab('home');
+      // 3. अगर प्रोफाइल एडिट मोड में है, तो वापस Read-Only प्रोफाइल कार्ड पर जाएगा
+      const editProfileCard = document.getElementById('custProfileEditCard');
+      if (editProfileCard && !editProfileCard.classList.contains('hidden')) {
+        toggleCustomerProfileEdit(false);
         return;
       }
 
+      // 4. अगर यूजर किसी अन्य टैब में आया था (जैसे Support -> Orders -> Home) तो स्टेप-बाय-स्टेप पीछे जाए
+      if (navHistoryStack.length > 1) {
+        navHistoryStack.pop();
+        const previousTab = navHistoryStack[navHistoryStack.length - 1];
+        switchAppTab(previousTab, true);
+        return;
+      }
+
+      // 5. केवल तब Exit Modal खुलेगा जब यूजर रूट (Home) पर पहुँच चुका हो
       openExitAppModal();
     }
 
@@ -1056,7 +1072,6 @@
 
     function cancelExitApp() {
       document.getElementById('exitAppModal').classList.add('hidden');
-      switchAppTab('home');
     }
 
     function confirmExitApp() {
@@ -1069,7 +1084,7 @@
       }
     }
 
-    // ---------------- GPS GEOLOCATION DETECTOR ----------------
+    // ---------------- LIVE GPS DETECTOR ----------------
     function detectLiveLocation(textareaId, statusSpanId) {
       const statusEl = document.getElementById(statusSpanId);
       const textarea = document.getElementById(textareaId);
@@ -1103,7 +1118,7 @@
       );
     }
 
-    // ---------------- AUTHENTICATION HANDLERS ----------------
+    // ---------------- AUTHENTICATION CONTROLLER ----------------
     function toggleAuthMode(mode) {
       const loginForm = document.getElementById('loginForm');
       const signupForm = document.getElementById('signupForm');
@@ -1164,7 +1179,7 @@
       try {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         await db.ref(`customers/${userCredential.user.uid}`).set({
-          name, email, phone, address, customerLat: customerLat || null, customerLng: customerLng || null, createdAt: Date.now()
+          name, email, phone, address, photoUrl: "", customerLat: customerLat || null, customerLng: customerLng || null, createdAt: Date.now()
         });
       } catch (err) {
         document.getElementById('signupAuthError').classList.remove('hidden');
@@ -1179,7 +1194,7 @@
       auth.signOut().catch(err => alert("Logout error: " + err.message)); 
     }
 
-    // ---------------- AUTH STATE LISTENER & ROLE VALIDATOR ----------------
+    // ---------------- AUTH STATE & LISTENERS ----------------
     auth.onAuthStateChanged(async (user) => {
       const splash = document.getElementById('splashScreen');
       if (isRoleChecking) return;
@@ -1227,18 +1242,59 @@
       }
     }
 
+    // =========================================================
+    // 👤 PROFILE PANEL (READ-ONLY & TOP-RIGHT PENCIL EDIT)
+    // =========================================================
+    function toggleCustomerProfileEdit(showEdit) {
+      document.getElementById('custProfileViewCard').classList.toggle('hidden', showEdit);
+      document.getElementById('custProfileEditCard').classList.toggle('hidden', !showEdit);
+    }
+
+    function previewCustPhoto(url) {
+      const img = document.getElementById('editCustPhotoPreview');
+      const ph = document.getElementById('editCustPlaceholder');
+      if (url && url.length > 5) {
+        img.src = url;
+        img.classList.remove('hidden');
+        ph.classList.add('hidden');
+      } else {
+        img.classList.add('hidden');
+        ph.classList.remove('hidden');
+      }
+    }
+
     function listenToCustomerProfile(uid) {
       db.ref(`customers/${uid}`).on('value', snap => {
         currentCustomer = snap.val() || {};
         currentCustomer.uid = uid;
 
-        document.getElementById('topCustomerName').innerText = `Hi, ${currentCustomer.name || 'Foodie'}`;
-        document.getElementById('topAddressPreview').innerText = currentCustomer.address || 'Set address';
+        // 1. Read-Only View भरें
+        document.getElementById('viewCustName').innerText = currentCustomer.name || 'Customer';
+        document.getElementById('viewCustEmail').innerText = currentCustomer.email || auth.currentUser?.email || '';
+        document.getElementById('viewCustPhone').innerText = currentCustomer.phone || 'No phone set';
+        document.getElementById('viewCustAddress').innerText = currentCustomer.address || 'No address set';
 
+        const photoEl = document.getElementById('viewCustPhoto');
+        const photoPh = document.getElementById('viewCustPhotoPlaceholder');
+        if (currentCustomer.photoUrl) {
+          photoEl.src = currentCustomer.photoUrl;
+          photoEl.classList.remove('hidden');
+          photoPh.classList.add('hidden');
+        } else {
+          photoEl.classList.add('hidden');
+          photoPh.classList.remove('hidden');
+        }
+
+        // 2. Edit Form इनपुट्स भरें
         document.getElementById('profName').value = currentCustomer.name || '';
         document.getElementById('profEmail').value = currentCustomer.email || auth.currentUser?.email || '';
         document.getElementById('profPhone').value = currentCustomer.phone || '';
         document.getElementById('profAddress').value = currentCustomer.address || '';
+        document.getElementById('profPhotoUrl').value = currentCustomer.photoUrl || '';
+        previewCustPhoto(currentCustomer.photoUrl || '');
+
+        document.getElementById('topCustomerName').innerText = `Hi, ${currentCustomer.name || 'Foodie'}`;
+        document.getElementById('topAddressPreview').innerText = currentCustomer.address || 'Set address';
         
         if (currentCustomer.customerLat && currentCustomer.customerLng) {
           customerLat = currentCustomer.customerLat;
@@ -1247,36 +1303,54 @@
       });
     }
 
+    async function handleUpdateProfile(e) {
+      e.preventDefault();
+      const name = document.getElementById('profName').value.trim();
+      const phone = document.getElementById('profPhone').value.trim();
+      const address = document.getElementById('profAddress').value.trim();
+      const photoUrl = document.getElementById('profPhotoUrl').value.trim();
+      const btn = document.getElementById('saveProfBtn');
+
+      btn.disabled = true;
+      try {
+        await db.ref(`customers/${auth.currentUser.uid}`).update({ 
+          name, phone, address, photoUrl, customerLat, customerLng 
+        });
+        toggleCustomerProfileEdit(false);
+        showModernFloatingToast("Profile Updated", "Your profile photo & details saved successfully!", "fa-solid fa-circle-check");
+      } catch (err) {
+        alert('Update failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ---------------- APP LISTENERS ----------------
     function initAppListeners() {
-      // 1. Approved Kitchens Listener
       db.ref('restaurants').on('value', snap => {
         cachedRestaurants = snap.val() || {};
         renderRestaurantsList();
       });
 
-      // 2. Delivery Riders Listener
       db.ref('deliveryPartners').on('value', snap => {
         cachedDeliveryBoys = snap.val() || {};
         renderOrdersList();
       });
 
-      // 3. Customer Specific Orders Listener (Safe Spark quota with limitToLast(20))
+      // SAFE SPARKLIMIT: Limit to last 20 orders using .indexOn
       db.ref('orders').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').limitToLast(20).on('value', snap => {
         cachedOrders = snap.val() || {};
         renderOrdersList();
       });
 
-      // 4. Admin Push Broadcasts Listener
       db.ref('admin/notifications').limitToLast(10).on('value', snap => {
         cachedBroadcasts = snap.val() || {};
         const keys = Object.keys(cachedBroadcasts);
-        
         if (keys.length > 0) {
           const latestKey = keys[keys.length - 1];
           const latest = cachedBroadcasts[latestKey];
-          
           if (!knownNotifIds.has(latestKey) && latest && latest.message) {
-            showModernFloatingToast("FoodWorld Announcement", latest.message, "fa-solid fa-bullhorn");
+            showModernFloatingToast("FoodWorld Notice", latest.message, "fa-solid fa-bullhorn");
             document.getElementById('notifBellBadge').innerText = keys.length;
             document.getElementById('notifBellBadge').classList.remove('hidden');
             knownNotifIds.add(latestKey);
@@ -1284,7 +1358,6 @@
         }
       });
 
-      // 5. Helpdesk Settings
       db.ref('settings/support').on('value', snap => {
         cachedSupportConfig = snap.val() || {};
         const phone = cachedSupportConfig.phone || '+91 9876543210';
@@ -1299,16 +1372,13 @@
         document.getElementById('custSupportWaLink').href = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello FoodWorld Support, I need assistance with my order.')}`;
       });
 
-      // 6. My Support Tickets
       db.ref('supportTickets').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').limitToLast(10).on('value', snap => {
         cachedMyTickets = snap.val() || {};
         renderMyTicketsList();
       });
     }
 
-    // ==========================================
-    // CUSTOMER SUPPORT TICKETING
-    // ==========================================
+    // ---------------- TICKETING SYSTEM ----------------
     async function handleRaiseTicket(e) {
       e.preventDefault();
       if (!currentCustomer) return;
@@ -1319,7 +1389,7 @@
       const btn = document.getElementById('submitTicketBtn');
 
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting to Helpdesk...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
       try {
         await db.ref('supportTickets').push().set({
@@ -1337,8 +1407,7 @@
 
         document.getElementById('ticketOrderId').value = '';
         document.getElementById('ticketMessage').value = '';
-
-        showModernFloatingToast("Ticket Submitted", "Our FoodWorld team will review your request immediately.", "fa-solid fa-circle-check");
+        showModernFloatingToast("Ticket Submitted", "Our team will review your request immediately.", "fa-solid fa-circle-check");
       } catch (err) {
         alert("Failed to submit ticket: " + err.message);
       } finally {
@@ -1373,7 +1442,6 @@
               </div>
               <span class="text-[10px] text-slate-400 font-mono">${new Date(t.createdAt || Date.now()).toLocaleDateString()}</span>
             </div>
-
             <div class="text-xs">
               <p class="font-bold text-slate-800"><i class="fa-solid fa-tag text-brand-500 mr-1 text-[10px]"></i> ${escapeHtml(t.category)}</p>
               ${t.orderId ? `<p class="text-[10px] text-slate-500 font-mono mt-0.5">Order Ref: ${escapeHtml(t.orderId)}</p>` : ''}
@@ -1382,12 +1450,11 @@
           </div>
         `;
       });
-
       container.innerHTML = html;
     }
 
     // ==========================================
-    // RESTAURANTS LIST & MENU ENGINE
+    // RESTAURANTS & MENU ENGINE
     // ==========================================
     function renderRestaurantsList(filter = '') {
       const container = document.getElementById('restaurantsListContainer');
@@ -1437,6 +1504,9 @@
       activeRestaurantId = restId;
       const r = cachedRestaurants[restId] || {};
       
+      navHistoryStack.push('menu');
+      pushNavState(`menu_${restId}`);
+
       document.getElementById('menuRestName').innerText = r.name || 'Menu';
       document.getElementById('menuRestCuisine').innerText = r.cuisine || 'Dishes';
       document.getElementById('heroRestTitle').innerText = r.name || 'Restaurant';
@@ -1450,7 +1520,7 @@
       document.getElementById('tab-menu').classList.remove('hidden');
 
       const menuContainer = document.getElementById('menuItemsContainer');
-      menuContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">Loading fresh menu dishes...</p>';
+      menuContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">Loading fresh dishes...</p>';
 
       db.ref(`menus/${restId}`).on('value', snap => {
         cachedMenus[restId] = snap.val() || {};
@@ -1493,13 +1563,10 @@
 
       if (itemKeys.length === 0) {
         menuContainer.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs">No dishes listed yet.</div>';
-        document.getElementById('dishCountBadge').innerText = '0 Dishes';
         return;
       }
 
-      let displayedCount = 0;
       let html = '';
-
       itemKeys.forEach(itemId => {
         const item = items[itemId];
         if (!item || item.available === false) return;
@@ -1512,7 +1579,6 @@
         if (currentVegFilter === 'NONVEG' && !isNonVeg) return;
         if (searchText && !name.toLowerCase().includes(searchText) && !desc.toLowerCase().includes(searchText)) return;
 
-        displayedCount++;
         const qty = (cart[itemId] && cart[itemId].restaurantId === restId) ? cart[itemId].qty : 0;
         const imgUrl = item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80';
 
@@ -1520,13 +1586,13 @@
           <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex justify-between gap-3 relative">
             <div class="flex-1 min-w-0 pr-2">
               <div class="flex items-center gap-1.5 mb-1">
-                <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'}" title="${isNonVeg ? 'Non-Vegetarian' : 'Vegetarian'}"></span>
+                <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'}" title="${isNonVeg ? 'Non-Veg' : 'Veg'}"></span>
                 <span class="px-1.5 py-0.2 rounded bg-amber-50 border border-amber-200 text-amber-800 text-[9px] font-extrabold">★ 4.5</span>
               </div>
               <h5 class="font-extrabold text-sm text-slate-900 leading-snug">${escapeHtml(name)}</h5>
               <p class="text-xs font-black text-slate-900 mt-1">₹${item.price}</p>
               <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed font-medium">
-                ${escapeHtml(desc || 'Delicious food freshly prepared by kitchen.')}
+                ${escapeHtml(desc || 'Freshly cooked with authentic ingredients.')}
               </p>
             </div>
             <div class="relative flex flex-col items-center flex-shrink-0 w-28 h-28">
@@ -1550,8 +1616,7 @@
         `;
       });
 
-      document.getElementById('dishCountBadge').innerText = `${displayedCount} Dishes`;
-      menuContainer.innerHTML = html || '<div class="p-8 text-center text-slate-400 text-xs">No matching dishes found in menu.</div>';
+      menuContainer.innerHTML = html || '<div class="p-8 text-center text-slate-400 text-xs">No matching dishes in menu.</div>';
     }
 
     function addToCart(restId, itemId) {
@@ -1641,7 +1706,7 @@
     }
 
     // =========================================================
-    // 100% GHOST-PROOF ORDER PLACEMENT (RAZORPAY + COD)
+    // 🛡️ 100% GHOST-PROOF ORDER PLACEMENT (RAZORPAY + COD)
     // =========================================================
     async function placeCustomerOrder() {
       if (!currentCustomer?.address || !currentCustomer?.phone) {
@@ -1659,7 +1724,6 @@
       let calculatedItemsTotal = 0;
       const verifiedItemsArray = [];
 
-      // Anti-Tamper check against live menu cache
       for (const k of keys) {
         const cartItem = cart[k];
         const menuItem = cachedMenus[restId]?.[cartItem.itemId];
@@ -1677,12 +1741,9 @@
       const grandTotal = calculatedItemsTotal + DELIVERY_FEE;
       const uniqueOtp = generateDeliveryOtp();
       const newOrderKey = db.ref('orders').push().key;
-
       const btn = document.getElementById('placeOrderBtn');
 
-      // -------------------------------------------------------------
-      // 1. CASH ON DELIVERY (COD) FLOW
-      // -------------------------------------------------------------
+      // 1. CASH ON DELIVERY (COD)
       if (currentPaymentMethod === 'COD') {
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ऑर्डर भेजा जा रहा है...';
@@ -1702,7 +1763,6 @@
             razorpayPaymentId: null
           });
 
-          // unassignedOrders में डालें ताकि राइडर्स स्वीकार कर सकें
           await db.ref(`unassignedOrders/${newOrderKey}`).set({
             orderId: newOrderKey,
             restaurantId: restId,
@@ -1714,15 +1774,11 @@
             createdAt: Date.now()
           });
 
-          // 🔥 सुरक्षित बैकएंड पुश नोटिफिकेशन ट्रिगर (Serverless)
+          // पुश नोटिफिकेशन ट्रिगर
           fetch(`${BACKEND_URL}/api/send-order-push`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              orderId: newOrderKey,
-              restaurantId: restId,
-              totalAmount: grandTotal
-            })
+            body: JSON.stringify({ orderId: newOrderKey, restaurantId: restId, totalAmount: grandTotal })
           }).catch(e => console.log("Push trigger non-blocking:", e));
 
           cart = {};
@@ -1740,14 +1796,12 @@
         return;
       }
 
-      // -------------------------------------------------------------
       // 2. 100% GHOST-PROOF ONLINE PAYMENT (RAZORPAY)
-      // -------------------------------------------------------------
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> सुरक्षित पेमेंट शुरू हो रही है...';
 
       try {
-        // 🛑 STEP A: Razorpay popup खुलने से पहले ही Firebase में save करें (Ghost-Proof)
+        // STEP A: Pre-Save order in Firebase as PAYMENT_PENDING
         await saveOrderToFirebase({
           orderId: newOrderKey,
           restId,
@@ -1758,29 +1812,22 @@
           uniqueOtp,
           paymentMethod: 'ONLINE',
           paymentStatus: 'PENDING_ONLINE',
-          orderStatus: 'PAYMENT_PENDING', // 👈 सिर्फ pending status
+          orderStatus: 'PAYMENT_PENDING',
           razorpayPaymentId: null
         });
 
-        // 🛑 STEP B: Vercel से Razorpay Order ID मंगवाएं
+        // STEP B: Generate Razorpay Order ID from Vercel
         const orderRes = await fetch(`${BACKEND_URL}/api/create-order`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: grandTotal,
-            receipt: newOrderKey
-          })
+          body: JSON.stringify({ amount: grandTotal, receipt: newOrderKey })
         });
-
         const rzpOrder = await orderRes.json();
         if (!rzpOrder.id) throw new Error(rzpOrder.error || "Order ID generation failed");
 
-        // Firebase में Razorpay Order ID लिंक करें ताकि Webhook तुरंत पहचान सके
-        await db.ref(`orders/${newOrderKey}`).update({
-          razorpayOrderId: rzpOrder.id
-        });
+        await db.ref(`orders/${newOrderKey}`).update({ razorpayOrderId: rzpOrder.id });
 
-        // 🛑 STEP C: Razorpay Popup खोलें
+        // STEP C: Open Razorpay Checkout Window
         const options = {
           "key": RAZORPAY_KEY_ID,
           "amount": rzpOrder.amount,
@@ -1791,7 +1838,6 @@
           "handler": async function (response) {
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> पेमेंट कन्फर्म हो रही है...';
 
-            // Payment successful होने पर status को PLACED करें
             await db.ref(`orders/${newOrderKey}`).update({
               status: 'PLACED',
               paymentStatus: 'PAID_ONLINE',
@@ -1799,7 +1845,6 @@
               updatedAt: Date.now()
             });
 
-            // Riders को broadcast task भेजें
             await db.ref(`unassignedOrders/${newOrderKey}`).set({
               orderId: newOrderKey,
               restaurantId: restId,
@@ -1812,15 +1857,10 @@
               createdAt: Date.now()
             });
 
-            // 🔥 सुरक्षित बैकएंड पुश नोटिफिकेशन ट्रिगर (Serverless)
             fetch(`${BACKEND_URL}/api/send-order-push`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                orderId: newOrderKey,
-                restaurantId: restId,
-                totalAmount: grandTotal
-              })
+              body: JSON.stringify({ orderId: newOrderKey, restaurantId: restId, totalAmount: grandTotal })
             }).catch(e => console.log("Push trigger non-blocking:", e));
 
             cart = {};
@@ -1828,7 +1868,7 @@
             closeCheckoutModal();
             closeRestaurantMenu();
             switchAppTab('orders');
-            showModernFloatingToast("पेमेंट सफल!", `ऑर्डर किचन में पहुँच चुका है!`, "fa-solid fa-circle-check");
+            showModernFloatingToast("पेमेंट सफल!", "ऑर्डर किचन में पहुँच चुका है!", "fa-solid fa-circle-check");
           },
           "prefill": {
             "name": currentCustomer.name || "Customer",
@@ -1838,10 +1878,8 @@
           "theme": { "color": "#ea580c" },
           "modal": {
             "ondismiss": async function() {
-              // अगर कस्टमर पॉपअप बिना पेमेंट के काट दे
               btn.disabled = false;
               btn.innerHTML = '<span>Confirm & Place Order</span> <i class="fa-solid fa-arrow-right"></i>';
-              
               await db.ref(`orders/${newOrderKey}`).update({
                 status: 'CANCELLED',
                 cancelReason: 'Customer closed payment window without paying'
@@ -1852,7 +1890,6 @@
 
         const rzp = new Razorpay(options);
         rzp.open();
-
       } catch (err) {
         alert("Payment Error: " + err.message);
         btn.disabled = false;
@@ -1876,14 +1913,13 @@
         customerLat: customerLat || null,
         customerLng: customerLng || null,
         phone: currentCustomer.phone,
-        status: data.orderStatus, // PAYMENT_PENDING या PLACED
+        status: data.orderStatus,
         locationLink: "",
         deliveryOtp: data.uniqueOtp,
         verifiedDelivery: false,
         createdAt: Date.now(),
         updatedAt: Date.now()
       };
-
       await db.ref(`orders/${data.orderId}`).set(orderData);
     }
 
@@ -1892,7 +1928,7 @@
       if (!order) return;
 
       if (order.status !== 'PLACED') {
-        alert('Cannot cancel order: Kitchen has already accepted your dishes.');
+        alert('Cannot cancel order: Kitchen has already started preparing your food.');
         return;
       }
 
@@ -1903,14 +1939,23 @@
         const liveOrder = snap.val();
 
         if (!liveOrder || liveOrder.status !== 'PLACED') {
-          alert('Sorry! The restaurant has just accepted your order, so it can no longer be cancelled.');
+          alert('Sorry! Kitchen has just accepted the order, it cannot be cancelled now.');
           return;
+        }
+
+        // ऑटो-रिफंड कॉल यदि ऑनलाइन पेमेंट था
+        if (liveOrder.paymentMethod === 'ONLINE' && liveOrder.razorpayPaymentId) {
+          await fetch(`${BACKEND_URL}/api/refund-order`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId: orderId, reason: 'Cancelled by customer before acceptance' })
+          });
         }
 
         const updates = {};
         updates[`orders/${orderId}/status`] = 'CANCELLED';
         updates[`orders/${orderId}/cancelledBy`] = 'CUSTOMER';
-        updates[`orders/${orderId}/cancelReason`] = 'Cancelled by customer before restaurant acceptance';
+        updates[`orders/${orderId}/cancelReason`] = 'Cancelled by customer before kitchen acceptance';
         updates[`orders/${orderId}/updatedAt`] = Date.now();
         updates[`unassignedOrders/${orderId}`] = null;
 
@@ -1928,15 +1973,15 @@
     function copyOtpToClipboard(otp) {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(otp);
-        showModernFloatingToast("Code Copied", `Delivery OTP ${otp} copied to clipboard.`, "fa-solid fa-copy");
+        showModernFloatingToast("Code Copied", `Delivery OTP ${otp} copied!`, "fa-solid fa-copy");
       } else {
         alert(`FoodWorld Delivery Code: ${otp}`);
       }
     }
 
-    // =========================================================================
-    // 100% REAL-TIME LIVE GPS TRACKING & ORDERS LIST
-    // =========================================================================
+    // =========================================================
+    // 🛵 LIVE GPS TRACKING & ORDERS LIST (GHOST FILTERED)
+    // =========================================================
     function renderOrdersList() {
       const activeContainer = document.getElementById('activeOrdersList');
       const pastContainer = document.getElementById('pastOrdersList');
@@ -1947,6 +1992,10 @@
       orderKeys.forEach(orderId => {
         const o = cachedOrders[orderId];
         if (!o) return;
+
+        // 🛑 फिल्टर: कच्चा / अधूरा पेमेंट ऑर्डर कस्टमर को कभी न दिखे
+        if (o.status === 'PAYMENT_PENDING') return;
+
         const restName = cachedRestaurants[o.restaurantId]?.name || 'Restaurant';
         const isClosed = o.status === 'DELIVERED' || o.status === 'CANCELLED';
         const isOnlinePay = (o.paymentMethod === 'ONLINE');
@@ -1978,12 +2027,9 @@
           </div>
         `;
 
-        // Real-Time Live GPS Radar Card
         let deliveryCard = '';
         if (o.deliveryUid && cachedDeliveryBoys[o.deliveryUid]) {
           const d = cachedDeliveryBoys[o.deliveryUid];
-
-          // Dynamic GPS Link
           let liveGpsLink = o.locationLink;
           if (!liveGpsLink && o.riderLat && o.riderLng) {
             liveGpsLink = `https://www.google.com/maps?q=${o.riderLat},${o.riderLng}`;
@@ -2175,32 +2221,17 @@
       }
     }
 
-    // ---------------- PROFILE UPDATE ----------------
-    async function handleUpdateProfile(e) {
-      e.preventDefault();
-      const name = document.getElementById('profName').value.trim();
-      const phone = document.getElementById('profPhone').value.trim();
-      const address = document.getElementById('profAddress').value.trim();
-      const btn = document.getElementById('saveProfBtn');
-
-      btn.disabled = true;
-      try {
-        await db.ref(`customers/${auth.currentUser.uid}`).update({ 
-          name, phone, address, customerLat, customerLng 
-        });
-        showModernFloatingToast("Profile Updated", "Your details have been saved.", "fa-solid fa-circle-check");
-      } catch (err) {
-        alert('Update failed: ' + err.message);
-      } finally {
-        btn.disabled = false;
-      }
-    }
-
     // ---------------- TAB SWITCHER & ESCAPERS ----------------
-    function switchAppTab(tabId) {
-      currentAppTab = tabId;
+    function switchAppTab(tabId, isBackAction = false) {
+      if (currentAppTab === tabId && !isBackAction) return;
       document.getElementById('tab-menu').classList.add('hidden');
 
+      if (!isBackAction) {
+        navHistoryStack.push(tabId);
+        pushNavState(`tab_${tabId}`);
+      }
+
+      currentAppTab = tabId;
       ['home', 'orders', 'support', 'profile'].forEach(t => {
         const sec = document.getElementById(`tab-${t}`);
         const btn = document.getElementById(`navBtn-${t}`);
@@ -2238,7 +2269,7 @@
           }
           document.getElementById("updateModal").style.display = "flex";
           document.getElementById("btnUpdateNow").onclick = function() {
-            const downloadUrl = data.customer_apk || data.apk_url;
+            const downloadUrl = data.customer_apk || data.apk_url || data.update_url;
             if (downloadUrl) window.location.href = downloadUrl;
           };
         }
