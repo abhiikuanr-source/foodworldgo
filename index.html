@@ -747,7 +747,7 @@
     </nav>
   </div>
 
-  <!-- ================= CHECKOUT MODAL (WITH LIVE +/- QUANTITY CONTROLS) ================= -->
+  <!-- ================= CHECKOUT MODAL ================= -->
   <div id="checkoutModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
       <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -879,7 +879,6 @@
       <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
     </div>
   </div>
-
 <!-- ================= JAVASCRIPT LOGIC (PART 2) ================= -->
   <script>
     // 1. FIREBASE CONFIGURATION
@@ -920,14 +919,13 @@
     let searchToastTimer = null;
 
     // =========================================================
-    // 🔄 PULL TO REFRESH ENGINE FOR CUSTOMER APP (CART SAFE & SWIGGY STYLE)
+    // 🔄 PULL TO REFRESH ENGINE FOR CUSTOMER APP
     // =========================================================
     let touchStartY = 0;
     let touchStartX = 0;
     let isPulling = false;
 
     window.addEventListener('touchstart', (e) => {
-      // Modals open hone par pull disable rakhein
       const isCheckoutOpen = !document.getElementById('checkoutModal')?.classList.contains('hidden');
       const isRatingOpen = !document.getElementById('ratingModal')?.classList.contains('hidden');
       const isNotifOpen = !document.getElementById('notifCenterDrawer')?.classList.contains('hidden');
@@ -938,7 +936,6 @@
         return;
       }
 
-      // Sirf page ke bilkul top par pull initiate karein
       if (window.scrollY <= 0) {
         touchStartY = e.touches[0].clientY;
         touchStartX = e.touches[0].clientX;
@@ -955,7 +952,6 @@
       const pullDistance = currentY - touchStartY;
       const horizontalDist = Math.abs(currentX - touchStartX);
 
-      // Horizontal categories scroll karte waqt refresh trigger na ho
       if (horizontalDist > pullDistance) return;
 
       if (pullDistance > 85) {
@@ -973,7 +969,6 @@
         if (indicator) indicator.classList.remove('hidden');
         if (navigator.vibrate) navigator.vibrate(25);
 
-        // Cart delete kiye bina silent data sync
         setTimeout(() => {
           if (typeof renderModernHomeSections === 'function') renderModernHomeSections();
           if (typeof renderRestaurantsList === 'function') renderRestaurantsList();
@@ -1208,10 +1203,17 @@
       container.innerHTML = html;
     }
 
-    // ---------------- BACK NAVIGATION ----------------
+    // ---------------- BACK NAVIGATION & CAPACITOR HOOK ----------------
     function pushNavState(stateName) { history.pushState({ screen: stateName }, ''); }
     pushNavState('root_home');
     window.addEventListener('popstate', () => handleStepByStepBack());
+
+    // Capacitor Native Hardware Back Button Bridge
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      window.Capacitor.Plugins.App.addListener('backButton', () => {
+        handleStepByStepBack();
+      });
+    }
 
     function handleStepByStepBack() {
       const openModals = ['checkoutModal', 'ratingModal', 'notifCenterDrawer', 'customerForgotModal', 'custEmailSentSuccessModal', 'exitAppModal'];
@@ -1371,7 +1373,6 @@
         try {
           const snap = await db.ref(`customers/${user.uid}`).once('value');
           if (!snap.exists()) {
-            // Deleted user check
             const isNewUser = (user.metadata && user.metadata.creationTime === user.metadata.lastSignInTime);
             if (!isNewUser) {
               await auth.signOut();
@@ -1552,7 +1553,7 @@
     }
 
     // =========================================================
-    // 🔍 REAL-TIME DISH SEARCH ("Kesar" finds Kesar Kulfi)
+    // 🔍 REAL-TIME DISH SEARCH
     // =========================================================
     function handleUniversalSearch(queryText) {
       const query = (queryText || '').trim().toLowerCase();
@@ -1706,7 +1707,7 @@
     }
 
     // =========================================================
-    // 🌟 ZERO-DEMO HOME SCREEN (Only Real, Live In-Stock Dishes)
+    // 🌟 ZERO-DEMO HOME SCREEN
     // =========================================================
     function renderModernHomeSections() {
       const topCarousel = document.getElementById('topFeaturedDealsCarousel');
@@ -1828,7 +1829,7 @@
       }
     }
 
-    // ---------------- RESTAURANTS & MENUS ----------------
+    // ---------------- RESTAURANTS & MENUS (100% FIXED IMAGE BOX) ----------------
     function renderRestaurantsList(filter = '') {
       const container = document.getElementById('restaurantsListContainer');
       const keys = Object.keys(cachedRestaurants);
@@ -1842,9 +1843,14 @@
         const search = (filter || '').toLowerCase().trim();
         if (search && !r.name?.toLowerCase().includes(search) && !r.cuisine?.toLowerCase().includes(search)) return;
 
+        // ✅ 100% Aspect Ratio & Size Lock (Yummy Momos bug fix)
         const photoHtml = (r.imageUrl && r.imageUrl.trim().length > 10) ? 
-          `<img src="${r.imageUrl.trim()}" class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border border-slate-100 flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80'">` :
-          `<div class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-brand-100 to-orange-100 text-brand-600 flex items-center justify-center text-2xl flex-shrink-0"><i class="fa-solid fa-utensils"></i></div>`;
+          `<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border border-slate-100 flex-shrink-0 bg-slate-100 shadow-2xs">
+             <img src="${r.imageUrl.trim()}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80'">
+           </div>` : 
+          `<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-brand-100 to-orange-100 text-brand-600 flex items-center justify-center text-2xl flex-shrink-0">
+             <i class="fa-solid fa-utensils"></i>
+           </div>`;
 
         html += `
           <div onclick="openRestaurantMenu('${restId}')" class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs active:scale-98 transition cursor-pointer flex gap-3 items-center">
@@ -2066,7 +2072,7 @@
     }
 
     // =========================================================
-    // 🛒 CHECKOUT MODAL (WITH LIVE +/- CONTROLS)
+    // 🛒 CHECKOUT MODAL
     // =========================================================
     function openCheckoutModal() {
       const keys = Object.keys(cart);
@@ -2145,7 +2151,7 @@
     function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
 
     // =========================================================
-    // 🛡️ ORDER PLACEMENT (WITH SOLD-OUT & GHOST PENDING FIXES)
+    // 🛡️ ORDER PLACEMENT (WITH FIXED RAZORPAY ONDISMISS RACE CONDITION)
     // =========================================================
     async function placeCustomerOrder() {
       if (!currentCustomer?.address || !currentCustomer?.phone) {
@@ -2164,7 +2170,6 @@
       const verifiedItemsArray = [];
       const btn = document.getElementById('placeOrderBtn');
 
-      // 🛡️ Sold-out dish availability guard
       for (const k of keys) {
         const cartItem = cart[k];
         const menuItem = cachedMenus[restId]?.[cartItem.itemId];
@@ -2232,9 +2237,10 @@
         return;
       }
 
-      // 2. ONLINE PAYMENT (RAZORPAY FIXED + GHOST ORDER CLEANUP)
+      // 2. ONLINE PAYMENT (RAZORPAY + SAFE DISMISS FLAG)
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> पेमेंट विंडो लोड हो रही है...';
+      let isPaymentCompleted = false; // 🛡️ Fix for ondismiss race condition
 
       try {
         await saveOrderToFirebase({
@@ -2263,6 +2269,7 @@
           "description": `Food Order #${newOrderKey.slice(-6)}`,
           "order_id": rzpOrder.id,
           "handler": async function (response) {
+            isPaymentCompleted = true; // Mark done so ondismiss won't delete order
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> पेमेंट वेरिफाई हो रही है...';
 
             try {
@@ -2326,7 +2333,7 @@
           "theme": { "color": "#ea580c" },
           "modal": {
             "ondismiss": function() {
-              // 🛡️ Ghost Order Cleanup: Payment cancel hote hi pending order remove karein
+              if (isPaymentCompleted) return; // Prevent deleting verified order!
               db.ref(`orders/${newOrderKey}`).remove().catch(() => {});
               btn.disabled = false;
               btn.innerHTML = '<span>Confirm & Place Order</span> <i class="fa-solid fa-arrow-right"></i>';
@@ -2377,10 +2384,13 @@
         const orderRef = db.ref(`orders/${orderId}`);
         const result = await orderRef.transaction(currentOrder => {
           if (!currentOrder) return currentOrder;
-          if (currentOrder.status !== 'PLACED') return; // Kitchen accept kar chuki ho toh abort
+          // Disallow cancellation if kitchen started cooking OR rider has accepted!
+          if (currentOrder.status !== 'PLACED' || (currentOrder.deliveryUid && currentOrder.deliveryUid !== '')) {
+            return; 
+          }
           currentOrder.status = 'CANCELLED';
           currentOrder.cancelledBy = 'CUSTOMER';
-          currentOrder.cancelReason = 'Cancelled by customer before kitchen acceptance';
+          currentOrder.cancelReason = 'Cancelled by customer before acceptance';
           currentOrder.updatedAt = Date.now();
           return currentOrder;
         });
@@ -2397,7 +2407,7 @@
           }
           showModernFloatingToast("Order Cancelled", `Order #${orderId.slice(-6)} was cancelled.`, "fa-solid fa-ban", true);
         } else {
-          alert('Maaf karein! Kitchen ne abhi order accept kar liya hai, ab yeh cancel nahi ho sakta.');
+          alert('Maaf karein! Kitchen ne accept kar liya hai ya Rider assign ho chuka hai, ab yeh cancel nahi ho sakta.');
         }
       } catch (err) {
         alert('Failed to cancel order: ' + err.message);
@@ -2433,7 +2443,8 @@
         const isClosed = o.status === 'DELIVERED' || o.status === 'CANCELLED';
         const isOnlinePay = (o.paymentMethod === 'ONLINE');
 
-        const otpCode = o.deliveryOtp || '----';
+        // Safe OTP String Coercion
+        const otpCode = String(o.deliveryOtp || '----');
         const otpDisplayCard = `
           <div class="p-3.5 bg-gradient-to-r from-orange-500/10 via-brand-500/10 to-amber-500/10 border-2 border-brand-500/30 rounded-2xl space-y-2">
             <div class="flex items-center justify-between">
@@ -2502,7 +2513,7 @@
 
         if (!isClosed) {
           const step = STATUS_PROGRESS[o.status] || 1;
-          const canCancel = (o.status === 'PLACED');
+          const canCancel = (o.status === 'PLACED' && (!o.deliveryUid || o.deliveryUid === ''));
 
           activeHtml += `
             <div class="bg-white p-4 rounded-3xl border border-brand-200 shadow-sm space-y-3">
@@ -2544,7 +2555,7 @@
                 </div>
               ` : `
                 <div class="p-2 bg-slate-50 border border-slate-100 rounded-xl text-center">
-                  <p class="text-[10px] text-slate-500 font-bold"><i class="fa-solid fa-lock text-brand-500 mr-1"></i> Order accepted by kitchen. Cancellation closed.</p>
+                  <p class="text-[10px] text-slate-500 font-bold"><i class="fa-solid fa-lock text-brand-500 mr-1"></i> Order accepted by kitchen / rider assigned. Cancellation closed.</p>
                 </div>
               `}
             </div>
@@ -2760,9 +2771,9 @@
     }
   </script>
 
-  <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
+  <!-- ================= IN-APP UPDATE POPUP CONTROLLER (CAPACITOR FIXED) ================= -->
   <script>
-    const CURRENT_APP_VERSION = "1.0.0";
+    const CURRENT_APP_VERSION = "1.0.2";
     async function checkForAppUpdate() {
       try {
         const response = await fetch("https://foodworldgo.abhiikuanr.workers.dev/version.json?t=" + new Date().getTime());
@@ -2776,12 +2787,21 @@
           document.getElementById("updateModal").style.display = "flex";
           document.getElementById("btnUpdateNow").onclick = function() {
             const downloadUrl = data.customer_apk || data.apk_url || data.update_url;
-            if (downloadUrl) window.location.href = downloadUrl;
+            if (downloadUrl) {
+              // Opens in System Chrome so Android DownloadManager downloads APK
+              window.open(downloadUrl, '_system');
+            }
           };
         }
       } catch (err) {}
     }
-    window.addEventListener("DOMContentLoaded", checkForAppUpdate);
+
+    // DOMContentLoaded miss na ho iske liye readyState check
+    if (document.readyState === "loading") {
+      window.addEventListener("DOMContentLoaded", checkForAppUpdate);
+    } else {
+      checkForAppUpdate();
+    }
   </script>
 </body>
 </html>
