@@ -1,22 +1,22 @@
 {
   "customer_version": "1.0.2",
-  "customer_apk": "https://github.com/abhiikuanr-source/foodworldgo/releases/download/v1.0.2/app-debug.apk",
+  "customer_apk": "https://github.com/abhiikuanr-source/foodworldgo/releases/download/v1.0.2/customer.apk",
   "customer_message": "Naye features aur fast speed ke liye FoodWorld app update karein!",
 
-  "rider_version": "1.0.0",
-  "rider_apk": "https://foodworldgo.netlify.app/foodworld-rider.apk",
+  "rider_version": "1.0.2",
+  "rider_apk": "https://github.com/abhiikuanr-source/foodworldgo/releases/download/v1.0.2/delivery.apk",
   "rider_message": "Rider app ka naya version update karein!",
 
-  "restaurant_version": "1.0.0",
-  "restaurant_apk": "https://foodworldgo.netlify.app/foodworld-kitchen.apk",
+  "restaurant_version": "1.0.2",
+  "restaurant_apk": "https://github.com/abhiikuanr-source/foodworldgo/releases/download/v1.0.2/restaurant.apk",
   "restaurant_message": "Kitchen app ka naya version update karein!",
 
-  "admin_version": "1.0.0",
-  "admin_apk": "https://foodworldgo.netlify.app/foodworld-admin.apk",
+  "admin_version": "1.0.2",
+  "admin_apk": "https://github.com/abhiikuanr-source/foodworldgo/releases/download/v1.0.2/admin.apk",
   "admin_message": "Admin Command Center ka naya version update karein!",
 
   "latest_version": "1.0.2",
-  "apk_url": "https://github.com/abhiikuanr-source/foodworldgo/releases/download/v1.0.2/app-debug.apk",
+  "apk_url": "https://github.com/abhiikuanr-source/foodworldgo/releases/download/v1.0.2/customer.apk",
   "message": "Naye features aur fast speed ke liye app update karein!"
 }
 
