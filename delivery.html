@@ -41,10 +41,10 @@
     .pb-safe { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
     @keyframes pulse-ring {
       0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(249, 115, 22, 0); }
+      70% { transform: scale(1); box-shadow: 0 0 0 14px rgba(249, 115, 22, 0); }
       100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
     }
-    .pulse-broadcast { animation: pulse-ring 2s infinite; }
+    .pulse-broadcast { animation: pulse-ring 1.5s infinite; }
 
     @keyframes toastSlideDown {
       0% { transform: translate(-50%, -100%) scale(0.9); opacity: 0; }
@@ -333,7 +333,7 @@
         </button>
       </form>
 
-      <!-- Signup Form with 100% OPTIONAL Bank Details -->
+      <!-- Signup Form with OPTIONAL Bank Details -->
       <form id="riderSignupForm" onsubmit="handleRiderSignup(event)" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
@@ -710,7 +710,149 @@
     let currentCodCashInHand = 0;
 
     // =========================================================
-    // 🔄 PULL TO REFRESH ENGINE FOR RIDER PANEL (GPS SAFE)
+    // 🚨 CONTINUOUS RIDER ALARM ENGINE (NON-STOP ALERT)
+    // =========================================================
+    let riderAlarmAudio = null;
+    let riderVibrateInterval = null;
+    let isRiderAlarmRinging = false;
+
+    function initRiderAlarmAudio() {
+      if (!riderAlarmAudio) {
+        // High-pitch emergency rider siren alert
+        riderAlarmAudio = new Audio("https://assets.mixkit.co/active_storage/sfx/995/995-preview.mp3");
+        riderAlarmAudio.loop = true; // Non-stop bajta rahega
+        riderAlarmAudio.volume = 1.0;
+      }
+    }
+
+    // Alarm aur Vibration Chalu Karna
+    function startContinuousRiderAlarm() {
+      if (isRiderAlarmRinging) return;
+      isRiderAlarmRinging = true;
+
+      initRiderAlarmAudio();
+
+      riderAlarmAudio.play().catch(e => {
+        console.log("Autoplay waiting for user gesture:", e);
+        playFallbackBeepLoop();
+      });
+
+      // Continuous Vibration (Har 1.5 second me tez vibration)
+      if (navigator.vibrate) {
+        navigator.vibrate([1000, 500]);
+        if (riderVibrateInterval) clearInterval(riderVibrateInterval);
+        riderVibrateInterval = setInterval(() => {
+          if (isRiderAlarmRinging && navigator.vibrate) {
+            navigator.vibrate([1000, 500]);
+          }
+        }, 1500);
+      }
+    }
+
+    // Alarm aur Vibration Turant Band Karna
+    function stopContinuousRiderAlarm() {
+      isRiderAlarmRinging = false;
+
+      if (riderAlarmAudio) {
+        riderAlarmAudio.pause();
+        riderAlarmAudio.currentTime = 0;
+      }
+
+      if (riderVibrateInterval) {
+        clearInterval(riderVibrateInterval);
+        riderVibrateInterval = null;
+      }
+
+      if (navigator.vibrate) {
+        navigator.vibrate(0); // Vibration turant stop
+      }
+    }
+
+    // Check karein ki koi open broadcast order pending hai ya nahi
+    function checkBroadcastTasksAndAlarm() {
+      // Agar rider offline hai ya verified nahi hai toh alarm na bajayein
+      if (!currentRider || currentRider.approved !== true || currentRider.online === false) {
+        stopContinuousRiderAlarm();
+        return;
+      }
+
+      const taskKeys = Object.keys(unassignedTasks || {});
+      const hasActiveBroadcast = taskKeys.some(id => {
+        const task = unassignedTasks[id];
+        return task && (!task.rejectedRiders || !task.rejectedRiders[currentRider.uid]);
+      });
+
+      if (hasActiveBroadcast) {
+        startContinuousRiderAlarm();
+      } else {
+        stopContinuousRiderAlarm();
+      }
+    }
+
+    function playFallbackBeepLoop() {
+      try {
+        initGlobalAudioContext();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(850, audioCtx.currentTime);
+        gain.gain.setValueAtTime(1.0, audioCtx.currentTime);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 1.0);
+      } catch (e) {}
+    }
+
+    // Screen touch par audio context unlock
+    window.addEventListener('click', () => { initRiderAlarmAudio(); initGlobalAudioContext(); }, { once: true });
+    window.addEventListener('touchstart', () => { initRiderAlarmAudio(); initGlobalAudioContext(); }, { once: true });
+
+    // =========================================================
+    // 🔔 NATIVE ANDROID NOTIFICATION CHANNEL (ANDROID 13+ FIX)
+    // =========================================================
+    async function initNativeNotificationChannel() {
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+        try {
+          const { LocalNotifications } = window.Capacitor.Plugins;
+          await LocalNotifications.requestPermissions();
+          await LocalNotifications.createChannel({
+            id: 'fw_rider_orders',
+            name: 'Rider Task Alerts',
+            description: 'Loud alert for new delivery tasks near you',
+            importance: 5, // High priority (Popup Banner + Ring)
+            visibility: 1,
+            vibration: true
+          });
+        } catch (e) {
+          console.warn("Notification channel setup note:", e);
+        }
+      }
+    }
+
+    async function sendNativeAndroidNotification(orderId, amount, kitchenName) {
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+        try {
+          const { LocalNotifications } = window.Capacitor.Plugins;
+          await LocalNotifications.schedule({
+            notifications: [
+              {
+                title: "🛵 NAYA DELIVERY TASK!",
+                body: `${kitchenName || 'Kitchen'} se order #${orderId.slice(-6)} (₹${amount}) pickup karein!`,
+                id: Math.floor(Math.random() * 99999),
+                channelId: 'fw_rider_orders',
+                sound: 'res://raw/beep.wav'
+              }
+            ]
+          });
+        } catch (e) {
+          console.warn("Native notification dispatch error:", e);
+        }
+      }
+    }
+
+    // =========================================================
+    // 🔄 PULL TO REFRESH ENGINE FOR RIDER PANEL
     // =========================================================
     let touchStartY = 0;
     let touchStartX = 0;
@@ -769,17 +911,7 @@
       isPulling = false;
     }, { passive: true });
 
-    // ---------------- SYSTEM PUSH & AUDIO ----------------
-    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
-      Notification.requestPermission().catch(() => {});
-    }
-
-    function sendSystemNotification(title, body) {
-      if ("Notification" in window && Notification.permission === "granted") {
-        try { new Notification(title, { body, icon: "https://cdn-icons-png.flaticon.com/512/2830/2830305.png" }); } catch(e) {}
-      }
-    }
-
+    // ---------------- AUDIO & SCREEN WAKELOCK ----------------
     async function requestScreenWakeLock() {
       try {
         if ('wakeLock' in navigator) {
@@ -800,16 +932,10 @@
       }
     }
 
-    function triggerRiderVibration() {
-      try { if ("vibrate" in navigator) navigator.vibrate([300, 100, 300, 100, 500]); } catch (e) {}
-    }
-
     function initGlobalAudioContext() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
     }
-    window.addEventListener('click', initGlobalAudioContext, { once: true });
-    window.addEventListener('touchstart', initGlobalAudioContext, { once: true });
 
     function playModernNotifChime() {
       try {
@@ -828,27 +954,6 @@
       } catch (e) {}
     }
 
-    function playTaskBroadcastSound() {
-      try {
-        initGlobalAudioContext();
-        triggerRiderVibration();
-        if (!audioCtx) return;
-        for (let i = 0; i < 3; i++) {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          const startTime = audioCtx.currentTime + (i * 0.3);
-          osc.frequency.setValueAtTime(750, startTime);
-          osc.frequency.exponentialRampToValueAtTime(1200, startTime + 0.15);
-          gain.gain.setValueAtTime(0.5, startTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.28);
-          osc.start(startTime);
-          osc.stop(startTime + 0.28);
-        }
-      } catch (e) {}
-    }
-
     function playCancelSound() {
       try {
         initGlobalAudioContext();
@@ -858,7 +963,6 @@
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-        osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 0.4);
         gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
         osc.start(audioCtx.currentTime);
@@ -868,7 +972,6 @@
 
     function showModernFloatingToast(title, message, iconClass = 'fa-solid fa-bell', isAlert = false) {
       playModernNotifChime();
-      sendSystemNotification(title, message);
       const toast = document.getElementById('modernFloatingToast');
       const tagEl = document.getElementById('toastTag');
       const bodyEl = document.getElementById('toastBody');
@@ -981,12 +1084,11 @@
       }
     }
 
-    // ---------------- BACK NAVIGATION & CAPACITOR HOOK ----------------
+    // ---------------- NAVIGATION & CAPACITOR BACK ----------------
     function pushNavState(stateName) { history.pushState({ screen: stateName }, ''); }
     pushNavState('root_deliveries');
     window.addEventListener('popstate', () => handleStepByStepBack());
 
-    // Capacitor Native Hardware Back Button Bridge
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
       window.Capacitor.Plugins.App.addListener('backButton', () => {
         handleStepByStepBack();
@@ -1021,7 +1123,7 @@
     }
 
     // =========================================================
-    // 📡 CONTINUOUS LIVE GPS TRACKING (GOOGLE MAPS)
+    // 📡 CONTINUOUS LIVE GPS TRACKING
     // =========================================================
     function toggleContinuousLiveGPS(orderId) {
       const btn = document.getElementById(`gpsBtn_${orderId}`);
@@ -1081,25 +1183,6 @@
       );
     }
 
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible" && activeGpsOrderId) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const lat = pos.coords.latitude, lng = pos.coords.longitude;
-            db.ref(`orders/${activeGpsOrderId}`).update({
-              locationLink: `https://www.google.com/maps?q=${lat},${lng}`,
-              riderLat: lat,
-              riderLng: lng,
-              updatedAt: Date.now()
-            });
-            showModernFloatingToast("GPS Synced", "Live location updated.", "fa-solid fa-satellite-dish");
-          },
-          (err) => console.log("GPS sync note:", err),
-          { enableHighAccuracy: true, timeout: 5000 }
-        );
-      }
-    });
-
     // ---------------- AUTH CONTROLLER ----------------
     function toggleAuthMode(mode) {
       const loginForm = document.getElementById('riderLoginForm');
@@ -1139,9 +1222,6 @@
       }
     }
 
-    // =========================================================
-    // 📝 RIDER SIGNUP (BANK DETAILS OPTIONAL)
-    // =========================================================
     async function handleRiderSignup(e) {
       e.preventDefault();
       const name = document.getElementById('regName').value.trim();
@@ -1195,6 +1275,7 @@
     }
 
     function handleLogout() {
+      stopContinuousRiderAlarm();
       if (gpsWatchId !== null) {
         navigator.geolocation.clearWatch(gpsWatchId);
         gpsWatchId = null;
@@ -1223,6 +1304,7 @@
           }
           document.getElementById('authView').classList.add('hidden');
           document.getElementById('appView').classList.remove('hidden');
+          initNativeNotificationChannel();
           listenToRiderData(user.uid);
         } catch (err) {
           console.warn("Connection glitch, keeping rider session alive:", err);
@@ -1237,6 +1319,7 @@
         document.getElementById('authView').classList.remove('hidden');
         splash.classList.add('hidden');
         currentRider = null;
+        stopContinuousRiderAlarm();
         releaseScreenWakeLock();
         detachListeners();
       }
@@ -1294,7 +1377,10 @@
         const isOnline = (currentRider.online !== false);
         updateDutyBtnUI(isOnline);
         if (isOnline) requestScreenWakeLock();
-        else releaseScreenWakeLock();
+        else {
+          releaseScreenWakeLock();
+          stopContinuousRiderAlarm();
+        }
 
         document.getElementById('viewRiderName').innerText = currentRider.name || 'Rider';
         document.getElementById('viewRiderVehicle').innerText = currentRider.vehicle || 'Bike';
@@ -1331,9 +1417,24 @@
         renderAllDeliveryFeeds();
       });
 
+      // UNASSIGNED BROADCAST ORDERS (WITH NON-STOP ALARM & NATIVE PUSH)
       db.ref('unassignedOrders').limitToLast(20).on('value', snap => {
         unassignedTasks = snap.val() || {};
-        checkNewBroadcastTasks();
+        
+        // Check new broadcast orders
+        Object.keys(unassignedTasks).forEach(id => {
+          const task = unassignedTasks[id];
+          if (!task) return;
+          const isRejectedByMe = task.rejectedRiders && task.rejectedRiders[currentRider?.uid];
+          if (!isRejectedByMe && !knownBroadcastTaskIds.has(id)) {
+            sendNativeAndroidNotification(id, task.totalAmount || 0, task.restaurantName);
+            showModernFloatingToast("New Delivery Task!", `Order #${id.slice(-6)} available near you.`, "fa-solid fa-bolt");
+            knownBroadcastTaskIds.add(id);
+          }
+        });
+
+        // Non-stop alarm tab tak bajega jab tak accept/decline na kare
+        checkBroadcastTasksAndAlarm();
         renderAllDeliveryFeeds();
       });
 
@@ -1342,22 +1443,6 @@
         checkAssignedOrderCancellations();
         renderAllDeliveryFeeds();
         renderEarningsAndTrips();
-      });
-    }
-
-    function checkNewBroadcastTasks() {
-      const isRiderEligible = currentRider && currentRider.approved === true && currentRider.online !== false;
-      Object.keys(unassignedTasks).forEach(id => {
-        const task = unassignedTasks[id];
-        if (!task) return;
-        const isRejectedByMe = task.rejectedRiders && task.rejectedRiders[currentRider?.uid];
-        if (!isRejectedByMe && !knownBroadcastTaskIds.has(id)) {
-          if (isRiderEligible) {
-            playTaskBroadcastSound();
-            showModernFloatingToast("New Delivery Task!", `Order #${id.slice(-6)} available near you.`, "fa-solid fa-bolt");
-          }
-          knownBroadcastTaskIds.add(id);
-        }
       });
     }
 
@@ -1379,13 +1464,37 @@
       });
     }
 
-    function toggleOnlineDuty() {
+    // =========================================================
+    // 🔋 DUTY TOGGLE (WITH FOREGROUND SERVICE SUPPORT)
+    // =========================================================
+    async function toggleOnlineDuty() {
       if (!currentRider) return;
       const newStatus = !(currentRider.online !== false);
+      
+      if (newStatus) {
+        requestScreenWakeLock();
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ForegroundService) {
+          try {
+            await window.Capacitor.Plugins.ForegroundService.startForegroundService({
+              title: "FW Rider - Live Radar Active",
+              body: "Duty On: Naye orders ke liye background radar active hai.",
+              smallIcon: "ic_launcher"
+            });
+          } catch (e) { console.log("Foreground service error:", e); }
+        }
+      } else {
+        releaseScreenWakeLock();
+        stopContinuousRiderAlarm();
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ForegroundService) {
+          try {
+            await window.Capacitor.Plugins.ForegroundService.stopForegroundService();
+          } catch (e) { console.log(e); }
+        }
+      }
+
       db.ref(`deliveryPartners/${currentRider.uid}`).update({ online: newStatus })
         .then(() => {
-          if (newStatus) requestScreenWakeLock();
-          else releaseScreenWakeLock();
+          checkBroadcastTasksAndAlarm();
         })
         .catch(err => alert("Failed to change duty status: " + err.message));
     }
@@ -1401,12 +1510,15 @@
       }
     }
 
-    // ---------------- TASK ACTIONS ----------------
+    // ---------------- TASK ACTIONS (ALARM AUTOMATIC STOP) ----------------
     async function acceptBroadcastTask(orderId) {
       if (!currentRider) return;
       if (currentRider.approved !== true) { alert("⚠️ You must be verified by Super Admin before accepting tasks."); return; }
       if (currentRider.online === false) { alert("⚠️ You are currently Offline. Please go Online first."); return; }
-      if (currentCodCashInHand >= 3000) { alert("⚠️ कैश लिमिट (₹3,000) पार हो चुकी है! नए ऑर्डर स्वीकार करने के लिए पहले एडमिन के पास पेंडिंग कैश जमा करवाएं।"); return; }
+      if (currentCodCashInHand >= 3000) { alert("⚠️ कैश लिमिट (₹3,000) पार हो चुकी है! पहले एडमिन के पास पेंडिंग कैश जमा करवाएं।"); return; }
+
+      // Turant buzzer band karein
+      stopContinuousRiderAlarm();
 
       const btn = document.getElementById(`acceptBtn_${orderId}`);
       if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locking...'; }
@@ -1433,21 +1545,27 @@
         alert("Acceptance failed: " + err.message);
       } finally {
         if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check text-emerald-600"></i> <span>Accept Task</span>'; }
+        checkBroadcastTasksAndAlarm();
       }
     }
 
     async function rejectBroadcastTask(orderId) {
       if (!currentRider) return;
       if (!confirm(`Decline delivery request for Order #${orderId.slice(-6)}?`)) return;
+
+      // Turant buzzer band karein
+      stopContinuousRiderAlarm();
+
       try {
         await db.ref(`unassignedOrders/${orderId}/rejectedRiders/${currentRider.uid}`).set(true);
-        showModernFloatingToast("Task Declined", `Order #${orderId.slice(-6)} removed from your feed.`, "fa-solid fa-xmark");
+        showModernFloatingToast("Task Declined", `Order #${orderId.slice(-6)} removed from feed.`, "fa-solid fa-xmark");
+        checkBroadcastTasksAndAlarm();
         renderAllDeliveryFeeds();
       } catch (err) { alert("Action failed: " + err.message); }
     }
 
     // =========================================================
-    // 🛡️ 4-DIGIT OTP VERIFICATION + COD PAYMENT SETTLEMENT
+    // 🛡️ 4-DIGIT OTP VERIFICATION
     // =========================================================
     function openOtpVerificationModal(orderId) {
       document.getElementById('otpModalOrderId').value = orderId;
@@ -1573,7 +1691,7 @@
 
             ${isCodLimitExceeded ? `
               <div class="p-2 bg-rose-500/30 border border-rose-300/40 rounded-xl text-[10px] font-bold text-center text-rose-100">
-                ⚠️ कैश लिमिट (₹3,000) पार हो चुकी है! नए ऑर्डर लेने के लिए एडमिन के पास कैश जमा करें।
+                ⚠️ कैश लिमिट (₹3,000) पार हो चुकी है! नए ऑर्डर लेने के लिए पहले कैश जमा करें।
               </div>
             ` : ''}
 
@@ -1861,32 +1979,43 @@
     }
   </script>
 
-  <!-- ================= IN-APP UPDATE POPUP CONTROLLER (CAPACITOR FIXED) ================= -->
+  <!-- ================= IN-APP UPDATE POPUP CONTROLLER (v1.0.4 READY) ================= -->
   <script>
-    const CURRENT_APP_VERSION = "1.0.3";
+    const CURRENT_APP_VERSION = "1.0.5";
+
     async function checkForAppUpdate() {
       try {
-        const response = await fetch("https://foodworldgo.abhiikuanr.workers.dev/version.json?t=" + new Date().getTime());
+        const response = await fetch("https://foodworldgo.abhiikuanr.workers.dev/version.json?t=" + Date.now(), {
+          headers: { 'Accept': 'application/json' }
+        });
         if (!response.ok) return;
+
         const data = await response.json();
-        const serverVersion = data.rider_version || data.delivery_version || data.latest_version;
+        const serverVersion = data.rider_version || data.delivery_version || data.latest_version || data.version;
+
         if (serverVersion && serverVersion !== CURRENT_APP_VERSION) {
-          if (data.rider_message || data.message) {
-            document.getElementById("updateDesc").innerText = data.rider_message || data.message;
+          const updateMsg = data.rider_message || data.delivery_message || data.message || "Naye features ke liye app update karein.";
+          const descEl = document.getElementById("updateDesc");
+          if (descEl) descEl.innerText = updateMsg;
+
+          const modalEl = document.getElementById("updateModal");
+          if (modalEl) modalEl.style.display = "flex";
+
+          const updateBtn = document.getElementById("btnUpdateNow");
+          if (updateBtn) {
+            updateBtn.onclick = function() {
+              const downloadUrl = data.rider_apk || data.delivery_apk || data.apk_url || data.update_url;
+              if (downloadUrl) {
+                window.open(downloadUrl, '_system');
+              }
+            };
           }
-          document.getElementById("updateModal").style.display = "flex";
-          document.getElementById("btnUpdateNow").onclick = function() {
-            const downloadUrl = data.rider_apk || data.delivery_apk || data.apk_url || data.update_url;
-            if (downloadUrl) {
-              // Opens System Chrome to trigger direct APK download
-              window.open(downloadUrl, '_system');
-            }
-          };
         }
-      } catch (err) {}
+      } catch (err) {
+        console.warn("Update check note:", err);
+      }
     }
 
-    // Prevents DOMContentLoaded from being missed in Capacitor WebView
     if (document.readyState === "loading") {
       window.addEventListener("DOMContentLoaded", checkForAppUpdate);
     } else {

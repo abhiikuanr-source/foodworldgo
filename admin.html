@@ -177,10 +177,9 @@
     </div>
   </div>
 
-  <!-- ================= 4.5 ORDER DETAIL INSPECTION MODAL (NEW FEATURE) ================= -->
+  <!-- ================= 4.5 ORDER DETAIL INSPECTION MODAL ================= -->
   <div id="orderDetailModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
-      <!-- Modal Header -->
       <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
         <div class="flex items-center gap-2.5">
           <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-lg shadow-inner">
@@ -196,12 +195,8 @@
         </button>
       </div>
 
-      <!-- Modal Body (Scrollable) -->
-      <div class="p-4 space-y-3.5 overflow-y-auto custom-scrollbar flex-1 text-xs" id="odModalBody">
-        <!-- Dynamic order details injected by JS -->
-      </div>
+      <div class="p-4 space-y-3.5 overflow-y-auto custom-scrollbar flex-1 text-xs" id="odModalBody"></div>
 
-      <!-- Modal Footer -->
       <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end">
         <button onclick="closeOrderDetailModal()" class="min-h-[38px] px-5 py-2 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold rounded-xl text-xs transition">
           Close
@@ -368,11 +363,12 @@
         </div>
         
         <div class="flex items-center gap-2">
-          <span class="px-2.5 py-1 bg-orange-50 border border-orange-200 text-orange-800 rounded-full text-[10px] sm:text-xs font-black flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span> Live Radar Active
+          <!-- Foreground Service & Screen-Lock Radar Active Indicator -->
+          <span id="fgServiceBadge" class="hidden px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-full text-[10px] sm:text-xs font-black flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Live Radar Active
           </span>
-          <span class="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-full text-[10px] sm:text-xs font-black flex items-center gap-1">
-            <i class="fa-solid fa-shield-halved text-emerald-600"></i> Razorpay & OTP
+          <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-800 rounded-full text-[10px] sm:text-xs font-black flex items-center gap-1">
+            <i class="fa-solid fa-shield-halved text-blue-600"></i> Razorpay & OTP
           </span>
         </div>
       </header>
@@ -557,12 +553,12 @@
           </div>
         </section>
 
-        <!-- 4. KITCHEN PARTNERS TAB -->
+        <!-- 4. KITCHEN PARTNERS TAB (LIVE ACTIVE/INACTIVE STATUS) -->
         <section id="section-restaurants" class="hidden space-y-4">
           <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h3 class="font-black text-slate-900 text-base">Kitchen Restaurant Partners & Bank Accounts</h3>
-              <p class="text-[11px] text-slate-400">Tap card to inspect details, menus, bank accounts or delete account</p>
+              <p class="text-[11px] text-slate-400">View live active status, bank accounts, menus or suspend/approve accounts</p>
             </div>
             <input type="text" id="restaurantSearch" onkeyup="filterRestaurants()" placeholder="Search kitchen or bank..." class="w-full sm:w-64 px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
           </div>
@@ -591,7 +587,7 @@
         <section id="section-customers" class="hidden space-y-4">
           <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs">
             <h3 class="font-black text-slate-900 text-base">Registered Customer Base</h3>
-            <p class="text-[11px] text-slate-400">Tap customer card to inspect order history or click delete</p>
+            <p class="text-[11px] text-slate-400">Tap customer card to inspect order history or delete account</p>
           </div>
 
           <div id="customersCardsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -656,7 +652,6 @@
 
         <!-- ================= 9. ADMIN PROFILE TAB ================= -->
         <section id="section-profile" class="hidden space-y-4 max-w-2xl mx-auto">
-          
           <!-- Read-Only Admin Card -->
           <div id="adminProfileViewCard" class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-5">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -742,7 +737,7 @@
     </main>
   </div>
 
-<!-- ================= 5. UPDATE POPUP MODAL ================= -->
+  <!-- ================= 5. UPDATE POPUP MODAL ================= -->
   <div id="updateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
     <div style="background:#1e1e1e; border:1px solid #333; padding:25px; border-radius:16px; width:85%; max-width:320px; text-align:center; color:#fff;">
       <div style="font-size:36px; margin-bottom:10px;">⚡</div>
@@ -752,7 +747,7 @@
       <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
     </div>
   </div>
-<!-- ================= JAVASCRIPT LOGIC (PART 2) ================= -->
+<!-- ================= JAVASCRIPT LOGIC (PART 2A) ================= -->
   <script>
     // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
@@ -782,6 +777,8 @@
     let activeDetailEntity = null;
     let toastTimeout = null;
     let audioCtx = null;
+    let wakeLockSentinel = null;
+    let knownOrderIds = new Set();
     const ADMIN_EMAILS = ["abhiikuanr@gmail.com", "superadmin@foodworld.com"];
 
     // ---------------- HELPER: SAFE ESCAPING ----------------
@@ -802,6 +799,88 @@
         return escapeHtml(trimmed);
       }
       return '';
+    }
+
+    // =========================================================
+    // 🚨 ADMIN FOREGROUND SERVICE & SCREEN-LOCK WAKE
+    // =========================================================
+    async function startAdminForegroundRadar() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLockSentinel = await navigator.wakeLock.request('screen');
+        }
+      } catch (e) {
+        console.log("WakeLock note:", e);
+      }
+
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ForegroundService) {
+        try {
+          await window.Capacitor.Plugins.ForegroundService.startForegroundService({
+            title: "FW Super Admin - Radar Active",
+            body: "Command Center: Screen-lock background order monitoring चालू है।",
+            smallIcon: "ic_launcher"
+          });
+          document.getElementById('fgServiceBadge')?.classList.remove('hidden');
+        } catch (e) {
+          console.warn("Foreground service start error:", e);
+        }
+      }
+    }
+
+    async function stopAdminForegroundRadar() {
+      if (wakeLockSentinel) {
+        wakeLockSentinel.release().catch(() => {});
+        wakeLockSentinel = null;
+      }
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ForegroundService) {
+        try {
+          await window.Capacitor.Plugins.ForegroundService.stopForegroundService();
+          document.getElementById('fgServiceBadge')?.classList.add('hidden');
+        } catch (e) {}
+      }
+    }
+
+    // =========================================================
+    // 🔔 NATIVE NOTIFICATION CHANNEL (ANDROID 13+ FIX)
+    // =========================================================
+    async function initAdminNotificationChannel() {
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+        try {
+          const { LocalNotifications } = window.Capacitor.Plugins;
+          await LocalNotifications.requestPermissions();
+          await LocalNotifications.createChannel({
+            id: 'fw_admin_orders',
+            name: 'Admin Order Radar Alerts',
+            description: 'Loud alerts for incoming orders & emergency tickets',
+            importance: 5,
+            visibility: 1,
+            vibration: true
+          });
+        } catch (e) {
+          console.warn("Notification channel setup note:", e);
+        }
+      }
+    }
+
+    async function sendAdminNativeAlert(orderId, amount, kitchenName) {
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+        try {
+          const { LocalNotifications } = window.Capacitor.Plugins;
+          await LocalNotifications.schedule({
+            notifications: [
+              {
+                title: "🚨 NAYA ORDER LIVE AAYA HAI!",
+                body: `Order #${orderId.slice(-6)} (₹${amount}) - ${kitchenName || 'Kitchen'}. Radar par dekhein!`,
+                id: Math.floor(Math.random() * 99999),
+                channelId: 'fw_admin_orders',
+                sound: 'res://raw/beep.wav'
+              }
+            ]
+          });
+        } catch (e) {
+          console.warn("Native alert dispatch error:", e);
+        }
+      }
     }
 
     // =========================================================
@@ -895,6 +974,22 @@
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
         osc.start(audioCtx.currentTime);
         osc.stop(audioCtx.currentTime + 0.35);
+      } catch (e) {}
+    }
+
+    function playNewOrderAlarm() {
+      try {
+        initGlobalAudioContext();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(950, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+        if (navigator.vibrate) navigator.vibrate([300, 150, 300]);
       } catch (e) {}
     }
 
@@ -1016,7 +1111,6 @@
     pushNavState('root_overview');
     window.addEventListener('popstate', () => handleHardwareBack());
 
-    // Capacitor Native Hardware Back Button Bridge
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
       window.Capacitor.Plugins.App.addListener('backButton', () => {
         handleHardwareBack();
@@ -1093,6 +1187,8 @@
           document.getElementById('dashboardView').classList.remove('hidden');
           document.getElementById('adminUserEmail').innerText = user.email || 'Admin';
           
+          initAdminNotificationChannel();
+          startAdminForegroundRadar();
           listenAdminProfile(user.uid);
           initRealtimeListeners();
         } catch (err) {
@@ -1104,6 +1200,7 @@
           splash.classList.add('hidden');
         }
       } else {
+        stopAdminForegroundRadar();
         document.getElementById('dashboardView').classList.add('hidden');
         document.getElementById('authView').classList.remove('hidden');
         splash.classList.add('hidden');
@@ -1138,7 +1235,10 @@
       }
     }
 
-    function handleLogout() { auth.signOut().catch(err => alert("Logout error: " + err.message)); }
+    function handleLogout() {
+      stopAdminForegroundRadar();
+      auth.signOut().catch(err => alert("Logout error: " + err.message));
+    }
 
     function detachRealtimeListeners() {
       db.ref('restaurants').off();
@@ -1166,14 +1266,26 @@
         populateDeliveryModalDropdown();
       });
 
-      db.ref('customers').limitToLast(50).on('value', snap => {
+      db.ref('customers').limitToLast(100).on('value', snap => {
         cachedCustomers = snap.val() || {};
         renderCustomersTable();
         updateStats();
       });
 
-      db.ref('orders').orderByChild('createdAt').limitToLast(50).on('value', snap => {
-        cachedOrders = snap.val() || {};
+      db.ref('orders').orderByChild('createdAt').limitToLast(100).on('value', snap => {
+        const orders = snap.val() || {};
+
+        Object.keys(orders).forEach(id => {
+          if (!knownOrderIds.has(id) && orders[id]?.status === 'PLACED') {
+            const restName = cachedRestaurants[orders[id].restaurantId]?.name || 'Kitchen';
+            sendAdminNativeAlert(id, orders[id].totalAmount || 0, restName);
+            playNewOrderAlarm();
+            showModernFloatingToast("New Live Order!", `Order #${id.slice(-6)} placed at ${restName}.`, "fa-solid fa-receipt");
+          }
+          knownOrderIds.add(id);
+        });
+
+        cachedOrders = orders;
         renderRecentOrders();
         renderOrdersTable();
         updateStats();
@@ -1195,7 +1307,7 @@
         document.getElementById('suppDescription').value = conf.description || 'Have an issue with your food or delivery? FoodWorld Helpdesk is here for you 24/7.';
       });
 
-      db.ref('supportTickets').limitToLast(20).on('value', snap => {
+      db.ref('supportTickets').limitToLast(30).on('value', snap => {
         cachedTickets = snap.val() || {};
         renderSupportTickets();
         updateStats();
@@ -1331,7 +1443,26 @@
     }
 
     // =========================================================
-    // 🗑️ PERMANENT USER DELETION (QUOTE-SAFE)
+    // 💵 SETTLE RIDER CASH (COD SETTLEMENT)
+    // =========================================================
+    async function settleRiderCash(uid, riderName, amount) {
+      if (!confirm(`Confirm cash receipt of ₹${amount} from ${riderName}? This will reset their pending COD balance.`)) return;
+      try {
+        await db.ref(`deliveryPartners/${uid}`).update({
+          lastSettledAt: Date.now(),
+          lastSettledAmount: amount
+        });
+        showModernFloatingToast("Cash Settled", `₹${amount} COD settled for ${riderName}.`, "fa-solid fa-hand-holding-dollar");
+        if (activeDetailEntity && activeDetailEntity.type === 'delivery' && activeDetailEntity.uid === uid) {
+          openRiderDetail(uid);
+        }
+      } catch (err) {
+        alert("Failed to settle cash: " + err.message);
+      }
+    }
+
+    // =========================================================
+    // 🗑️ PERMANENT USER DELETION
     // =========================================================
     async function deleteUserPermanently(uid, role, name) {
       const roleLabels = { customer: 'Customer', restaurant: 'Kitchen Partner', delivery: 'Delivery Rider' };
@@ -1366,13 +1497,14 @@
       }
     }
 
-    // ---------------- DEEP DETAILS INSPECTION ----------------
     function closeDetailView() {
       document.getElementById('section-detail-view').classList.add('hidden');
       document.getElementById(`section-${currentActiveTab}`).classList.remove('hidden');
       activeDetailEntity = null;
     }
-
+// =========================================================
+    // 🔍 DEEP DETAILS INSPECTION ENGINE
+    // =========================================================
     function openRestaurantDetail(uid) {
       const r = cachedRestaurants[uid];
       if (!r) return;
@@ -1384,6 +1516,8 @@
 
       document.getElementById('detailEntityTitle').innerText = r.name || 'Restaurant';
       document.getElementById('detailEntitySubtitle').innerText = `Kitchen Partner UID: ${uid}`;
+
+      const isStoreOpen = (r.isOpen !== false);
 
       document.getElementById('detailActionButtons').innerHTML = `
         ${r.phone ? `<a href="tel:${escapeHtml(r.phone)}" class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-black flex items-center gap-1.5 active:scale-95 transition"><i class="fa-solid fa-phone"></i> Call</a>` : ''}
@@ -1420,6 +1554,7 @@
             <div class="flex items-center justify-center sm:justify-start gap-2">
               <h4 class="text-lg font-black text-slate-900">${escapeHtml(r.name || '')}</h4>
               <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${r.approved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${r.approved ? 'Approved' : 'Pending'}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${isStoreOpen ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isStoreOpen ? '🟢 Active Today' : '🔴 Inactive Today'}</span>
             </div>
             <p class="text-xs text-brand-600 font-bold">${escapeHtml(r.cuisine || 'Multi-Cuisine')} • ${escapeHtml(r.hours || 'Hours not set')}</p>
             <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(r.address || 'Address not provided')}</p>
@@ -1643,7 +1778,7 @@
     }
 
     // =========================================================
-    // 🔍 FULL ORDER DETAILS INSPECTOR (DATE, TIME, RIDER, KITCHEN)
+    // 🔍 ORDER DETAILS INSPECTION MODAL
     // =========================================================
     function openOrderDetailModal(orderId) {
       const o = cachedOrders[orderId];
@@ -1655,7 +1790,6 @@
       const rest = cachedRestaurants[o.restaurantId] || {};
       const rider = (o.deliveryUid && cachedDelivery[o.deliveryUid]) ? cachedDelivery[o.deliveryUid] : null;
 
-      // Indian Date & Time formatting
       const createdTime = o.createdAt ? new Date(o.createdAt).toLocaleString('en-IN', { 
         dateStyle: 'medium', timeStyle: 'short' 
       }) : 'N/A';
@@ -1664,7 +1798,6 @@
         dateStyle: 'medium', timeStyle: 'short' 
       }) : null;
 
-      // Ordered Items List HTML
       let itemsHtml = '';
       if (o.items && Array.isArray(o.items)) {
         itemsHtml = o.items.map(it => `
@@ -1679,7 +1812,6 @@
 
       const body = document.getElementById('odModalBody');
       body.innerHTML = `
-        <!-- Status & Delivery Timeline -->
         <div class="p-3.5 rounded-2xl ${o.status === 'DELIVERED' ? 'bg-emerald-50 border border-emerald-200' : 'bg-slate-50 border border-slate-200'} space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-black uppercase text-slate-500">Delivery Status</span>
@@ -1714,21 +1846,18 @@
           ` : ''}
         </div>
 
-        <!-- Customer & Drop Info -->
         <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
           <span class="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1"><i class="fa-solid fa-user text-slate-400"></i> Customer Details</span>
           <p class="font-bold text-slate-900 text-xs">${escapeHtml(o.phone || 'Customer')} ${o.customerUid ? `<span class="text-[10px] text-slate-400 font-mono">(UID: ${o.customerUid.slice(0,6)})</span>` : ''}</p>
           <p class="text-[11px] text-slate-600"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(o.address || 'Address not provided')}</p>
         </div>
 
-        <!-- Kitchen Details -->
         <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
           <span class="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1"><i class="fa-solid fa-store text-slate-400"></i> Kitchen Details</span>
           <p class="font-bold text-slate-900 text-xs">${escapeHtml(rest.name || 'Kitchen Partner')} ${rest.phone ? `(${escapeHtml(rest.phone)})` : ''}</p>
           <p class="text-[11px] text-slate-600 truncate"><i class="fa-solid fa-location-dot text-amber-500 mr-1"></i> ${escapeHtml(rest.address || 'Pickup location')}</p>
         </div>
 
-        <!-- Delivery Rider Details -->
         <div class="p-3.5 rounded-2xl border ${rider ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/50 border-amber-200'} space-y-1.5">
           <span class="text-[10px] font-black uppercase text-slate-500 flex items-center gap-1"><i class="fa-solid fa-motorcycle text-brand-500"></i> Delivery Rider</span>
           ${rider ? `
@@ -1744,7 +1873,6 @@
           `}
         </div>
 
-        <!-- Ordered Items Bill -->
         <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
           <span class="text-[10px] font-black uppercase text-slate-400 block">Order Food Bill</span>
           ${itemsHtml}
@@ -1822,7 +1950,7 @@
                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black ${isResolved ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
                   ${isResolved ? 'RESOLVED' : 'OPEN / PENDING'}
                 </span>
-                <span class="px-2 py-0.5 rounded-md text-[9px] font-black bg-slate-100 text-slate-700">${escapeHtml(t.category || 'General Issue')}</span>
+                <span class="px-2.5 py-0.5 rounded-md text-[9px] font-black bg-slate-100 text-slate-700">${escapeHtml(t.category || 'General Issue')}</span>
               </div>
               <span class="text-[10px] text-slate-400 font-mono">${new Date(t.createdAt || Date.now()).toLocaleString('en-IN')}</span>
             </div>
@@ -1938,6 +2066,9 @@
       container.innerHTML = html;
     }
 
+    // =========================================================
+    // 🏬 RESTAURANTS TABLE (WITH 🟢 ACTIVE / 🔴 INACTIVE BADGE)
+    // =========================================================
     function renderRestaurantsTable(filterText = '') {
       const container = document.getElementById('restaurantsCardList');
       const keys = Object.keys(cachedRestaurants);
@@ -1954,6 +2085,7 @@
         const name = r.name || 'Unnamed Kitchen';
         const email = r.email || 'No email';
         const isApproved = r.approved === true;
+        const isStoreOpen = (r.isOpen !== false);
 
         if (filterText && !name.toLowerCase().includes(filterText.toLowerCase()) && !email.toLowerCase().includes(filterText.toLowerCase()) && !r.bankAccountNo?.includes(filterText) && !r.ifscCode?.toLowerCase().includes(filterText.toLowerCase())) return;
 
@@ -1990,9 +2122,14 @@
                     <p class="text-[10px] text-slate-400 font-mono truncate">${escapeHtml(email)} • ${escapeHtml(r.phone || '')}</p>
                   </div>
                 </div>
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-black ${isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                  ${isApproved ? 'Approved' : 'Pending'}
-                </span>
+                <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                  <span class="px-2 py-0.5 rounded-full text-[9px] font-black ${isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                    ${isApproved ? 'Approved' : 'Pending'}
+                  </span>
+                  <span class="px-2 py-0.2 rounded-full text-[8px] font-black ${isStoreOpen ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
+                    ${isStoreOpen ? '🟢 Active' : '🔴 Inactive'}
+                  </span>
+                </div>
               </div>
               <p class="text-[11px] text-slate-500 mt-2 line-clamp-1"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(r.address || 'N/A')}</p>
               ${bankHtml}
@@ -2132,129 +2269,6 @@
       db.ref(`deliveryPartners/${uid}`).update({ approved: approve })
         .then(() => showModernFloatingToast("Rider Status", `Approval state changed.`, "fa-solid fa-motorcycle"))
         .catch(err => alert("Failed to update rider: " + err.message));
-    }
-
-    // =========================================================
-    // 📡 REAL-TIME ORDERS RADAR (WITH ORDER DETAILS BUTTON)
-    // =========================================================
-    function renderOrdersTable() {
-      const container = document.getElementById('ordersCardsContainer');
-      const filterStatus = document.getElementById('orderStatusFilter').value;
-      const orderKeys = Object.keys(cachedOrders).reverse();
-
-      if (orderKeys.length === 0) {
-        container.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs bg-white rounded-3xl border border-slate-200">No orders found.</div>`;
-        return;
-      }
-
-      let html = '';
-      orderKeys.forEach(id => {
-        const o = cachedOrders[id];
-        if (!o) return;
-        if (filterStatus !== 'ALL' && o.status !== filterStatus) return;
-
-        const restName = cachedRestaurants[o.restaurantId]?.name || 'Unknown Restaurant';
-        const isClosed = o.status === 'DELIVERED' || o.status === 'CANCELLED';
-        
-        let deliveryBoyInfo = '';
-        if (o.deliveryUid && cachedDelivery[o.deliveryUid]) {
-          deliveryBoyInfo = `<span class="text-emerald-700 font-bold"><i class="fa-solid fa-person-biking mr-1"></i> Rider: ${escapeHtml(cachedDelivery[o.deliveryUid].name)} (${escapeHtml(cachedDelivery[o.deliveryUid].phone || '')})</span>`;
-        } else if (!isClosed && o.status !== 'PAYMENT_PENDING') {
-          deliveryBoyInfo = `<span class="text-orange-600 font-black flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span> Live Broadcast (Waiting for Rider)</span>`;
-        } else if (o.status === 'PAYMENT_PENDING') {
-          deliveryBoyInfo = `<span class="text-amber-600 font-bold"><i class="fa-solid fa-hourglass-half mr-1"></i> Awaiting Razorpay Payment</span>`;
-        } else {
-          deliveryBoyInfo = `<span class="text-slate-400 font-bold">Unassigned</span>`;
-        }
-
-        const badgeClass = STATUS_BADGES[o.status] || 'bg-slate-100 text-slate-700';
-        const paymentBadge = o.paymentMethod === 'ONLINE' ? 
-          `<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-50 text-blue-700 border border-blue-200">RAZORPAY ONLINE</span>` : 
-          `<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">COD</span>`;
-
-        let riderGpsMapUrl = o.locationLink;
-        if (!riderGpsMapUrl && o.riderLat && o.riderLng) {
-          riderGpsMapUrl = `https://www.google.com/maps?q=${o.riderLat},${o.riderLng}`;
-        }
-        const safeRiderMapUrl = sanitizeMapUrl(riderGpsMapUrl);
-
-        let customerMapUrl = "";
-        if (o.customerLat && o.customerLng) {
-          customerMapUrl = `https://www.google.com/maps?q=${o.customerLat},${o.customerLng}`;
-        } else if (o.address) {
-          customerMapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.address)}`;
-        }
-        const safeCustomerMapUrl = sanitizeMapUrl(customerMapUrl);
-
-        html += `
-          <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-              <div>
-                <span class="font-mono font-black text-xs text-slate-900">#${id.slice(-6)}</span>
-                <p class="text-[10px] text-slate-400 font-mono">${new Date(o.createdAt || Date.now()).toLocaleTimeString('en-IN')}</p>
-              </div>
-              <div class="flex items-center gap-1.5">
-                ${paymentBadge}
-                <span class="px-2.5 py-1 rounded-full text-[10px] font-black border ${badgeClass}">${o.status}</span>
-                ${o.deliveryOtp ? `
-                  <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-black ${o.verifiedDelivery ? 'bg-emerald-100 text-emerald-800' : 'bg-brand-50 text-brand-700 border border-brand-200'}">
-                    OTP: ${o.deliveryOtp} ${o.verifiedDelivery ? '✓' : ''}
-                  </span>
-                ` : ''}
-              </div>
-            </div>
-
-            <div class="text-xs space-y-1.5">
-              <p class="font-black text-slate-900"><i class="fa-solid fa-utensils text-brand-500 mr-1"></i> ${escapeHtml(restName)}</p>
-              <div class="flex items-center justify-between">
-                <p class="text-slate-600 truncate flex-1 mr-2"><i class="fa-solid fa-location-dot text-slate-400 mr-1"></i> ${escapeHtml(o.address || 'No address')} (${escapeHtml(o.phone || 'N/A')})</p>
-                ${safeCustomerMapUrl ? `<a href="${safeCustomerMapUrl}" target="_system" class="text-blue-600 font-bold text-[10px] hover:underline flex-shrink-0"><i class="fa-solid fa-map-pin"></i> Drop Pin</a>` : ''}
-              </div>
-              
-              ${o.paymentMethod === 'ONLINE' ? `
-                <div class="p-2.5 rounded-2xl bg-blue-50/70 border border-blue-200 flex items-center justify-between text-[11px]">
-                  <div>
-                    <span class="font-mono font-bold text-blue-900"><i class="fa-solid fa-shield-halved text-blue-600 mr-1"></i> Razorpay ID: <strong>${escapeHtml(o.razorpayPaymentId || 'Payment Processing')}</strong></span>
-                    <span class="block text-[10px] font-bold ${o.paymentStatus === 'PAID_ONLINE' ? 'text-emerald-700' : 'text-amber-700'}">● Status: ${o.paymentStatus === 'PAID_ONLINE' ? 'Paid & Verified' : 'Awaiting Confirmation'}</span>
-                  </div>
-                  <span class="${o.paymentStatus === 'PAID_ONLINE' ? 'text-emerald-700 bg-emerald-100' : 'text-amber-700 bg-amber-100'} font-black text-[10px] px-2 py-0.5 rounded-full">
-                    ${o.paymentStatus === 'PAID_ONLINE' ? 'Paid ✓' : 'Pending'}
-                  </span>
-                </div>
-              ` : ''}
-
-              <div class="flex items-center justify-between pt-1">
-                <div class="text-[11px]">${deliveryBoyInfo}</div>
-                ${safeRiderMapUrl ? `
-                  <a href="${safeRiderMapUrl}" target="_system" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-[10px] rounded-xl flex items-center gap-1 shadow-xs transition">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-ping"></span> Live Rider GPS Map
-                  </a>
-                ` : ''}
-              </div>
-              ${o.cancelReason ? `<p class="text-[10px] text-rose-600 font-bold bg-rose-50 p-1.5 rounded-xl"><i class="fa-solid fa-circle-info"></i> ${escapeHtml(o.cancelReason)}</p>` : ''}
-            </div>
-
-            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-              <span class="font-black text-sm text-emerald-700">₹${o.totalAmount || 0}</span>
-              <div class="flex gap-1.5">
-                <!-- Details Modal Trigger -->
-                <button onclick="openOrderDetailModal('${id}')" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 active:scale-95 text-brand-700 rounded-xl text-xs font-black transition border border-brand-200" title="View Full Order Details">
-                  <i class="fa-solid fa-eye"></i> Details
-                </button>
-                ${o.status !== 'DELIVERED' && o.status !== 'CANCELLED' ? `
-                  <button onclick="openReassignModal('${id}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-xl text-xs font-black transition" title="Assign / Override Rider">
-                    <i class="fa-solid fa-user-gear"></i> Rider
-                  </button>
-                  <button onclick="cancelOrder('${id}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black border border-rose-200 transition" title="Cancel Order">
-                    <i class="fa-solid fa-ban"></i>
-                  </button>
-                ` : '<span class="text-[11px] text-slate-400 font-bold self-center">Closed</span>'}
-              </div>
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html || `<div class="p-6 text-center text-slate-400 text-xs bg-white rounded-3xl border border-slate-200">No orders match filter.</div>`;
     }
 
     // =========================================================
@@ -2536,32 +2550,43 @@
     }
   </script>
 
-  <!-- ================= IN-APP UPDATE POPUP CONTROLLER (CAPACITOR FIXED) ================= -->
+  <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
   <script>
-    const CURRENT_APP_VERSION = "1.0.3";
+    const CURRENT_APP_VERSION = "1.0.5";
+
     async function checkForAppUpdate() {
       try {
-        const response = await fetch("https://foodworldgo.abhiikuanr.workers.dev/version.json?t=" + new Date().getTime());
+        const response = await fetch("https://foodworldgo.abhiikuanr.workers.dev/version.json?t=" + Date.now(), {
+          headers: { 'Accept': 'application/json' }
+        });
         if (!response.ok) return;
+
         const data = await response.json();
-        const serverVersion = data.admin_version || data.latest_version;
+        const serverVersion = data.admin_version || data.latest_version || data.version;
+
         if (serverVersion && serverVersion !== CURRENT_APP_VERSION) {
-          if (data.admin_message || data.message) {
-            document.getElementById("updateDesc").innerText = data.admin_message || data.message;
+          const updateMsg = data.admin_message || data.message || "Naye command center features ke liye update karein.";
+          const descEl = document.getElementById("updateDesc");
+          if (descEl) descEl.innerText = updateMsg;
+
+          const modalEl = document.getElementById("updateModal");
+          if (modalEl) modalEl.style.display = "flex";
+
+          const updateBtn = document.getElementById("btnUpdateNow");
+          if (updateBtn) {
+            updateBtn.onclick = function() {
+              const downloadUrl = data.admin_apk || data.apk_url || data.update_url;
+              if (downloadUrl) {
+                window.open(downloadUrl, '_system');
+              }
+            };
           }
-          document.getElementById("updateModal").style.display = "flex";
-          document.getElementById("btnUpdateNow").onclick = function() {
-            const downloadUrl = data.admin_apk || data.apk_url || data.update_url;
-            if (downloadUrl) {
-              // Opens System Chrome browser to trigger APK download directly
-              window.open(downloadUrl, '_system');
-            }
-          };
         }
-      } catch (err) {}
+      } catch (err) {
+        console.warn("Update check note:", err);
+      }
     }
 
-    // Prevents DOMContentLoaded from being missed in Capacitor WebView
     if (document.readyState === "loading") {
       window.addEventListener("DOMContentLoaded", checkForAppUpdate);
     } else {
