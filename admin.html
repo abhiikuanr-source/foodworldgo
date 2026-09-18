@@ -104,7 +104,7 @@
         <button onclick="closeForgotPasswordModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800"><i class="fa-solid fa-xmark text-xs"></i></button>
       </div>
       
-      <p class="text-xs text-slate-600 leading-relaxed">Enter your registered Admin email below. We'll send a password recovery verification link to your email.</p>
+      <p class="text-xs text-slate-600 leading-relaxed">Enter your registered Admin email below. We will send a password recovery verification link to your email.</p>
 
       <form onsubmit="handleSendPasswordReset(event)" class="space-y-3.5">
         <div>
@@ -132,11 +132,11 @@
       <div>
         <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">Mail Dispatched</span>
         <h3 class="font-black text-slate-900 text-base mt-2">Verification Link Sent!</h3>
-        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">Password recovery verification link has been sent to your inbox/spam folder.</p>
+        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">A password recovery verification link has been sent to your registered inbox/spam folder.</p>
         <p class="text-xs font-mono font-bold text-brand-600 bg-brand-50 p-2 rounded-xl mt-2.5 truncate" id="sentSuccessEmailPreview">admin@foodworld.com</p>
       </div>
       <div class="pt-1">
-        <button onclick="closeEmailSentSuccessModal()" class="w-full min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold rounded-xl text-xs shadow-md transition">Understood / ठीक है</button>
+        <button onclick="closeEmailSentSuccessModal()" class="w-full min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold rounded-xl text-xs shadow-md transition">Got It</button>
       </div>
     </div>
   </div>
@@ -356,18 +356,18 @@
 
     <!-- Main Content Area -->
     <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
-      <header class="bg-white/95 backdrop-blur-md border-b border-slate-100 sticky top-0 z-30 px-4 sm:px-6 py-3 flex items-center justify-between shadow-xs">
+      <header class="bg-white/95 backdrop-blur-md border-b border-slate-100 sticky top-0 z-30 px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between shadow-xs">
         <div class="flex items-center gap-3">
           <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-700 p-2 rounded-xl bg-slate-100 active:bg-slate-200"><i class="fa-solid fa-bars text-base"></i></button>
           <h1 id="pageTitle" class="text-base sm:text-lg font-black text-slate-900 truncate">Dashboard Overview</h1>
         </div>
         
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2.5">
           <!-- Foreground Service & Screen-Lock Radar Active Indicator -->
-          <span id="fgServiceBadge" class="hidden px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-full text-[10px] sm:text-xs font-black flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Live Radar Active
+          <span id="fgServiceBadge" class="hidden px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-full text-xs font-black flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span> Live Radar Active
           </span>
-          <span class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-800 rounded-full text-[10px] sm:text-xs font-black flex items-center gap-1">
+          <span class="px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-800 rounded-full text-xs font-black flex items-center gap-1.5">
             <i class="fa-solid fa-shield-halved text-blue-600"></i> Razorpay & OTP
           </span>
         </div>
@@ -708,10 +708,10 @@
                   </div>
                   <div class="flex-1 space-y-1.5">
                     <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-xl text-xs font-extrabold cursor-pointer active:scale-95 transition border border-brand-200">
-                      <i class="fa-solid fa-camera"></i> <span>गैलरी / कैमरा से चुनें</span>
+                      <i class="fa-solid fa-camera"></i> <span>Choose from Gallery / Camera</span>
                       <input type="file" accept="image/*" class="hidden" onchange="processImageUpload(this, 'adminPhotoInput', 'editAdminPhotoPreview', 'editAdminPlaceholder')">
                     </label>
-                    <input type="text" id="adminPhotoInput" oninput="previewPhotoUrl(this.value, 'editAdminPhotoPreview', 'editAdminPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="या फोटो लिंक (URL) डालें...">
+                    <input type="text" id="adminPhotoInput" oninput="previewPhotoUrl(this.value, 'editAdminPhotoPreview', 'editAdminPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Or enter photo URL...">
                   </div>
                 </div>
               </div>
@@ -741,13 +741,13 @@
   <div id="updateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
     <div style="background:#1e1e1e; border:1px solid #333; padding:25px; border-radius:16px; width:85%; max-width:320px; text-align:center; color:#fff;">
       <div style="font-size:36px; margin-bottom:10px;">⚡</div>
-      <h3 style="margin:0 0 10px; font-size:18px;">Admin Portal Update!</h3>
-      <p id="updateDesc" style="font-size:13px; color:#aaa; margin-bottom:20px;">Naye command center features ke liye update karein.</p>
+      <h3 style="margin:0 0 10px; font-size:18px;">Admin Portal Update Available!</h3>
+      <p id="updateDesc" style="font-size:13px; color:#aaa; margin-bottom:20px;">Update to access the latest command center features.</p>
       <button id="btnUpdateNow" style="background:#ea580c; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">Update Now</button>
-      <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
+      <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Later</button>
     </div>
   </div>
-<!-- ================= JAVASCRIPT LOGIC (PART 2A) ================= -->
+<!-- ================= JAVASCRIPT LOGIC (PART 2) ================= -->
   <script>
     // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
@@ -817,7 +817,7 @@
         try {
           await window.Capacitor.Plugins.ForegroundService.startForegroundService({
             title: "FW Super Admin - Radar Active",
-            body: "Command Center: Screen-lock background order monitoring चालू है।",
+            body: "Command Center: Screen-lock background order monitoring is active.",
             smallIcon: "ic_launcher"
           });
           document.getElementById('fgServiceBadge')?.classList.remove('hidden');
@@ -849,12 +849,14 @@
           const { LocalNotifications } = window.Capacitor.Plugins;
           await LocalNotifications.requestPermissions();
           await LocalNotifications.createChannel({
-            id: 'fw_admin_orders',
-            name: 'Admin Order Radar Alerts',
-            description: 'Loud alerts for incoming orders & emergency tickets',
+            id: 'fw_admin_orders_v3',
+            name: 'Admin Live Order Alerts',
+            description: 'High-priority alerts for incoming orders and emergency tickets',
             importance: 5,
             visibility: 1,
-            vibration: true
+            vibration: true,
+            lights: true,
+            lightColor: '#EA580C'
           });
         } catch (e) {
           console.warn("Notification channel setup note:", e);
@@ -869,11 +871,12 @@
           await LocalNotifications.schedule({
             notifications: [
               {
-                title: "🚨 NAYA ORDER LIVE AAYA HAI!",
-                body: `Order #${orderId.slice(-6)} (₹${amount}) - ${kitchenName || 'Kitchen'}. Radar par dekhein!`,
+                title: "🚨 NEW ORDER RECEIVED LIVE!",
+                body: `Order #${orderId.slice(-6)} (₹${amount}) from ${kitchenName || 'Kitchen'}. Check Operations Radar!`,
                 id: Math.floor(Math.random() * 99999),
-                channelId: 'fw_admin_orders',
-                sound: 'res://raw/beep.wav'
+                channelId: 'fw_admin_orders_v3',
+                ongoing: false,
+                autoCancel: true
               }
             ]
           });
@@ -952,7 +955,7 @@
       isPulling = false;
     }, { passive: true });
 
-    // ---------------- AUDIO & TOAST ----------------
+    // ---------------- AUDIO & TOAST ENGINE ----------------
     function initGlobalAudioContext() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
@@ -1502,7 +1505,8 @@
       document.getElementById(`section-${currentActiveTab}`).classList.remove('hidden');
       activeDetailEntity = null;
     }
-// =========================================================
+
+    // =========================================================
     // 🔍 DEEP DETAILS INSPECTION ENGINE
     // =========================================================
     function openRestaurantDetail(uid) {
@@ -2552,7 +2556,7 @@
 
   <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
   <script>
-    const CURRENT_APP_VERSION = "1.0.5";
+    const CURRENT_APP_VERSION = "1.0.6";
 
     async function checkForAppUpdate() {
       try {
@@ -2565,7 +2569,7 @@
         const serverVersion = data.admin_version || data.latest_version || data.version;
 
         if (serverVersion && serverVersion !== CURRENT_APP_VERSION) {
-          const updateMsg = data.admin_message || data.message || "Naye command center features ke liye update karein.";
+          const updateMsg = data.admin_message || data.message || "Update to access the latest command center features.";
           const descEl = document.getElementById("updateDesc");
           if (descEl) descEl.innerText = updateMsg;
 

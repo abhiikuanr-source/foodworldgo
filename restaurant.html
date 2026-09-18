@@ -133,7 +133,7 @@
       </div>
       
       <p class="text-xs text-slate-600 leading-relaxed">
-        Apna registered Kitchen business email enter karein. Hum verification link aapke inbox par bhejenge.
+        Enter your registered Kitchen business email address below. We will send a password reset verification link to your inbox.
       </p>
 
       <form onsubmit="handlePartnerPasswordReset(event)" class="space-y-3.5">
@@ -162,16 +162,16 @@
         <i class="fa-solid fa-envelope-circle-check"></i>
       </div>
       <div>
-        <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">Mail Sent</span>
-        <h3 class="font-black text-slate-900 text-base mt-2">Kitchen Recovery Link Sent!</h3>
+        <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">Mail Dispatched</span>
+        <h3 class="font-black text-slate-900 text-base mt-2">Recovery Link Sent!</h3>
         <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
-          Password reset verification link has been sent to your registered email. Please check your inbox or spam folder.
+          A password reset verification link has been sent to your registered email address. Please check your inbox or spam folder.
         </p>
         <p class="text-xs font-mono font-bold text-brand-600 bg-brand-50 p-2 rounded-xl mt-2.5 truncate" id="partnerSuccessEmailPreview">kitchen@foodworld.com</p>
       </div>
       <div class="pt-1">
         <button onclick="closePartnerEmailSuccessModal()" class="w-full min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold rounded-2xl text-xs shadow-md transition">
-          ठीक है / Got it
+          Understood
         </button>
       </div>
     </div>
@@ -281,7 +281,7 @@
               <span id="regGpsStatus">Auto-Detect GPS</span>
             </button>
           </div>
-          <textarea id="regAddress" rows="2" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="दुकान/किचन का पूरा पता..."></textarea>
+          <textarea id="regAddress" rows="2" required class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Full kitchen address, street, landmark, city..."></textarea>
         </div>
 
         <!-- 100% OPTIONAL BANK DETAILS SECTION -->
@@ -293,7 +293,7 @@
             </div>
             <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 uppercase">Optional</span>
           </div>
-          <p class="text-[11px] text-slate-500 leading-tight">Abhi khali chhod sakte hain, baad mein profile se add kar sakte hain.</p>
+          <p class="text-[11px] text-slate-500 leading-tight">Optional: You can leave this blank and add it anytime from your profile.</p>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Bank Name (Optional)</label>
@@ -335,39 +335,40 @@
   <!-- ================= RESTAURANT DASHBOARD VIEW ================= -->
   <div id="dashboardView" class="hidden min-h-screen flex flex-col bg-slate-50">
     
-    <!-- Top Navigation Header with Prominent Store Active/Inactive Toggle -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs px-4 sm:px-6 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3 overflow-hidden">
-        <div class="w-11 h-11 rounded-2xl bg-brand-500 text-white flex items-center justify-center font-black text-lg shadow-md shadow-brand-500/30 overflow-hidden flex-shrink-0">
+    <!-- ================= 🌟 ENLARGED TOPBAR HEADER ================= -->
+    <header class="bg-white border-b border-slate-200/90 sticky top-0 z-30 shadow-xs px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3.5 overflow-hidden">
+        <!-- Enlarged Kitchen Logo / Avatar -->
+        <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-brand-500 text-white flex items-center justify-center font-black text-2xl shadow-md shadow-brand-500/30 overflow-hidden flex-shrink-0">
           <img id="topRestaurantAvatar" src="" class="w-full h-full object-cover hidden" alt="Kitchen Logo">
           <i id="topRestaurantIcon" class="fa-solid fa-fire-burner"></i>
         </div>
         <div class="overflow-hidden">
           <div class="flex items-center gap-2">
-            <h2 class="font-extrabold text-sm sm:text-base text-slate-900 leading-tight truncate" id="topRestaurantName">Kitchen Name</h2>
-            <span id="approvalBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 flex-shrink-0">Checking...</span>
+            <h2 class="font-black text-base sm:text-lg text-slate-900 leading-tight truncate" id="topRestaurantName">Kitchen Name</h2>
+            <span id="approvalBadge" class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 flex-shrink-0">Checking...</span>
           </div>
-          <p class="text-[11px] text-slate-400 font-medium truncate" id="topRestaurantCuisine">Cuisine info</p>
+          <p class="text-xs sm:text-sm text-slate-500 font-semibold truncate mt-0.5" id="topRestaurantCuisine">Cuisine info</p>
         </div>
       </div>
 
       <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         <!-- Foreground Service / Lock Screen Indicator -->
-        <span id="fgServiceBadge" class="hidden px-2 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[9px] font-black" title="Foreground Service Active">
-          <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping inline-block mr-1"></span> KOT Active
+        <span id="fgServiceBadge" class="hidden px-3 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-black" title="Foreground Service Active">
+          <span class="w-2 h-2 rounded-full bg-blue-600 animate-ping inline-block mr-1"></span> KOT Active
         </span>
 
-        <!-- 🟢 / 🔴 Store Active/Inactive Status Toggle Button -->
-        <button onclick="toggleKitchenStoreStatus()" id="storeStatusBtn" class="min-h-[38px] px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-2 transition active:scale-95 shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-300">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span id="storeStatusText">🟢 Active (दुकान खुली है)</span>
+        <!-- 🟢 / 🔴 Store Active/Inactive Toggle Button (Enlarged) -->
+        <button onclick="toggleKitchenStoreStatus()" id="storeStatusBtn" class="min-h-[44px] px-4 py-2 rounded-full text-xs sm:text-sm font-black flex items-center gap-2.5 transition active:scale-95 shadow-md bg-emerald-100 text-emerald-800 border-2 border-emerald-300">
+          <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="storeStatusText">🟢 Active (Store Open)</span>
         </button>
 
-        <button onclick="testKitchenSound()" class="min-h-[36px] w-9 sm:w-auto px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-800 text-xs font-bold transition flex items-center justify-center gap-1" title="Test Order Chime">
-          <i class="fa-solid fa-volume-high"></i>
+        <button onclick="testKitchenSound()" class="min-h-[42px] px-3.5 py-2 rounded-2xl bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-800 text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 border border-amber-200 shadow-2xs" title="Test Order Siren">
+          <i class="fa-solid fa-volume-high text-sm"></i>
           <span class="hidden sm:inline">Sound</span>
         </button>
-        <button onclick="handleLogout()" class="min-h-[36px] px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 active:scale-95 text-rose-600 text-xs font-bold transition flex items-center gap-1.5">
+        <button onclick="handleLogout()" class="min-h-[42px] px-3.5 py-2 rounded-2xl bg-red-50 hover:bg-red-100 active:scale-95 text-rose-600 text-xs sm:text-sm font-bold transition flex items-center gap-1.5 border border-red-200 shadow-2xs">
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
           <span class="hidden sm:inline">Logout</span>
         </button>
@@ -382,25 +383,25 @@
       </div>
     </div>
 
-    <!-- Navigation Tabs Bar -->
-    <div class="bg-white border-b border-slate-200 px-4 sm:px-6 sticky top-[62px] z-20 shadow-2xs">
-      <div class="flex space-x-4 sm:space-x-8 overflow-x-auto no-scrollbar py-1 text-xs font-bold whitespace-nowrap">
-        <button onclick="switchTab('orders')" id="tabBtn-orders" class="tab-button py-3 border-b-2 border-brand-600 text-brand-600 flex items-center gap-2 flex-shrink-0 transition active:scale-95">
-          <i class="fa-solid fa-bell-concierge"></i>
-          <span>Live Orders Pipeline</span>
-          <span id="activeOrdersBadge" class="px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-[10px]">0</span>
+    <!-- ================= 🌟 ENLARGED TOP NAVIGATION TABS ================= -->
+    <div class="bg-white border-b border-slate-200/80 px-4 sm:px-6 sticky top-[72px] sm:top-[78px] z-20 shadow-xs">
+      <div class="flex space-x-6 sm:space-x-10 overflow-x-auto no-scrollbar py-1 text-sm font-black whitespace-nowrap">
+        <button onclick="switchTab('orders')" id="tabBtn-orders" class="tab-button py-3.5 border-b-2 border-brand-600 text-brand-600 flex items-center gap-2.5 flex-shrink-0 transition active:scale-95">
+          <i class="fa-solid fa-bell-concierge text-base"></i>
+          <span class="text-sm font-black">Live Orders Pipeline</span>
+          <span id="activeOrdersBadge" class="px-2.5 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-black">0</span>
         </button>
-        <button onclick="switchTab('menu')" id="tabBtn-menu" class="tab-button py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 flex-shrink-0 transition active:scale-95">
-          <i class="fa-solid fa-book-open"></i>
-          <span>FoodWorld Menu & Stocks</span>
+        <button onclick="switchTab('menu')" id="tabBtn-menu" class="tab-button py-3.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2.5 flex-shrink-0 transition active:scale-95">
+          <i class="fa-solid fa-book-open text-base"></i>
+          <span class="text-sm font-black">FoodWorld Menu & Stocks</span>
         </button>
-        <button onclick="switchTab('reports')" id="tabBtn-reports" class="tab-button py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 flex-shrink-0 transition active:scale-95">
-          <i class="fa-solid fa-chart-line"></i>
-          <span>Business Pulse & COD</span>
+        <button onclick="switchTab('reports')" id="tabBtn-reports" class="tab-button py-3.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2.5 flex-shrink-0 transition active:scale-95">
+          <i class="fa-solid fa-chart-line text-base"></i>
+          <span class="text-sm font-black">Business Pulse & COD</span>
         </button>
-        <button onclick="switchTab('profile')" id="tabBtn-profile" class="tab-button py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 flex-shrink-0 transition active:scale-95">
-          <i class="fa-solid fa-sliders"></i>
-          <span>Kitchen Profile & Bank</span>
+        <button onclick="switchTab('profile')" id="tabBtn-profile" class="tab-button py-3.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2.5 flex-shrink-0 transition active:scale-95">
+          <i class="fa-solid fa-sliders text-base"></i>
+          <span class="text-sm font-black">Kitchen Profile & Bank</span>
         </button>
       </div>
     </div>
@@ -542,7 +543,7 @@
               <p class="font-bold text-slate-800 leading-relaxed" id="viewRestAddress">Address details</p>
               <div id="viewRestMapLinkBox" class="pt-1 hidden">
                 <a id="viewRestMapLink" href="#" target="_blank" class="text-[11px] text-blue-600 font-bold hover:underline flex items-center gap-1">
-                  <i class="fa-solid fa-map-location-dot"></i> अपनी दुकान की लोकेशन मैप पर देखें ➔
+                  <i class="fa-solid fa-map-location-dot"></i> View store location on Maps ➔
                 </a>
               </div>
             </div>
@@ -581,10 +582,10 @@
                 </div>
                 <div class="flex-1 space-y-1.5 min-w-0">
                   <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-xl text-xs font-extrabold cursor-pointer active:scale-95 transition border border-brand-200">
-                    <i class="fa-solid fa-image"></i> <span>गैलरी / कैमरा से चुनें</span>
+                    <i class="fa-solid fa-image"></i> <span>Choose from Gallery / Camera</span>
                     <input type="file" accept="image/*" class="hidden" onchange="processImageUpload(this, 'profImageUrlInput', 'editRestPhotoPreview', 'editRestPhotoPlaceholder')">
                   </label>
-                  <input type="text" id="profImageUrlInput" oninput="previewPhotoUrl(this.value, 'editRestPhotoPreview', 'editRestPhotoPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="या इमेज लिंक (URL) डालें...">
+                  <input type="text" id="profImageUrlInput" oninput="previewPhotoUrl(this.value, 'editRestPhotoPreview', 'editRestPhotoPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Or enter image URL...">
                 </div>
               </div>
             </div>
@@ -613,10 +614,10 @@
                 <label class="block text-xs font-bold text-slate-600">Kitchen Address & GPS Pin</label>
                 <button type="button" onclick="detectRestaurantLocation('profAddress', 'profGpsStatus')" class="text-[11px] text-brand-600 hover:text-brand-700 font-extrabold flex items-center gap-1 active:scale-95 transition">
                   <i class="fa-solid fa-location-crosshairs text-brand-500"></i>
-                  <span id="profGpsStatus">Live GPS डिटेक्ट करें</span>
+                  <span id="profGpsStatus">Detect Live GPS</span>
                 </button>
               </div>
-              <textarea id="profAddress" rows="2" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none" placeholder="दुकान संख्या, लैंडमार्क, शहर..."></textarea>
+              <textarea id="profAddress" rows="2" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none" placeholder="Shop No., Landmark, Area, City..."></textarea>
             </div>
 
             <!-- OPTIONAL BANK EDIT FIELDS -->
@@ -685,7 +686,7 @@
         </div>
 
         <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
-          <label class="block text-xs font-bold text-slate-700">Dish Photo (डिश की फोटो)</label>
+          <label class="block text-xs font-bold text-slate-700">Dish Photo</label>
           <div class="flex items-center gap-3">
             <div class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-white border-2 border-brand-200 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-xs relative">
               <img id="dishImgPreview" src="" class="w-full h-full object-cover hidden" alt="Dish Preview">
@@ -698,10 +699,10 @@
             <div class="flex-1 space-y-1.5 min-w-0">
               <label class="inline-flex items-center gap-1.5 px-3 py-2 bg-brand-500 hover:bg-brand-600 active:scale-95 text-white rounded-xl text-xs font-extrabold cursor-pointer transition shadow-sm">
                 <i class="fa-solid fa-camera"></i>
-                <span>गैलरी / कैमरा से चुनें</span>
+                <span>Choose from Gallery / Camera</span>
                 <input type="file" id="dishFileInput" accept="image/*" class="hidden" onchange="processImageUpload(this, 'dishImageUrlInput', 'dishImgPreview', 'dishImgPlaceholder')">
               </label>
-              <input type="text" id="dishImageUrlInput" oninput="previewPhotoUrl(this.value, 'dishImgPreview', 'dishImgPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="या ऑनलाइन इमेज लिंक डालें...">
+              <input type="text" id="dishImageUrlInput" oninput="previewPhotoUrl(this.value, 'dishImgPreview', 'dishImgPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Or enter online image link...">
             </div>
           </div>
         </div>
@@ -724,9 +725,9 @@
     <div style="background:#1e1e1e; border:1px solid #333; padding:25px; border-radius:16px; width:85%; max-width:320px; text-align:center; color:#fff;">
       <div style="font-size:36px; margin-bottom:10px;">👨‍🍳</div>
       <h3 style="margin:0 0 10px; font-size:18px;">Kitchen App Update!</h3>
-      <p id="updateDesc" style="font-size:13px; color:#aaa; margin-bottom:20px;">Naye features aur fast order alert ke liye app update karein.</p>
+      <p id="updateDesc" style="font-size:13px; color:#aaa; margin-bottom:20px;">Update for faster order alerts and new kitchen features.</p>
       <button id="btnUpdateNow" style="background:#ea580c; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">Update Now</button>
-      <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
+      <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Later</button>
     </div>
   </div>
 <!-- ================= JAVASCRIPT LOGIC (PART 2) ================= -->
@@ -763,31 +764,54 @@
     let restaurantLng = null;
 
     // =========================================================
-    // 🚨 CONTINUOUS KITCHEN ALARM ENGINE (NON-STOP ALERT)
+    // 🚨 100% OFFLINE CONTINUOUS KITCHEN SIREN (ZERO-LAG SYNTH)
     // =========================================================
-    let kitchenAlarmAudio = null;
-    let alarmVibrateInterval = null;
     let isAlarmRinging = false;
+    let alarmVibrateInterval = null;
+    let kitchenSirenOsc = null;
+    let kitchenSirenGain = null;
+    let kitchenSweepInterval = null;
 
-    function initKitchenAlarmAudio() {
-      if (!kitchenAlarmAudio) {
-        kitchenAlarmAudio = new Audio("https://assets.mixkit.co/active_storage/sfx/995/995-preview.mp3");
-        kitchenAlarmAudio.loop = true; // Tab tak bajega jab tak accept ya reject na ho
-        kitchenAlarmAudio.volume = 1.0;
-      }
+    function initGlobalAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
     }
+    window.addEventListener('click', initGlobalAudioContext, { once: true });
+    window.addEventListener('touchstart', initGlobalAudioContext, { once: true });
 
-    // Alarm aur Vibration Chalu Karna
     function startContinuousKitchenAlarm() {
       if (isAlarmRinging) return;
       isAlarmRinging = true;
 
-      initKitchenAlarmAudio();
+      try {
+        initGlobalAudioContext();
+        if (audioCtx) {
+          if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
 
-      kitchenAlarmAudio.play().catch(e => {
-        console.log("Autoplay waiting for user gesture:", e);
-        playContinuousFallbackBeep();
-      });
+          kitchenSirenOsc = audioCtx.createOscillator();
+          kitchenSirenGain = audioCtx.createGain();
+          kitchenSirenOsc.type = 'sawtooth';
+          kitchenSirenGain.gain.setValueAtTime(1.0, audioCtx.currentTime);
+
+          kitchenSirenOsc.connect(kitchenSirenGain);
+          kitchenSirenGain.connect(audioCtx.destination);
+          kitchenSirenOsc.start();
+
+          let up = true;
+          kitchenSweepInterval = setInterval(() => {
+            if (!isAlarmRinging || !audioCtx) return;
+            const now = audioCtx.currentTime;
+            if (up) {
+              kitchenSirenOsc.frequency.exponentialRampToValueAtTime(1350, now + 0.25);
+            } else {
+              kitchenSirenOsc.frequency.exponentialRampToValueAtTime(650, now + 0.25);
+            }
+            up = !up;
+          }, 300);
+        }
+      } catch (e) {
+        console.warn("Kitchen siren synth error:", e);
+      }
 
       if (navigator.vibrate) {
         navigator.vibrate([1000, 500]);
@@ -800,27 +824,27 @@
       }
     }
 
-    // Alarm aur Vibration Turant Band Karna
     function stopContinuousKitchenAlarm() {
       isAlarmRinging = false;
 
-      if (kitchenAlarmAudio) {
-        kitchenAlarmAudio.pause();
-        kitchenAlarmAudio.currentTime = 0;
+      if (kitchenSweepInterval) {
+        clearInterval(kitchenSweepInterval);
+        kitchenSweepInterval = null;
       }
-
+      if (kitchenSirenOsc) {
+        try { kitchenSirenOsc.stop(); kitchenSirenOsc.disconnect(); } catch (e) {}
+        kitchenSirenOsc = null;
+      }
       if (alarmVibrateInterval) {
         clearInterval(alarmVibrateInterval);
         alarmVibrateInterval = null;
       }
-
       if (navigator.vibrate) {
         navigator.vibrate(0);
       }
     }
 
     function checkPendingOrdersAndAlarm() {
-      // Agar dukan band hai toh alarm na bajayein
       if (!currentPartner || currentPartner.isOpen === false) {
         stopContinuousKitchenAlarm();
         return;
@@ -836,24 +860,6 @@
       }
     }
 
-    function playContinuousFallbackBeep() {
-      try {
-        initGlobalAudioContext();
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.setValueAtTime(900, audioCtx.currentTime);
-        gain.gain.setValueAtTime(1.0, audioCtx.currentTime);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 1.2);
-      } catch (e) {}
-    }
-
-    window.addEventListener('click', () => { initKitchenAlarmAudio(); initGlobalAudioContext(); }, { once: true });
-    window.addEventListener('touchstart', () => { initKitchenAlarmAudio(); initGlobalAudioContext(); }, { once: true });
-
     // =========================================================
     // 🔔 NATIVE ANDROID NOTIFICATION CHANNEL (ANDROID 13+ FIX)
     // =========================================================
@@ -863,12 +869,14 @@
           const { LocalNotifications } = window.Capacitor.Plugins;
           await LocalNotifications.requestPermissions();
           await LocalNotifications.createChannel({
-            id: 'fw_kitchen_orders',
-            name: 'Kitchen Live Orders Alert',
-            description: 'Loud alert for new customer orders',
-            importance: 5, // High priority banner + sound
+            id: 'fw_kitchen_siren_v3',
+            name: 'Kitchen Urgent Order Alerts',
+            description: 'Loud alert siren for incoming kitchen orders',
+            importance: 5,
             visibility: 1,
-            vibration: true
+            vibration: true,
+            lights: true,
+            lightColor: '#EA580C'
           });
         } catch (e) {
           console.warn("Notification channel setup note:", e);
@@ -877,17 +885,20 @@
     }
 
     async function sendNativeAndroidNotification(orderId, amount) {
+      requestScreenWakeLock();
+
       if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
         try {
           const { LocalNotifications } = window.Capacitor.Plugins;
           await LocalNotifications.schedule({
             notifications: [
               {
-                title: "🚨 NAYA ORDER AAYA HAI!",
-                body: `Order #${orderId.slice(-6)} mila hai (₹${amount}). Turant Accept karein!`,
+                title: "🚨 NEW INCOMING ORDER!",
+                body: `Order #${orderId.slice(-6)} received (₹${amount}). Accept immediately!`,
                 id: Math.floor(Math.random() * 99999),
-                channelId: 'fw_kitchen_orders',
-                sound: 'res://raw/beep.wav'
+                channelId: 'fw_kitchen_siren_v3',
+                ongoing: false,
+                autoCancel: true
               }
             ]
           });
@@ -898,7 +909,7 @@
     }
 
     // =========================================================
-    // 🔄 PULL TO REFRESH ENGINE FOR RESTAURANT PANEL
+    // 🔄 PULL TO REFRESH ENGINE
     // =========================================================
     let touchStartY = 0;
     let touchStartX = 0;
@@ -977,11 +988,6 @@
       }
     }
 
-    function initGlobalAudioContext() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
-    }
-
     function playModernNotifChime() {
       try {
         initGlobalAudioContext();
@@ -1001,7 +1007,7 @@
 
     function testKitchenSound() {
       startContinuousKitchenAlarm();
-      showModernFloatingToast("Alarm Test", "Buzzer chalu hua! Band karne ke liye 'Accept' karein.", "fa-solid fa-volume-high");
+      showModernFloatingToast("Siren Test", "Siren activated! Tap Accept/Reject to silence.", "fa-solid fa-volume-high");
       setTimeout(() => {
         stopContinuousKitchenAlarm();
       }, 5000);
@@ -1080,9 +1086,9 @@
     function detectRestaurantLocation(textareaId, statusSpanId) {
       const statusEl = document.getElementById(statusSpanId);
       const textarea = document.getElementById(textareaId);
-      if (!navigator.geolocation) { alert("GPS not supported."); return; }
+      if (!navigator.geolocation) { alert("GPS not supported on device."); return; }
 
-      statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> लोकेशन लॉक हो रही है...';
+      statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Locking GPS location...';
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           restaurantLat = position.coords.latitude;
@@ -1095,16 +1101,16 @@
             const data = await res.json();
             if (data && data.display_name) textarea.value = data.display_name;
             else textarea.value = `Kitchen Pin (GPS: ${restaurantLat.toFixed(6)}, ${restaurantLng.toFixed(6)})`;
-            statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> GPS सेट हो गया!</span>';
-            showModernFloatingToast("GPS Locked", `सटीक लोकेशन पिन हो गई (${restaurantLat.toFixed(4)}, ${restaurantLng.toFixed(4)})`, "fa-solid fa-location-dot");
+            statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> GPS Locked!</span>';
+            showModernFloatingToast("GPS Locked", `Accurate store location pinned (${restaurantLat.toFixed(4)}, ${restaurantLng.toFixed(4)})`, "fa-solid fa-location-dot");
           } catch (e) {
             if (!textarea.value) textarea.value = `GPS Pin: ${restaurantLat.toFixed(6)}, ${restaurantLng.toFixed(6)}`;
-            statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> GPS सेट ✓</span>';
+            statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> GPS Set ✓</span>';
           }
         },
         (error) => {
-          statusEl.innerHTML = '<span class="text-rose-600 font-bold">GPS अनुमति दें</span>';
-          alert("कृपया Location Permission (GPS) ऑन करें: " + error.message);
+          statusEl.innerHTML = '<span class="text-rose-600 font-bold">Grant GPS</span>';
+          alert("Please enable GPS Location Permissions: " + error.message);
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
@@ -1131,7 +1137,7 @@
       const errBox = document.getElementById('partnerResetError');
       errBox.classList.add('hidden');
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending link...';
 
       try {
         await auth.sendPasswordResetEmail(email);
@@ -1147,7 +1153,7 @@
       }
     }
 
-    // ---------------- BACK NAVIGATION & CAPACITOR HOOK ----------------
+    // ---------------- NAVIGATION & CAPACITOR BACK ----------------
     function pushNavState(stateName) { history.pushState({ screen: stateName }, ''); }
     pushNavState('root_orders');
     window.addEventListener('popstate', () => handleStepByStepBack());
@@ -1257,7 +1263,7 @@
             try {
               userCredential = await auth.signInWithEmailAndPassword(email, password);
             } catch (loginErr) {
-              throw new Error("Yeh email pehle se registered hai. Kripya apna wahi purana password daalein.");
+              throw new Error("This email is already registered. Please sign in with your password.");
             }
           } else { throw authErr; }
         }
@@ -1374,7 +1380,6 @@
           warnBanner.classList.remove('hidden');
         }
 
-        // 🟢 / 🔴 Active/Inactive Store Status Sync
         const isOpen = (currentPartner.isOpen !== false);
         updateKitchenStoreUI(isOpen);
 
@@ -1466,14 +1471,14 @@
       if (!currentPartner) return;
       const newStatus = !(currentPartner.isOpen !== false);
 
-      // 1. Agar dukan ACTIVE (khuli) hai -> Foreground Service shuru karein
+      // 1. If store is ACTIVE (open) -> Start Foreground Service & WakeLock
       if (newStatus) {
         requestScreenWakeLock();
         if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ForegroundService) {
           try {
             await window.Capacitor.Plugins.ForegroundService.startForegroundService({
               title: "FW Kitchen - KOT Radar Active",
-              body: "दुकान खुली है: नए ऑर्डर्स के लिए बैकग्राउंड अलर्ट चालू है।",
+              body: "Store Open: Background radar active for incoming orders.",
               smallIcon: "ic_launcher"
             });
             document.getElementById('fgServiceBadge')?.classList.remove('hidden');
@@ -1482,7 +1487,7 @@
           }
         }
       } 
-      // 2. Agar dukan INACTIVE (band) hai -> Service band karein
+      // 2. If store is INACTIVE (closed) -> Stop Service & WakeLock
       else {
         releaseScreenWakeLock();
         stopContinuousKitchenAlarm();
@@ -1498,7 +1503,7 @@
 
       db.ref(`restaurants/${currentPartner.uid}`).update({ isOpen: newStatus })
         .then(() => {
-          showModernFloatingToast("Status Updated", newStatus ? "दुकान Active है!" : "दुकान Inactive कर दी गई।");
+          showModernFloatingToast("Status Updated", newStatus ? "Store is now Active (Open)!" : "Store marked Inactive (Closed).");
           checkPendingOrdersAndAlarm();
         })
         .catch(err => alert("Failed to change store status: " + err.message));
@@ -1509,12 +1514,12 @@
       const fgBadge = document.getElementById('fgServiceBadge');
       if (!btn) return;
       if (isOpen) {
-        btn.className = "min-h-[38px] px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-2 transition active:scale-95 shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-300";
-        btn.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> <span>🟢 Active (दुकान खुली है)</span>';
+        btn.className = "min-h-[44px] px-4 py-2 rounded-full text-xs sm:text-sm font-black flex items-center gap-2.5 transition active:scale-95 shadow-md bg-emerald-100 text-emerald-800 border-2 border-emerald-300";
+        btn.innerHTML = '<span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span> <span>🟢 Active (Store Open)</span>';
         if (fgBadge) fgBadge.classList.remove('hidden');
       } else {
-        btn.className = "min-h-[38px] px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-2 transition active:scale-95 shadow-sm bg-rose-100 text-rose-800 border border-rose-300";
-        btn.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> <span>🔴 Inactive (दुकान बंद है)</span>';
+        btn.className = "min-h-[44px] px-4 py-2 rounded-full text-xs sm:text-sm font-black flex items-center gap-2.5 transition active:scale-95 shadow-md bg-rose-100 text-rose-800 border-2 border-rose-300";
+        btn.innerHTML = '<span class="w-3 h-3 rounded-full bg-rose-500"></span> <span>🔴 Inactive (Store Closed)</span>';
         if (fgBadge) fgBadge.classList.add('hidden');
       }
     }
@@ -1689,7 +1694,7 @@
       container.innerHTML = html || `<div class="col-span-full p-8 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200">No orders match the selected filter.</div>`;
     }
 
-    // ORDER ACCEPT HOT-ACTION (TURANT ALARM BAND KAREGA)
+    // ORDER ACCEPT
     function updateOrderStatus(orderId, newStatus) {
       if (cachedOrders[orderId]) {
         cachedOrders[orderId].status = newStatus;
@@ -1703,9 +1708,9 @@
         .catch(err => alert('Failed to update status: ' + err.message));
     }
 
-    // ORDER REJECT HOT-ACTION (TURANT ALARM BAND KAREGA)
+    // ORDER REJECT
     async function rejectOrder(orderId) {
-      if (!confirm(`Reject order #${orderId.slice(-6)}? If paid online, customer will receive a refund.`)) return;
+      if (!confirm(`Reject order #${orderId.slice(-6)}? If paid online, the customer will receive a refund.`)) return;
 
       if (cachedOrders[orderId]) {
         cachedOrders[orderId].status = 'CANCELLED';
@@ -1867,7 +1872,7 @@
           await db.ref(`menus/${auth.currentUser.uid}`).push(dishData);
         }
         closeDishModal();
-        showModernFloatingToast("Dish Saved", `${name} menu mein jud gayi!`, "fa-solid fa-utensils");
+        showModernFloatingToast("Dish Saved", `${name} added to your menu!`, "fa-solid fa-utensils");
       } catch (err) {
         alert('Failed to save dish: ' + err.message);
       } finally {
@@ -2005,7 +2010,7 @@
 
   <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
   <script>
-    const CURRENT_APP_VERSION = "1.0.5";
+    const CURRENT_APP_VERSION = "1.0.6";
 
     async function checkForAppUpdate() {
       try {
@@ -2018,7 +2023,7 @@
         const serverVersion = data.restaurant_version || data.kitchen_version || data.latest_version || data.version;
 
         if (serverVersion && serverVersion !== CURRENT_APP_VERSION) {
-          const updateMsg = data.restaurant_message || data.kitchen_message || data.message || "Naye features ke liye app update karein.";
+          const updateMsg = data.restaurant_message || data.kitchen_message || data.message || "Update for faster order alerts and new kitchen features.";
           const descEl = document.getElementById("updateDesc");
           if (descEl) descEl.innerText = updateMsg;
 

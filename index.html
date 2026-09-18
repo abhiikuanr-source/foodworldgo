@@ -138,10 +138,10 @@
         </div>
         <button onclick="closeCustomerForgotModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800"><i class="fa-solid fa-xmark text-xs"></i></button>
       </div>
-      <p class="text-xs text-slate-600 leading-relaxed">Apna registered email enter karein. Hum password reset link bhejenge.</p>
+      <p class="text-xs text-slate-600 leading-relaxed">Enter your registered email address below. We'll send a password recovery verification link to your inbox.</p>
       <form onsubmit="handleCustomerPasswordReset(event)" class="space-y-3.5">
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Customer Email</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Registered Email</label>
           <div class="relative">
             <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
             <input type="email" id="custResetEmail" required class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="you@example.com">
@@ -161,13 +161,13 @@
     <div class="bg-white rounded-3xl p-6 max-w-xs w-full shadow-2xl space-y-4 text-center border border-emerald-200">
       <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner"><i class="fa-solid fa-envelope-circle-check"></i></div>
       <div>
-        <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">Mail Sent</span>
-        <h3 class="font-black text-slate-900 text-base mt-2">रिकवरी लिंक भेज दिया गया है!</h3>
-        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">Password recovery link aapke email par bhej diya gaya hai. Inbox ya spam folder check karein.</p>
+        <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">Mail Dispatched</span>
+        <h3 class="font-black text-slate-900 text-base mt-2">Password Recovery Link Sent!</h3>
+        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">A password reset verification link has been sent to your email. Please check your inbox or spam folder.</p>
         <p class="text-xs font-mono font-bold text-brand-600 bg-brand-50 p-2 rounded-xl mt-2.5 truncate" id="custSuccessEmailPreview">you@example.com</p>
       </div>
       <div class="pt-1">
-        <button onclick="closeCustEmailSuccessModal()" class="w-full min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold rounded-2xl text-xs shadow-md transition">ठीक है / Got it</button>
+        <button onclick="closeCustEmailSuccessModal()" class="w-full min-h-[44px] py-2.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white font-extrabold rounded-2xl text-xs shadow-md transition">Got It</button>
       </div>
     </div>
   </div>
@@ -204,7 +204,7 @@
       <!-- Login Form -->
       <form id="loginForm" onsubmit="handleCustomerLogin(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Email</label>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Email Address</label>
           <div class="relative">
             <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
             <input type="email" id="loginEmail" required class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="you@example.com">
@@ -236,7 +236,7 @@
           <input type="text" id="regName" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="John Doe">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Email</label>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Email Address</label>
           <input type="email" id="regEmail" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="john@example.com">
         </div>
         <div>
@@ -245,16 +245,16 @@
         </div>
         <div>
           <div class="flex items-center justify-between mb-1">
-            <label class="block text-xs font-bold text-slate-600">Delivery Address</label>
+            <label class="block text-xs font-bold text-slate-600">Default Delivery Address</label>
             <button type="button" onclick="detectLiveLocation('regAddress', 'regGpsStatus')" class="text-[11px] text-brand-600 hover:text-brand-700 font-extrabold flex items-center gap-1">
               <i class="fa-solid fa-crosshairs text-brand-500"></i> <span id="regGpsStatus">Auto-Detect GPS</span>
             </button>
           </div>
-          <textarea id="regAddress" rows="2" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Flat, Street, Landmark, City..."></textarea>
+          <textarea id="regAddress" rows="2" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="House/Flat No., Street, Landmark, City..."></textarea>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Password</label>
-          <input type="password" id="regPassword" minlength="6" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Min. 6 characters">
+          <label class="block text-xs font-bold text-slate-600 mb-1">Create Password</label>
+          <input type="password" id="regPassword" minlength="6" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Min. 6 characters">
         </div>
         <div id="signupAuthError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
           <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
@@ -270,33 +270,33 @@
   <!-- ================= CUSTOMER APP VIEW ================= -->
   <div id="appView" class="hidden max-w-lg mx-auto bg-white min-h-screen relative shadow-2xl pb-safe flex flex-col">
 
-    <!-- ================= 🌟 ENLARGED & MODERN TOPBAR HEADER ================= -->
-    <header class="sticky top-0 z-30 bg-white/98 backdrop-blur-md border-b border-slate-200/80 px-4 py-3.5 sm:py-4 flex items-center justify-between shadow-xs">
-      <div onclick="switchAppTab('profile')" class="flex items-center gap-3 overflow-hidden cursor-pointer active:scale-98 transition flex-1 mr-2">
-        <!-- Bada & Attractive Icon -->
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-orange-600 text-white flex items-center justify-center font-black text-xl shadow-md shadow-brand-500/30 flex-shrink-0">
+    <!-- ================= 🌟 ENLARGED & PROMINENT TOPBAR HEADER ================= -->
+    <header class="sticky top-0 z-30 bg-white/98 backdrop-blur-md border-b border-slate-200/90 px-4 py-4 sm:py-4.5 flex items-center justify-between shadow-xs">
+      <div onclick="switchAppTab('profile')" class="flex items-center gap-3.5 overflow-hidden cursor-pointer active:scale-98 transition flex-1 mr-2">
+        <!-- Enlarged App Icon -->
+        <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-orange-600 text-white flex items-center justify-center font-black text-2xl shadow-md shadow-brand-500/30 flex-shrink-0">
           <i class="fa-solid fa-bowl-food"></i>
         </div>
         
-        <!-- Bada Address aur Customer Name -->
+        <!-- Enlarged Delivery Address & Customer Name -->
         <div class="overflow-hidden flex-1 min-w-0">
           <div class="flex items-center gap-1.5">
-            <i class="fa-solid fa-location-dot text-brand-600 text-sm flex-shrink-0 animate-bounce"></i>
-            <h2 class="text-sm sm:text-base font-black text-slate-900 truncate leading-tight tracking-tight" id="topAddressPreview">Delivery Address</h2>
-            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 flex-shrink-0 ml-0.5"></i>
+            <i class="fa-solid fa-location-dot text-brand-600 text-base flex-shrink-0 animate-bounce"></i>
+            <h2 class="text-base sm:text-lg font-black text-slate-900 truncate leading-tight tracking-tight" id="topAddressPreview">Delivery Address</h2>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-400 flex-shrink-0 ml-0.5"></i>
           </div>
-          <p class="text-xs text-brand-600 font-extrabold truncate mt-0.5" id="topCustomerName">Welcome Foodie</p>
+          <p class="text-xs sm:text-sm text-brand-600 font-black truncate mt-0.5" id="topCustomerName">Welcome Foodie</p>
         </div>
       </div>
 
-      <!-- Right Action Badges -->
-      <div class="flex items-center gap-2 flex-shrink-0">
-        <button onclick="toggleNotifCenter(true)" class="relative w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 flex items-center justify-center text-base transition shadow-2xs">
+      <!-- Enlarged Action Badges -->
+      <div class="flex items-center gap-2.5 flex-shrink-0">
+        <button onclick="toggleNotifCenter(true)" class="relative w-11 h-11 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 flex items-center justify-center text-lg transition shadow-2xs">
           <i class="fa-solid fa-bell"></i>
-          <span id="notifBellBadge" class="hidden absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-brand-600 text-white font-extrabold text-[9px] flex items-center justify-center border-2 border-white animate-pulse">0</span>
+          <span id="notifBellBadge" class="hidden absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-brand-600 text-white font-black text-[10px] flex items-center justify-center border-2 border-white animate-pulse">0</span>
         </button>
-        <span class="px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-2xl text-xs font-black flex items-center gap-1 shadow-2xs">
-          <i class="fa-solid fa-shield-halved text-emerald-600"></i>
+        <span class="px-3.5 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-xs sm:text-sm font-black flex items-center gap-1.5 shadow-2xs">
+          <i class="fa-solid fa-shield-halved text-emerald-600 text-sm"></i>
           <span class="hidden sm:inline">Live</span> Razorpay
         </span>
       </div>
@@ -311,7 +311,7 @@
         <!-- 1. LIVE SEARCH BAR WITH CLEAR & MIC -->
         <div class="relative flex items-center">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-slate-400 text-sm"></i>
-          <input type="text" id="restaurantSearchInput" oninput="handleUniversalSearch(this.value)" placeholder="Search 'Kesar', 'Pizza', 'Biryani'..." class="w-full pl-10 pr-16 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-semibold shadow-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          <input type="text" id="restaurantSearchInput" oninput="handleUniversalSearch(this.value)" placeholder="Search 'Pizza', 'Biryani', 'Burger'..." class="w-full pl-10 pr-16 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-semibold shadow-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
           <div class="absolute right-3 flex items-center gap-1.5">
             <button type="button" onclick="clearSearchFilter()" class="text-slate-400 hover:text-slate-600 p-1 text-xs" title="Clear Search">
               <i class="fa-solid fa-xmark"></i>
@@ -360,7 +360,7 @@
           </div>
         </div>
 
-        <!-- 5. POPULAR CATEGORIES (WITH REAL PARATHA & THALI PHOTOS) -->
+        <!-- 5. POPULAR CATEGORIES -->
         <div id="categoriesSection" class="space-y-2.5 pt-1">
           <div class="flex items-center justify-between">
             <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">What's on your mind?</h3>
@@ -389,7 +389,6 @@
               <span class="text-[11px] font-bold text-slate-700 text-center">Burger</span>
             </div>
 
-            <!-- Real Aloo Paratha Photo -->
             <div onclick="quickFilterDishes('Paratha')" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 active:scale-95 transition w-16">
               <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
                 <img src="https://images.unsplash.com/photo-1683533761804-5fc12be0f684?w=150" class="w-full h-full object-cover" alt="Paratha">
@@ -397,7 +396,6 @@
               <span class="text-[11px] font-bold text-slate-700 text-center">Paratha</span>
             </div>
 
-            <!-- Real Indian Thali Photo -->
             <div onclick="quickFilterDishes('Thali')" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 active:scale-95 transition w-16">
               <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
                 <img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=150" class="w-full h-full object-cover" alt="Thali">
@@ -423,7 +421,7 @@
               <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
                 <img src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=150" class="w-full h-full object-cover" alt="Chai">
               </div>
-              <span class="text-[11px] font-bold text-slate-700 text-center">Tea / Chai</span>
+              <span class="text-[11px] font-bold text-slate-700 text-center">Tea / Beverages</span>
             </div>
           </div>
         </div>
@@ -621,7 +619,7 @@
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h3 class="font-black text-slate-900 text-base">My Profile</h3>
-              <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Account details & address</p>
+              <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Account details & saved location</p>
             </div>
             <button type="button" onclick="toggleCustomerProfileEdit(true)" class="w-10 h-10 rounded-2xl bg-brand-50 hover:bg-brand-100 text-brand-600 flex items-center justify-center text-sm shadow-xs transition active:scale-95 border border-brand-200" title="Edit Profile">
               <i class="fa-solid fa-pen"></i>
@@ -645,7 +643,7 @@
               <span class="font-bold text-slate-800" id="viewCustPhone">+91 0000000000</span>
             </div>
             <div class="p-3 bg-slate-50 rounded-2xl space-y-1">
-              <span class="text-slate-400 font-bold flex items-center gap-2"><i class="fa-solid fa-location-dot text-brand-500"></i> Saved Delivery Address</span>
+              <span class="text-slate-400 font-bold flex items-center gap-2"><i class="fa-solid fa-location-dot text-brand-500"></i> Default Saved Address</span>
               <p class="font-bold text-slate-800 leading-relaxed" id="viewCustAddress">No address set</p>
             </div>
           </div>
@@ -672,10 +670,10 @@
                 </div>
                 <div class="flex-1 space-y-1.5 min-w-0">
                   <label class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-xl text-xs font-extrabold cursor-pointer active:scale-95 transition border border-brand-200">
-                    <i class="fa-solid fa-camera"></i> <span>गैलरी / कैमरा से चुनें</span>
+                    <i class="fa-solid fa-camera"></i> <span>Choose from Gallery / Camera</span>
                     <input type="file" id="custPhotoFileInput" accept="image/*" class="hidden" onchange="processImageUpload(this, 'profPhotoUrl', 'editCustPhotoPreview', 'editCustPlaceholder')">
                   </label>
-                  <input type="text" id="profPhotoUrl" oninput="previewPhotoUrl(this.value, 'editCustPhotoPreview', 'editCustPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="या फोटो लिंक (URL) डालें...">
+                  <input type="text" id="profPhotoUrl" oninput="previewPhotoUrl(this.value, 'editCustPhotoPreview', 'editCustPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Or enter photo URL...">
                 </div>
               </div>
             </div>
@@ -685,7 +683,7 @@
               <input type="text" id="profName" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Email</label>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Email Address</label>
               <input type="email" id="profEmail" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 text-slate-500 rounded-xl text-xs cursor-not-allowed">
             </div>
             <div>
@@ -755,7 +753,7 @@
     </nav>
   </div>
 
-  <!-- ================= CHECKOUT MODAL ================= -->
+  <!-- ================= CHECKOUT MODAL (WITH FLEXIBLE DELIVERY ADDRESS) ================= -->
   <div id="checkoutModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
       <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -777,15 +775,51 @@
           <div id="checkoutCartItemsList" class="divide-y divide-slate-100 bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1"></div>
         </div>
 
-        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1">
+        <!-- ================= 📍 FLEXIBLE DELIVERY ADDRESS (DEFAULT VS OFFICE / OTHER) ================= -->
+        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-2.5">
           <div class="flex items-center justify-between">
-            <h4 class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-              <i class="fa-solid fa-location-crosshairs text-brand-500"></i> Deliver To
+            <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-location-dot text-brand-600"></i> Deliver To
             </h4>
-            <button onclick="switchAppTab('profile'); closeCheckoutModal();" class="text-[10px] text-brand-600 font-bold hover:underline">Change</button>
+            <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Choose Address</span>
           </div>
-          <p class="text-xs text-slate-600 font-medium" id="checkoutAddress">Address...</p>
-          <p class="text-[11px] text-slate-500 font-mono" id="checkoutPhone">Phone: ...</p>
+
+          <!-- 1-Tap Toggle: Default vs Custom Location -->
+          <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+            <button type="button" onclick="selectCheckoutAddressType('DEFAULT')" id="addrTypeBtnDefault" class="min-h-[38px] py-1.5 px-2.5 rounded-xl border-2 border-brand-500 bg-brand-50/60 text-brand-700 flex items-center justify-center gap-1.5 transition active:scale-95">
+              <i class="fa-solid fa-house text-[11px]"></i>
+              <span>Default Address</span>
+            </button>
+            <button type="button" onclick="selectCheckoutAddressType('CUSTOM')" id="addrTypeBtnCustom" class="min-h-[38px] py-1.5 px-2.5 rounded-xl border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 flex items-center justify-center gap-1.5 transition active:scale-95">
+              <i class="fa-solid fa-briefcase text-[11px]"></i>
+              <span>Office / Other</span>
+            </button>
+          </div>
+
+          <!-- Option A: Default Profile Address Box -->
+          <div id="checkoutDefaultAddressBox" class="p-2.5 bg-white rounded-xl border border-slate-200/80 text-xs space-y-1">
+            <div class="flex items-center justify-between text-[11px] text-slate-500 font-bold">
+              <span>Saved Profile Address:</span>
+              <span class="text-emerald-700 text-[10px] font-black"><i class="fa-solid fa-check"></i> Selected</span>
+            </div>
+            <p class="text-slate-800 font-semibold leading-relaxed text-xs" id="checkoutAddress">Loading saved address...</p>
+            <p class="text-[11px] text-slate-500 font-mono" id="checkoutPhone">Phone: ...</p>
+          </div>
+
+          <!-- Option B: Custom / Office Address Box (Temporary for this order) -->
+          <div id="checkoutCustomAddressBox" class="hidden space-y-2 pt-0.5">
+            <div class="flex items-center justify-between">
+              <label class="block text-[11px] font-bold text-slate-700">Enter Location for this Order:</label>
+              <button type="button" onclick="detectLiveLocation('checkoutCustomAddress', 'checkoutCustomGpsStatus')" class="text-[10px] text-brand-600 hover:text-brand-700 font-extrabold flex items-center gap-1 active:scale-95 transition">
+                <i class="fa-solid fa-crosshairs text-brand-500"></i>
+                <span id="checkoutCustomGpsStatus">Detect Live GPS</span>
+              </button>
+            </div>
+            <textarea id="checkoutCustomAddress" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Office name, Floor / Flat, Street, Landmark, City..."></textarea>
+            <p class="text-[10px] text-slate-400 leading-tight">
+              <i class="fa-solid fa-shield-halved text-emerald-600 mr-0.5"></i> This address is only for this order. Your saved profile address will not be changed.
+            </p>
+          </div>
         </div>
 
         <div class="space-y-2">
@@ -823,7 +857,7 @@
             <span class="text-[10px] font-mono font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded" id="upiAmountTag">₹0</span>
           </div>
           <p class="text-[11px] text-slate-600 leading-tight">
-            "Confirm & Place Order" दबाते ही सुरक्षित Razorpay विंडो खुलेगी जहाँ आप Google Pay, PhonePe, Paytm या कार्ड से भुगतान कर सकते हैं।
+            Tap 'Confirm & Place Order' to open a secure Razorpay checkout window where you can pay via Google Pay, PhonePe, Paytm, Cards, or Netbanking.
           </p>
         </div>
 
@@ -881,13 +915,13 @@
   <div id="updateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
     <div style="background:#1e1e1e; border:1px solid #333; padding:25px; border-radius:16px; width:85%; max-width:320px; text-align:center; color:#fff;">
       <div style="font-size:36px; margin-bottom:10px;">🚀</div>
-      <h3 style="margin:0 0 10px; font-size:18px;">Naya Update Aaya Hai!</h3>
-      <p id="updateDesc" style="font-size:13px; color:#aaa; margin-bottom:20px;">Naye features ke liye app update karein.</p>
+      <h3 style="margin:0 0 10px; font-size:18px;">New Update Available!</h3>
+      <p id="updateDesc" style="font-size:13px; color:#aaa; margin-bottom:20px;">Please update the app to access the latest features.</p>
       <button id="btnUpdateNow" style="background:#ff4757; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">Update Now</button>
-      <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Baad mein karein</button>
+      <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Later</button>
     </div>
   </div>
-<!-- ================= JAVASCRIPT LOGIC (PART 2) ================= -->
+<!-- ================= JAVASCRIPT LOGIC (PART 2A) ================= -->
   <script>
     // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
@@ -910,7 +944,7 @@
     const BACKEND_URL = "https://foodworld-backend.vercel.app";
     const RAZORPAY_KEY_ID = "rzp_live_TXVKN9bGeN4CAv";
 
-    // 3. APP STATE
+    // 3. APP STATE VARIABLES
     let currentCustomer = null;
     let cachedRestaurants = {}, cachedMenus = {}, cachedDeliveryBoys = {}, cachedOrders = {};
     let cachedBroadcasts = {}, cachedMyTickets = {}, cachedSupportConfig = {};
@@ -926,8 +960,13 @@
     let lastSearchQuery = "";
     let previousOrderStatuses = {};
 
+    // 4. DUAL DELIVERY ADDRESS SELECTION STATE
+    let checkoutAddressMode = 'DEFAULT'; // 'DEFAULT' or 'CUSTOM'
+    let checkoutCustomLat = null;
+    let checkoutCustomLng = null;
+
     // =========================================================
-    // 🔔 CUSTOMER NATIVE NOTIFICATIONS & LIVE TRACKING SERVICE
+    // 🔔 NATIVE NOTIFICATIONS & BACKGROUND TRACKING
     // =========================================================
     async function initCustomerNativeChannels() {
       if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
@@ -935,9 +974,9 @@
           const { LocalNotifications } = window.Capacitor.Plugins;
           await LocalNotifications.requestPermissions();
           await LocalNotifications.createChannel({
-            id: 'fw_customer_orders',
-            name: 'FoodWorld Order Updates',
-            description: 'Live alerts for food preparation and delivery tracking',
+            id: 'fw_customer_orders_v3',
+            name: 'FoodWorld Order Tracking Alerts',
+            description: 'Live alerts for food preparation and delivery progress',
             importance: 5,
             visibility: 1,
             vibration: true
@@ -957,8 +996,9 @@
                 title: title,
                 body: message,
                 id: Math.floor(Math.random() * 99999),
-                channelId: 'fw_customer_orders',
-                sound: 'res://raw/beep.wav'
+                channelId: 'fw_customer_orders_v3',
+                ongoing: false,
+                autoCancel: true
               }
             ]
           });
@@ -974,8 +1014,8 @@
         try {
           if (hasActiveOrders) {
             await ForegroundService.startForegroundService({
-              title: "FoodWorld - Order Live Tracking 🛵",
-              body: "Aapka order track ho raha hai. Screen lock hone par bhi alert milenge.",
+              title: "FoodWorld - Live Order Tracking 🛵",
+              body: "Order in progress. Screen-lock alerts enabled.",
               smallIcon: "ic_launcher"
             });
           } else {
@@ -1045,7 +1085,7 @@
           }
 
           if (indicator) indicator.classList.add('hidden');
-          showModernFloatingToast("Refreshed", "Menu aur offers update ho gaye hain!", "fa-solid fa-arrows-rotate");
+          showModernFloatingToast("Refreshed", "Menu and deals updated successfully!", "fa-solid fa-arrows-rotate");
         }, 650);
       } else {
         if (indicator) indicator.classList.add('hidden');
@@ -1053,7 +1093,7 @@
       isPulling = false;
     }, { passive: true });
 
-    // ---------------- AUDIO & TOAST ----------------
+    // ---------------- AUDIO & TOAST ENGINE ----------------
     function initGlobalAudioContext() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
@@ -1153,6 +1193,30 @@
       }
     }
 
+    // =========================================================
+    // 📍 DUAL DELIVERY ADDRESS TOGGLE (DEFAULT VS CUSTOM)
+    // =========================================================
+    function selectCheckoutAddressType(mode) {
+      checkoutAddressMode = mode;
+      const btnDefault = document.getElementById('addrTypeBtnDefault');
+      const btnCustom = document.getElementById('addrTypeBtnCustom');
+      const defBox = document.getElementById('checkoutDefaultAddressBox');
+      const custBox = document.getElementById('checkoutCustomAddressBox');
+
+      if (mode === 'CUSTOM') {
+        if (btnCustom) btnCustom.className = "min-h-[38px] py-1.5 px-2.5 rounded-xl border-2 border-brand-500 bg-brand-50/60 text-brand-700 flex items-center justify-center gap-1.5 transition active:scale-95";
+        if (btnDefault) btnDefault.className = "min-h-[38px] py-1.5 px-2.5 rounded-xl border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 flex items-center justify-center gap-1.5 transition active:scale-95";
+        if (defBox) defBox.classList.add('hidden');
+        if (custBox) custBox.classList.remove('hidden');
+        document.getElementById('checkoutCustomAddress')?.focus();
+      } else {
+        if (btnDefault) btnDefault.className = "min-h-[38px] py-1.5 px-2.5 rounded-xl border-2 border-brand-500 bg-brand-50/60 text-brand-700 flex items-center justify-center gap-1.5 transition active:scale-95";
+        if (btnCustom) btnCustom.className = "min-h-[38px] py-1.5 px-2.5 rounded-xl border-2 border-slate-200 bg-white text-slate-600 hover:border-slate-300 flex items-center justify-center gap-1.5 transition active:scale-95";
+        if (custBox) custBox.classList.add('hidden');
+        if (defBox) defBox.classList.remove('hidden');
+      }
+    }
+
     // ---------------- PAYMENT METHOD SELECTOR ----------------
     function selectPaymentMethod(method) {
       currentPaymentMethod = method;
@@ -1212,7 +1276,7 @@
       try {
         await auth.sendPasswordResetEmail(email);
         closeCustomerForgotModal();
-        showModernFloatingToast("Verification Sent!", `Password recovery mail sent to: ${email}`, "fa-solid fa-envelope-circle-check");
+        showModernFloatingToast("Verification Sent!", `Password reset link sent to: ${email}`, "fa-solid fa-envelope-circle-check");
         openCustEmailSuccessModal(email);
       } catch (err) {
         errBox.innerText = err.message || "Failed to send reset link.";
@@ -1239,7 +1303,7 @@
       const container = document.getElementById('notifCenterList');
       const keys = Object.keys(cachedBroadcasts).reverse();
       if (keys.length === 0) {
-        container.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs">No announcements yet.</div>';
+        container.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs">No announcements available.</div>';
         return;
       }
       let html = '';
@@ -1312,18 +1376,27 @@
       statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Detecting...';
       navigator.geolocation.getCurrentPosition(
         async (position) => {
-          customerLat = position.coords.latitude;
-          customerLng = position.coords.longitude;
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          if (textareaId === 'checkoutCustomAddress') {
+            checkoutCustomLat = lat;
+            checkoutCustomLng = lng;
+          } else {
+            customerLat = lat;
+            customerLng = lng;
+          }
+
           try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 4000);
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${customerLat}&lon=${customerLng}`, { signal: controller.signal });
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, { signal: controller.signal });
             clearTimeout(timeoutId);
             const data = await res.json();
-            textarea.value = (data && data.display_name) ? data.display_name : `GPS: ${customerLat.toFixed(6)}, ${customerLng.toFixed(6)}`;
+            textarea.value = (data && data.display_name) ? data.display_name : `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
             statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> GPS Set</span>';
           } catch (e) {
-            textarea.value = `GPS Pin: ${customerLat.toFixed(6)}, ${customerLng.toFixed(6)}`;
+            textarea.value = `GPS Pin: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
             statusEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> Location Set</span>';
           }
         },
@@ -1385,7 +1458,7 @@
       const errBox = document.getElementById('signupAuthError');
       errBox.classList.add('hidden');
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
 
       try {
         await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
@@ -1397,7 +1470,7 @@
             try {
               userCredential = await auth.signInWithEmailAndPassword(email, password);
             } catch (loginErr) {
-              throw new Error("Yeh email pehle se registered hai. Kripya apna wahi purana password daalein.");
+              throw new Error("This email is already registered. Please sign in with your password.");
             }
           } else { throw authErr; }
         }
@@ -1407,10 +1480,10 @@
           customerLat: customerLat || null, customerLng: customerLng || null, 
           createdAt: Date.now()
         });
-        showModernFloatingToast("Swagat Hai!", "Aapka customer account link ho gaya hai.", "fa-solid fa-circle-check");
+        showModernFloatingToast("Welcome!", "Your customer account is now connected.", "fa-solid fa-circle-check");
       } catch (err) {
         errBox.classList.remove('hidden');
-        document.getElementById('signupErrorMsg').innerText = err.message || 'Signup failed.';
+        document.getElementById('signupErrorMsg').innerText = err.message || 'Registration failed.';
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<span>Create Customer Account</span> <i class="fa-solid fa-user-plus"></i>';
@@ -1546,8 +1619,7 @@
         btn.disabled = false;
       }
     }
-
-    // ---------------- REALTIME LISTENERS ----------------
+// ---------------- REALTIME LISTENERS ----------------
     function initAppListeners() {
       db.ref('restaurants').on('value', snap => {
         cachedRestaurants = snap.val() || {};
@@ -1585,20 +1657,20 @@
             const orderRef = `#${id.slice(-6)}`;
             
             if (currentStatus === 'ACCEPTED') {
-              sendCustomerNativeAlert("🎉 Order Confirmed!", `Order ${orderRef}: Kitchen ne aapka order accept kar liya hai.`);
+              sendCustomerNativeAlert("🎉 Order Confirmed!", `Order ${orderRef}: Kitchen has accepted your order.`);
               playModernNotifChime();
             } else if (currentStatus === 'PREPARING') {
-              sendCustomerNativeAlert("👨‍🍳 Cooking in Progress!", `Order ${orderRef}: Kitchen aapke liye taaza khana bana raha hai.`);
+              sendCustomerNativeAlert("👨‍🍳 Cooking in Progress!", `Order ${orderRef}: Kitchen is preparing your fresh meal.`);
             } else if (currentStatus === 'READY_FOR_PICKUP') {
-              sendCustomerNativeAlert("📦 Food Packed!", `Order ${orderRef}: Khana pack ho gaya hai, rider lene pahunch raha hai.`);
+              sendCustomerNativeAlert("📦 Food Packed!", `Order ${orderRef}: Food is packed and awaiting rider pickup.`);
             } else if (currentStatus === 'PICKED_UP' || currentStatus === 'OUT_FOR_DELIVERY') {
-              sendCustomerNativeAlert("🛵 Out for Delivery!", `Order ${orderRef}: Delivery partner khana lekar aapki taraf nikal chuka hai.`);
+              sendCustomerNativeAlert("🛵 Out for Delivery!", `Order ${orderRef}: Rider is on the way with your food.`);
               playModernNotifChime();
             } else if (currentStatus === 'DELIVERED') {
-              sendCustomerNativeAlert("✅ Order Delivered!", `Order ${orderRef}: Khana deliver ho gaya! Enjoy your delicious meal.`);
+              sendCustomerNativeAlert("✅ Order Delivered!", `Order ${orderRef}: Food delivered! Enjoy your meal.`);
               playModernNotifChime();
             } else if (currentStatus === 'CANCELLED') {
-              sendCustomerNativeAlert("❌ Order Cancelled", `Order ${orderRef}: Order cancel ho gaya hai.`);
+              sendCustomerNativeAlert("❌ Order Cancelled", `Order ${orderRef}: Your order has been cancelled.`);
             }
           }
 
@@ -1765,8 +1837,8 @@
             <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xl mx-auto">
               <i class="fa-solid fa-circle-exclamation"></i>
             </div>
-            <h5 class="font-black text-sm text-slate-900">Item not available now</h5>
-            <p class="text-xs text-slate-500">Koi kitchen abhi yeh item offer nahi kar raha hai.</p>
+            <h5 class="font-black text-sm text-slate-900">Item not available right now</h5>
+            <p class="text-xs text-slate-500">No restaurant is currently offering this item.</p>
             <button onclick="clearSearchFilter()" class="mt-2 px-4 py-1.5 bg-brand-50 text-brand-600 font-bold rounded-xl text-xs">
               View All Kitchens
             </button>
@@ -1800,7 +1872,7 @@
       const budgetContainer = document.getElementById('budgetDealsContainer');
       const restKeys = Object.keys(cachedRestaurants);
 
-      // 1. TOP CAROUSEL
+      // 1. TOP FEATURED CAROUSEL
       let carouselHtml = '';
       restKeys.forEach(uid => {
         const r = cachedRestaurants[uid];
@@ -1842,7 +1914,7 @@
                 <span class="w-3.5 h-3.5 rounded-full ${isStoreOpen ? 'bg-emerald-700' : 'bg-slate-500'} text-white flex items-center justify-center text-[8px] font-black"><i class="fa-solid fa-star"></i></span>
                 <span class="font-black text-slate-800">4.5</span>
                 <span class="text-slate-400">•</span>
-                <span class="text-slate-400 truncate">${isStoreOpen ? escapeHtml(r.cuisine || 'Dishes') : 'Closed Today'}</span>
+                <span class="text-slate-400 truncate">${isStoreOpen ? escapeHtml(r.cuisine || 'Dishes') : 'Closed'}</span>
               </div>
             </div>
           </div>
@@ -1850,7 +1922,7 @@
       });
 
       if (topCarousel) {
-        topCarousel.innerHTML = carouselHtml || '<div class="p-4 text-center text-slate-400 text-xs w-full">Currently no kitchens with active menus.</div>';
+        topCarousel.innerHTML = carouselHtml || '<div class="p-4 text-center text-slate-400 text-xs w-full">Currently no restaurants with active menus.</div>';
       }
 
       // 2. 99 STORE
@@ -1907,14 +1979,14 @@
       });
 
       if (budgetContainer) {
-        budgetContainer.innerHTML = budgetCount > 0 ? budgetHtml : '<div class="p-4 text-center text-slate-400 text-xs w-full">No active dishes under ₹99 right now.</div>';
+        budgetContainer.innerHTML = budgetCount > 0 ? budgetHtml : '<div class="p-4 text-center text-slate-400 text-xs w-full">No active meals under ₹99 right now.</div>';
       }
     }
 
     function filterByMaxPrice(maxPrice) {
       const budgetSection = document.getElementById('budgetDealsContainer');
       if (budgetSection) budgetSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      showModernFloatingToast("99 Store", `All dishes under ₹${maxPrice} listed. Tap any dish to Add.`, "fa-solid fa-tag");
+      showModernFloatingToast("99 Store", `All meals under ₹${maxPrice} listed. Tap any dish to Add.`, "fa-solid fa-tag");
     }
 
     function toggleHomeFilter(type) {
@@ -1973,7 +2045,7 @@
               <div class="flex items-center gap-2 mt-1.5 text-[10px] font-bold">
                 ${isStoreOpen 
                   ? `<span class="text-slate-500"><i class="fa-solid fa-clock text-brand-500"></i> 25-35 min • Accepting Orders</span>`
-                  : `<span class="text-rose-600 font-bold"><i class="fa-solid fa-ban"></i> Abhi band hai (Orders closed)</span>`
+                  : `<span class="text-rose-600 font-bold"><i class="fa-solid fa-ban"></i> Currently Closed (Orders paused)</span>`
                 }
               </div>
             </div>
@@ -2007,7 +2079,7 @@
 
       const heroTag = document.getElementById('heroRestCuisineTag');
       if (!isStoreOpen) {
-        heroTag.innerHTML = `<span class="text-rose-600 font-bold bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">🔴 यह रेस्टोरेंट अभी बंद (Inactive) है</span>`;
+        heroTag.innerHTML = `<span class="text-rose-600 font-bold bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">🔴 This restaurant is currently closed (Inactive)</span>`;
       } else {
         heroTag.innerText = r.cuisine || 'Multi-Cuisine Speciality';
       }
@@ -2077,7 +2149,7 @@
     function handleDishCardClick(event, restId, itemId) {
       const rest = cachedRestaurants[restId];
       if (rest && rest.isOpen === false) {
-        alert("⚠️ यह रेस्टोरेंट अभी बंद (Inactive) है! कृपया दुकान खुलने पर ऑर्डर करें।");
+        alert("⚠️ This restaurant is currently closed (Inactive)! Please place your order when it reopens.");
         return;
       }
 
@@ -2104,7 +2176,7 @@
         html += `
           <div class="bg-rose-50 border border-rose-200 text-rose-800 p-3 rounded-2xl text-xs font-bold text-center flex items-center justify-center gap-2 mb-2">
             <i class="fa-solid fa-circle-exclamation text-rose-600 text-sm"></i>
-            <span>यह रेस्टोरेंट अभी बंद (Inactive) है। नए ऑर्डर स्वीकार नहीं किए जा रहे हैं।</span>
+            <span>This restaurant is currently closed (Inactive). New orders are paused.</span>
           </div>
         `;
       }
@@ -2130,7 +2202,7 @@
           <div id="dishCard_${itemId}" onclick="handleDishCardClick(event, '${restId}', '${itemId}')" class="bg-white p-3.5 rounded-3xl border ${!isStoreOpen ? 'border-slate-100 opacity-80' : 'border-slate-100 shadow-sm hover:border-brand-300'} flex items-center justify-between gap-3 cursor-pointer active:scale-[0.99] transition">
             <div class="flex-1 min-w-0 pr-2">
               <div class="flex items-center gap-1.5 mb-1">
-                <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'}" title="${isNonVeg ? 'Non-Veg' : 'Veg'}"></span>
+                <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'} text-base" title="${isNonVeg ? 'Non-Veg' : 'Veg'}"></span>
                 <span class="px-1.5 py-0.2 rounded bg-amber-50 border border-amber-200 text-amber-800 text-[9px] font-extrabold">★ 4.5</span>
               </div>
               <h5 class="font-extrabold text-sm text-slate-900 leading-snug">${escapeHtml(name)}</h5>
@@ -2169,7 +2241,7 @@
     function addToCart(restId, itemId) {
       const rest = cachedRestaurants[restId];
       if (rest && rest.isOpen === false) {
-        alert("⚠️ यह रेस्टोरेंट अभी बंद (Inactive) है! कृपया दुकान खुलने पर ऑर्डर करें।");
+        alert("⚠️ This restaurant is currently closed (Inactive)! Please place your order when it reopens.");
         return;
       }
 
@@ -2187,7 +2259,7 @@
       cart[itemId] = { itemId, restaurantId: restId, name: item.name, price: Number(item.price) || 0, qty: 1 };
       if (activeRestaurantId === restId) renderFoodWorldMenuItems(restId);
       updateCartFloatingBar();
-      showModernFloatingToast("Item Added", `${item.name} cart mein add ho gaya!`, "fa-solid fa-basket-shopping");
+      showModernFloatingToast("Item Added", `${item.name} added to your cart!`, "fa-solid fa-basket-shopping");
     }
 
     function changeCartQty(itemId, delta) {
@@ -2224,7 +2296,7 @@
     function openCheckoutModal() {
       const keys = Object.keys(cart);
       if (keys.length === 0) {
-        showModernFloatingToast("Cart Khali Hai", "Pehle menu se koi dish chunein.", "fa-solid fa-basket-shopping");
+        showModernFloatingToast("Cart is Empty", "Please select a dish from the menu first.", "fa-solid fa-basket-shopping");
         return;
       }
 
@@ -2232,13 +2304,23 @@
       const rest = cachedRestaurants[restId] || {};
 
       if (rest.isOpen === false) {
-        alert("⚠️ यह रेस्टोरेंट अभी बंद (Inactive) हो चुका है! ऑर्डर नहीं लिया जा सकता।");
+        alert("⚠️ This restaurant is currently closed (Inactive). Orders cannot be accepted.");
         return;
       }
 
       document.getElementById('checkoutRestName').innerText = rest.name || 'Restaurant';
-      document.getElementById('checkoutAddress').innerText = currentCustomer?.address || 'Please set address in profile.';
-      document.getElementById('checkoutPhone').innerText = `Phone: ${currentCustomer?.phone || 'N/A'}`;
+      
+      const checkoutAddressEl = document.getElementById('checkoutAddress');
+      if (checkoutAddressEl) {
+        checkoutAddressEl.innerText = currentCustomer?.address || 'No saved address in profile. Tap "Office / Other" to enter a delivery address.';
+      }
+      const checkoutPhoneEl = document.getElementById('checkoutPhone');
+      if (checkoutPhoneEl) {
+        checkoutPhoneEl.innerText = `Phone: ${currentCustomer?.phone || 'N/A'}`;
+      }
+
+      // Always reset to Default Address mode initially
+      selectCheckoutAddressType('DEFAULT');
 
       renderCheckoutCartItems();
       selectPaymentMethod(currentPaymentMethod || 'ONLINE');
@@ -2296,7 +2378,7 @@
 
       if (Object.keys(cart).length === 0) {
         closeCheckoutModal();
-        showModernFloatingToast("Cart Empty", "Aapka cart khali ho gaya hai.", "fa-solid fa-cart-shopping");
+        showModernFloatingToast("Cart is Empty", "All items have been removed from your cart.", "fa-solid fa-cart-shopping");
       } else {
         renderCheckoutCartItems();
       }
@@ -2305,11 +2387,33 @@
     function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
 
     // =========================================================
-    // 🛡️ PLACE ORDER (WITH STORE CLOSED CHECK & RAZORPAY)
+    // 🛡️ PLACE ORDER WITH FLEXIBLE DELIVERY ADDRESS
     // =========================================================
     async function placeCustomerOrder() {
-      if (!currentCustomer?.address || !currentCustomer?.phone) {
-        alert('कृपया प्रोफाइल में अपना पता और फ़ोन नंबर अपडेट करें.');
+      // 1. Determine final delivery address (Default Profile vs Office / Other)
+      let finalDeliveryAddress = currentCustomer?.address || '';
+      let finalDeliveryLat = customerLat;
+      let finalDeliveryLng = customerLng;
+
+      if (checkoutAddressMode === 'CUSTOM') {
+        const customAddr = document.getElementById('checkoutCustomAddress')?.value?.trim();
+        if (!customAddr) {
+          alert("Please enter a custom delivery address, or tap 'Default Address' to use your saved profile address.");
+          return;
+        }
+        finalDeliveryAddress = customAddr;
+        if (checkoutCustomLat && checkoutCustomLng) {
+          finalDeliveryLat = checkoutCustomLat;
+          finalDeliveryLng = checkoutCustomLng;
+        }
+      }
+
+      if (!finalDeliveryAddress) {
+        alert("Please provide a delivery address before placing your order.");
+        return;
+      }
+      if (!currentCustomer?.phone) {
+        alert("Please update your phone number in your profile first.");
         closeCheckoutModal();
         switchAppTab('profile');
         return;
@@ -2322,7 +2426,7 @@
       const rest = cachedRestaurants[restId] || {};
 
       if (rest.isOpen === false) {
-        alert("⚠️ यह रेस्टोरेंट अभी बंद (Inactive) हो चुका है! ऑर्डर प्लेस नहीं किया जा सकता।");
+        alert("⚠️ This restaurant is currently closed (Inactive). Order cannot be placed.");
         return;
       }
 
@@ -2335,7 +2439,7 @@
         const menuItem = cachedMenus[restId]?.[cartItem.itemId];
 
         if (!menuItem || menuItem.available === false || menuItem.available === 'false') {
-          alert(`"${cartItem.name}" abhi Sold Out ho chuki hai. Kripya ise cart se hatayein.`);
+          alert(`"${cartItem.name}" is currently Sold Out. Please remove it from your cart.`);
           return;
         }
 
@@ -2356,23 +2460,40 @@
       // 1. CASH ON DELIVERY (COD)
       if (currentPaymentMethod === 'COD') {
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ऑर्डर दर्ज हो रहा है...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Placing order...';
 
         try {
-          await saveOrderToFirebase({
-            orderId: newOrderKey, restId, rest,
-            items: verifiedItemsArray, itemTotal: calculatedItemsTotal,
-            grandTotal, uniqueOtp, paymentMethod: 'COD',
-            paymentStatus: 'PENDING_CASH', orderStatus: 'PLACED',
-            razorpayPaymentId: null
+          await db.ref(`orders/${newOrderKey}`).set({
+            customerUid: currentCustomer.uid,
+            restaurantId: restId,
+            deliveryUid: "",
+            items: verifiedItemsArray,
+            itemTotal: calculatedItemsTotal,
+            deliveryFee: DELIVERY_FEE,
+            totalAmount: grandTotal,
+            paymentMethod: 'COD',
+            paymentStatus: 'PENDING_CASH',
+            razorpayPaymentId: null,
+            address: finalDeliveryAddress,        // <--- Custom or Default address attached
+            customerLat: finalDeliveryLat || null,
+            customerLng: finalDeliveryLng || null,
+            phone: currentCustomer.phone,
+            status: 'PLACED',
+            locationLink: "",
+            deliveryOtp: uniqueOtp,
+            verifiedDelivery: false,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
           });
 
           await db.ref(`unassignedOrders/${newOrderKey}`).set({
-            orderId: newOrderKey, restaurantId: restId,
+            orderId: newOrderKey,
+            restaurantId: restId,
             restaurantName: rest.name || 'Kitchen',
             restaurantAddress: rest.address || 'Address',
-            customerAddress: currentCustomer.address,
-            totalAmount: grandTotal, paymentMethod: 'COD',
+            customerAddress: finalDeliveryAddress,  // <--- Custom or Default address attached
+            totalAmount: grandTotal,
+            paymentMethod: 'COD',
             createdAt: Date.now()
           });
 
@@ -2387,7 +2508,7 @@
           closeCheckoutModal();
           closeRestaurantMenu();
           switchAppTab('orders');
-          showModernFloatingToast("ऑर्डर दर्ज हुआ!", "आपका COD ऑर्डर किचन में भेज दिया गया है.", "fa-solid fa-circle-check");
+          showModernFloatingToast("Order Placed!", "Your COD order has been sent to the kitchen.", "fa-solid fa-circle-check");
         } catch (err) {
           alert("Order placement failed: " + err.message);
         } finally {
@@ -2399,16 +2520,31 @@
 
       // 2. ONLINE PAYMENT (RAZORPAY)
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> पेमेंट विंडो लोड हो रही है...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Opening payment window...';
       let isPaymentCompleted = false;
 
       try {
-        await saveOrderToFirebase({
-          orderId: newOrderKey, restId, rest,
-          items: verifiedItemsArray, itemTotal: calculatedItemsTotal,
-          grandTotal, uniqueOtp, paymentMethod: 'ONLINE',
-          paymentStatus: 'PENDING_ONLINE', orderStatus: 'PAYMENT_PENDING',
-          razorpayPaymentId: null
+        await db.ref(`orders/${newOrderKey}`).set({
+          customerUid: currentCustomer.uid,
+          restaurantId: restId,
+          deliveryUid: "",
+          items: verifiedItemsArray,
+          itemTotal: calculatedItemsTotal,
+          deliveryFee: DELIVERY_FEE,
+          totalAmount: grandTotal,
+          paymentMethod: 'ONLINE',
+          paymentStatus: 'PENDING_ONLINE',
+          razorpayPaymentId: null,
+          address: finalDeliveryAddress,         // <--- Custom or Default address attached
+          customerLat: finalDeliveryLat || null,
+          customerLng: finalDeliveryLng || null,
+          phone: currentCustomer.phone,
+          status: 'PAYMENT_PENDING',
+          locationLink: "",
+          deliveryOtp: uniqueOtp,
+          verifiedDelivery: false,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
         });
 
         const orderRes = await fetch(`${BACKEND_URL}/api/create-order`, {
@@ -2430,7 +2566,7 @@
           "order_id": rzpOrder.id,
           "handler": async function (response) {
             isPaymentCompleted = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> पेमेंट वेरिफाई हो रही है...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying payment...';
 
             try {
               const verifyRes = await fetch(`${BACKEND_URL}/api/verify-payment`, {
@@ -2461,7 +2597,7 @@
                 restaurantId: restId,
                 restaurantName: rest.name || 'Kitchen',
                 restaurantAddress: rest.address || 'Address',
-                customerAddress: currentCustomer.address,
+                customerAddress: finalDeliveryAddress, // <--- Custom or Default address attached
                 totalAmount: grandTotal,
                 paymentMethod: 'ONLINE',
                 razorpayPaymentId: response.razorpay_payment_id,
@@ -2479,7 +2615,7 @@
               closeCheckoutModal();
               closeRestaurantMenu();
               switchAppTab('orders');
-              showModernFloatingToast("पेमेंट सफल!", "ऑर्डर किचन में पहुँच चुका है!", "fa-solid fa-circle-check");
+              showModernFloatingToast("Payment Successful!", "Your order has been sent to the kitchen!", "fa-solid fa-circle-check");
 
             } catch (err) {
               alert("Payment Verification Error: " + err.message);
@@ -2497,7 +2633,7 @@
               db.ref(`orders/${newOrderKey}`).remove().catch(() => {});
               btn.disabled = false;
               btn.innerHTML = '<span>Confirm & Place Order</span> <i class="fa-solid fa-arrow-right"></i>';
-              showModernFloatingToast("Payment Cancelled", "Payment poori nahi hui, order cancel ho gaya.", "fa-solid fa-circle-info");
+              showModernFloatingToast("Payment Cancelled", "Payment was not completed. Order cancelled.", "fa-solid fa-circle-info");
             }
           }
         };
@@ -2509,32 +2645,6 @@
         btn.disabled = false;
         btn.innerHTML = '<span>Confirm & Place Order</span> <i class="fa-solid fa-arrow-right"></i>';
       }
-    }
-
-    async function saveOrderToFirebase(data) {
-      const orderData = {
-        customerUid: currentCustomer.uid,
-        restaurantId: data.restId,
-        deliveryUid: "",
-        items: data.items,
-        itemTotal: data.itemTotal,
-        deliveryFee: DELIVERY_FEE,
-        totalAmount: data.grandTotal,
-        paymentMethod: data.paymentMethod,
-        paymentStatus: data.paymentStatus,
-        razorpayPaymentId: data.razorpayPaymentId || null,
-        address: currentCustomer.address,
-        customerLat: customerLat || null,
-        customerLng: customerLng || null,
-        phone: currentCustomer.phone,
-        status: data.orderStatus,
-        locationLink: "",
-        deliveryOtp: data.uniqueOtp,
-        verifiedDelivery: false,
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-      };
-      await db.ref(`orders/${data.orderId}`).set(orderData);
     }
 
     async function cancelOrderByCustomer(orderId) {
@@ -2549,7 +2659,7 @@
           }
           currentOrder.status = 'CANCELLED';
           currentOrder.cancelledBy = 'CUSTOMER';
-          currentOrder.cancelReason = 'Cancelled by customer before acceptance';
+          currentOrder.cancelReason = 'Cancelled by customer before kitchen acceptance';
           currentOrder.updatedAt = Date.now();
           return currentOrder;
         });
@@ -2561,12 +2671,12 @@
             fetch(`${BACKEND_URL}/api/refund-order`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ orderId: orderId, reason: 'Cancelled by customer before acceptance' })
+              body: JSON.stringify({ orderId: orderId, reason: 'Cancelled by customer before kitchen acceptance' })
             }).catch(e => console.error("Refund note:", e));
           }
           showModernFloatingToast("Order Cancelled", `Order #${orderId.slice(-6)} was cancelled.`, "fa-solid fa-ban", true);
         } else {
-          alert('Maaf karein! Kitchen ne accept kar liya hai ya Rider assign ho chuka hai, ab yeh cancel nahi ho sakta.');
+          alert('Sorry! The kitchen has already accepted your order or a rider has been assigned. It can no longer be cancelled.');
         }
       } catch (err) {
         alert('Failed to cancel order: ' + err.message);
@@ -2624,7 +2734,7 @@
             </div>
             
             <p class="text-[10px] text-slate-500 text-center font-bold">
-              <i class="fa-solid fa-circle-info text-brand-500 mr-1"></i> Delivery partner ko khana milne par hi yeh code share karein.
+              <i class="fa-solid fa-circle-info text-brand-500 mr-1"></i> Share this 4-digit code with the delivery partner only after receiving your food.
             </p>
           </div>
         `;
@@ -2653,7 +2763,7 @@
               ${liveGpsLink ? `
                 <a href="${escapeHtml(liveGpsLink)}" target="_blank" class="w-full min-h-[38px] py-2 px-3 bg-blue-600 active:scale-95 text-white text-[11px] font-extrabold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition">
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 
-                  <span>Track Rider Live (100% GPS Live Stream)</span>
+                  <span>Track Rider Live (Live GPS Stream)</span>
                 </a>
               ` : `
                 <div class="text-[10px] text-slate-400 bg-white p-2 rounded-xl border border-slate-100 text-center">Rider assigned! Live GPS coordinates acquiring...</div>
@@ -2678,7 +2788,7 @@
               <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                 <div>
                   <h4 class="font-extrabold text-sm text-slate-900">${escapeHtml(restName)}</h4>
-                  <p class="text-[10px] text-slate-400 font-mono">Order #${orderId.slice(-6)} • ₹${o.totalAmount} (${isOnlinePay ? 'Online Paid' : 'COD'})</p>
+                  <p class="text-[10px] text-slate-400 font-mono">Order #${orderId.slice(-6)} • ₹${o.totalAmount} (${isOnlinePay ? 'Prepaid Online' : 'COD'})</p>
                   ${o.razorpayPaymentId ? `<p class="text-[9px] font-mono font-bold text-emerald-700 mt-0.5">Payment ID: ${escapeHtml(o.razorpayPaymentId)}</p>` : ''}
                 </div>
                 <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-brand-50 text-brand-700 border border-brand-200">
@@ -2850,7 +2960,7 @@
 
         document.getElementById('ticketOrderId').value = '';
         document.getElementById('ticketMessage').value = '';
-        showModernFloatingToast("Ticket Submitted", "Our team will review your request immediately.", "fa-solid fa-circle-check");
+        showModernFloatingToast("Ticket Submitted", "Our support team will review your request immediately.", "fa-solid fa-circle-check");
       } catch (err) {
         alert("Failed to submit ticket: " + err.message);
       } finally {
@@ -2864,7 +2974,7 @@
       const keys = Object.keys(cachedMyTickets).reverse();
 
       if (keys.length === 0) {
-        container.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200">No support tickets raised yet.</div>';
+        container.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200">No support requests submitted yet.</div>';
         return;
       }
 
@@ -2931,7 +3041,7 @@
 
   <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
   <script>
-    const CURRENT_APP_VERSION = "1.0.5";
+    const CURRENT_APP_VERSION = "1.0.6";
 
     async function checkForAppUpdate() {
       try {
@@ -2944,7 +3054,7 @@
         const serverVersion = data.customer_version || data.latest_version || data.version;
 
         if (serverVersion && serverVersion !== CURRENT_APP_VERSION) {
-          const updateMsg = data.customer_message || data.message || "Naye features ke liye app update karein.";
+          const updateMsg = data.customer_message || data.message || "Please update to access new features.";
           const descEl = document.getElementById("updateDesc");
           if (descEl) descEl.innerText = updateMsg;
 
