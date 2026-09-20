@@ -55,7 +55,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
 
-  <!-- ================= 🔄 PULL TO REFRESH SPINNER INDICATOR ================= -->
+  <!-- ================= 🔄 PULL TO REFRESH SPINNER ================= -->
   <div id="pullToRefreshIndicator" class="hidden fixed top-3 left-1/2 -translate-x-1/2 z-[99] bg-white shadow-lg rounded-full p-2.5 text-brand-600 border border-slate-200 transition-transform">
     <i class="fa-solid fa-arrows-rotate fa-spin text-sm"></i>
   </div>
@@ -177,7 +177,7 @@
     </div>
   </div>
 
-  <!-- ================= 4.5 ORDER DETAIL INSPECTION MODAL ================= -->
+  <!-- ================= 4.5 ORDER DETAIL INSPECTION MODAL (WITH FORCE CANCEL BUTTON) ================= -->
   <div id="orderDetailModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
       <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
@@ -197,15 +197,18 @@
 
       <div class="p-4 space-y-3.5 overflow-y-auto custom-scrollbar flex-1 text-xs" id="odModalBody"></div>
 
-      <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex justify-end">
-        <button onclick="closeOrderDetailModal()" class="min-h-[38px] px-5 py-2 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold rounded-xl text-xs transition">
+      <div class="p-3.5 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-2" id="odModalFooter">
+        <button id="odModalCancelBtn" onclick="" class="min-h-[40px] px-4 py-2 bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-extrabold rounded-xl text-xs shadow-sm transition flex items-center gap-1.5">
+          <i class="fa-solid fa-ban"></i> <span>Force Cancel Order (Admin Override)</span>
+        </button>
+        <button onclick="closeOrderDetailModal()" class="min-h-[40px] px-5 py-2 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold rounded-xl text-xs transition">
           Close
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ================= AUTH VIEW (ADMIN LOGIN) ================= -->
+  <!-- ================= AUTH VIEW (LOGIN WITH EYE ICON) ================= -->
   <div id="authView" class="hidden min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-stone-950">
     <div class="max-w-md w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-6 sm:p-8 border border-white/20">
       <div class="text-center mb-6 sm:mb-8">
@@ -230,9 +233,12 @@
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">Admin Password</label>
             <button type="button" onclick="openForgotPasswordModal()" class="text-xs text-brand-600 hover:text-brand-700 font-black transition">Forgot Password?</button>
           </div>
-          <div class="relative">
-            <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400"></i>
-            <input type="password" id="loginPassword" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition" placeholder="••••••••">
+          <div class="relative flex items-center">
+            <i class="fa-solid fa-lock absolute left-3.5 text-slate-400 pointer-events-none"></i>
+            <input type="password" id="loginPassword" required class="w-full pl-10 pr-11 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition" placeholder="••••••••">
+            <button type="button" onclick="togglePasswordVisibility('loginPassword', 'adminEyeIcon')" class="absolute right-3.5 p-1 text-slate-400 hover:text-slate-700 transition active:scale-90" title="Show / Hide Password">
+              <i id="adminEyeIcon" class="fa-solid fa-eye text-sm"></i>
+            </button>
           </div>
         </div>
 
@@ -363,7 +369,6 @@
         </div>
         
         <div class="flex items-center gap-2.5">
-          <!-- Foreground Service & Screen-Lock Radar Active Indicator -->
           <span id="fgServiceBadge" class="hidden px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-full text-xs font-black flex items-center gap-1.5">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span> Live Radar Active
           </span>
@@ -457,7 +462,7 @@
           <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h3 class="font-black text-slate-900 text-base">Live Order & GPS Tracking Command</h3>
-              <p class="text-[11px] text-slate-400">Track OTPs, live Razorpay IDs, and monitor real-time rider coordinates</p>
+              <p class="text-[11px] text-slate-400">Track OTPs, live Razorpay IDs, monitor riders, or force-cancel accidental orders</p>
             </div>
             <select id="orderStatusFilter" onchange="renderOrdersTable()" class="w-full sm:w-auto px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500 font-extrabold">
               <option value="ALL">All Statuses</option>
@@ -747,7 +752,7 @@
       <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Later</button>
     </div>
   </div>
-<!-- ================= JAVASCRIPT LOGIC (PART 2) ================= -->
+<!-- ================= JAVASCRIPT LOGIC (PART 2A) ================= -->
   <script>
     // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
@@ -799,6 +804,26 @@
         return escapeHtml(trimmed);
       }
       return '';
+    }
+
+    // =========================================================
+    // 👁️ SHOW / HIDE PASSWORD TOGGLE FUNCTION
+    // =========================================================
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (!input || !icon) return;
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash', 'text-brand-600');
+        icon.classList.remove('text-slate-400');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash', 'text-brand-600');
+        icon.classList.add('fa-eye', 'text-slate-400');
+      }
     }
 
     // =========================================================
@@ -1379,6 +1404,76 @@
       }
     }
 
+    // =========================================================
+    // 🛑 UNIVERSAL FORCE-CANCEL ORDER (ADMIN ROOT OVERRIDE)
+    // =========================================================
+    async function forceCancelOrderByAdmin(orderId) {
+      const o = cachedOrders[orderId];
+      if (!o) {
+        alert("Order details not found!");
+        return;
+      }
+
+      if (o.status === 'CANCELLED') {
+        alert("This order is already marked as CANCELLED.");
+        return;
+      }
+
+      let warnMessage = `🛑 FORCE CANCEL ORDER #${orderId.slice(-6)}?\n\nCurrent Status: ${o.status}\nAmount: ₹${o.totalAmount || 0} (${o.paymentMethod === 'ONLINE' ? 'Prepaid Online' : 'COD'})\n\nThis will instantly:\n• Cancel order for Customer & Kitchen\n• Remove from Delivery Rider radar\n• Trigger automatic online refund (if paid via Razorpay)`;
+      
+      if (o.status === 'DELIVERED') {
+        warnMessage = `⚠️ WARNING: This order is already marked as DELIVERED!\n\nAre you sure you want to override and FORCE CANCEL it? (This will reverse the sale and initiate refund if paid online)`;
+      }
+
+      if (!confirm(warnMessage)) return;
+
+      const customReason = prompt("Enter cancellation reason (Kitchen & Customer will see this):", "Cancelled by Super Admin (Accidental Order / Technical Glitch)");
+      if (customReason === null) return;
+
+      const finalReason = customReason.trim() || "Cancelled by Super Admin (Technical Issue / Accidental Order)";
+
+      try {
+        // 1. Update order status in Firebase
+        await db.ref(`orders/${orderId}`).update({
+          status: 'CANCELLED',
+          cancelledBy: 'SUPER_ADMIN',
+          cancelReason: finalReason,
+          updatedAt: Date.now()
+        });
+
+        // 2. Remove from unassigned queue if rider was not assigned
+        await db.ref(`unassignedOrders/${orderId}`).remove().catch(() => {});
+
+        // 3. Trigger automatic Razorpay refund if prepaid online
+        let refundTriggered = false;
+        if (o.paymentMethod === 'ONLINE' && o.razorpayPaymentId) {
+          try {
+            const res = await fetch(`${BACKEND_URL}/api/refund-order`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderId: orderId, reason: finalReason })
+            });
+            const data = await res.json();
+            if (data && data.refundId) refundTriggered = true;
+          } catch (refErr) {
+            console.warn("Backend refund dispatch note:", refErr);
+          }
+        }
+
+        closeOrderDetailModal();
+
+        showModernFloatingToast(
+          "Order Force-Cancelled", 
+          refundTriggered ? `Order #${orderId.slice(-6)} cancelled & refund initiated.` : `Order #${orderId.slice(-6)} cancelled successfully.`, 
+          "fa-solid fa-ban", 
+          true
+        );
+
+      } catch (err) {
+        alert("Failed to cancel order: " + err.message);
+      }
+    }
+
     // ---------------- ADMIN PROFILE ----------------
     function toggleAdminProfileEdit(showEdit) {
       document.getElementById('adminProfileViewCard').classList.toggle('hidden', showEdit);
@@ -1444,8 +1539,7 @@
         btn.innerHTML = 'Save Profile';
       }
     }
-
-    // =========================================================
+// =========================================================
     // 💵 SETTLE RIDER CASH (COD SETTLEMENT)
     // =========================================================
     async function settleRiderCash(uid, riderName, amount) {
@@ -1782,7 +1876,7 @@
     }
 
     // =========================================================
-    // 🔍 ORDER DETAILS INSPECTION MODAL
+    // 🔍 ORDER DETAILS INSPECTION MODAL (WITH FORCE CANCEL BUTTON)
     // =========================================================
     function openOrderDetailModal(orderId) {
       const o = cachedOrders[orderId];
@@ -1816,10 +1910,10 @@
 
       const body = document.getElementById('odModalBody');
       body.innerHTML = `
-        <div class="p-3.5 rounded-2xl ${o.status === 'DELIVERED' ? 'bg-emerald-50 border border-emerald-200' : 'bg-slate-50 border border-slate-200'} space-y-2">
+        <div class="p-3.5 rounded-2xl ${o.status === 'DELIVERED' ? 'bg-emerald-50 border border-emerald-200' : (o.status === 'CANCELLED' ? 'bg-rose-50 border border-rose-200' : 'bg-slate-50 border border-slate-200')} space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-black uppercase text-slate-500">Delivery Status</span>
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black ${o.status === 'DELIVERED' ? 'bg-emerald-200 text-emerald-800' : 'bg-brand-100 text-brand-700'}">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black ${o.status === 'DELIVERED' ? 'bg-emerald-200 text-emerald-800' : (o.status === 'CANCELLED' ? 'bg-rose-200 text-rose-800' : 'bg-brand-100 text-brand-700')}">
               ${o.status.replace(/_/g, ' ')}
             </span>
           </div>
@@ -1837,10 +1931,17 @@
             ` : `
               <div>
                 <span class="text-slate-400 block text-[10px] font-bold">Delivered At:</span>
-                <span class="text-slate-500 font-bold">In Progress / Pending</span>
+                <span class="text-slate-500 font-bold">${o.status === 'CANCELLED' ? 'Order Cancelled' : 'In Progress / Pending'}</span>
               </div>
             `}
           </div>
+
+          ${o.cancelReason ? `
+            <div class="p-2.5 rounded-xl bg-rose-100/70 border border-rose-300 text-rose-900 text-xs font-semibold">
+              <span class="block text-[10px] font-black uppercase text-rose-800">Cancellation Note:</span>
+              <span>${escapeHtml(o.cancelReason)}</span>
+            </div>
+          ` : ''}
 
           ${o.deliveryOtp ? `
             <div class="text-[11px] font-mono text-slate-700 bg-white p-2 rounded-xl border border-slate-100 flex items-center justify-between mt-1">
@@ -1892,6 +1993,15 @@
           </div>
         </div>
       `;
+
+      // Set force cancel button in modal footer
+      const cancelBtn = document.getElementById('odModalCancelBtn');
+      if (o.status === 'CANCELLED') {
+        cancelBtn.classList.add('hidden');
+      } else {
+        cancelBtn.classList.remove('hidden');
+        cancelBtn.onclick = () => forceCancelOrderByAdmin(orderId);
+      }
 
       document.getElementById('orderDetailModal').classList.remove('hidden');
     }
@@ -2055,19 +2165,127 @@
               <p class="text-xs font-black text-slate-800 truncate mt-0.5">${escapeHtml(restName)}</p>
               <p class="text-[11px] text-slate-400 truncate">${escapeHtml(o.phone || 'Customer')} • ${escapeHtml(o.address || '')}</p>
               ${o.razorpayPaymentId ? `<p class="text-[9px] font-mono font-bold text-emerald-700">Razorpay: ${escapeHtml(o.razorpayPaymentId)}</p>` : ''}
+              ${o.cancelReason ? `<p class="text-[9px] text-rose-600 font-bold truncate">Reason: ${escapeHtml(o.cancelReason)}</p>` : ''}
             </div>
             <div class="text-right flex-shrink-0">
               <span class="font-black text-xs sm:text-sm text-emerald-700">₹${o.totalAmount || 0}</span>
               <span class="block text-[9px] font-extrabold ${o.paymentMethod === 'ONLINE' ? 'text-blue-600' : 'text-slate-500'}">${paymentMode}</span>
-              <div class="flex gap-2 justify-end mt-1">
+              <div class="flex gap-2 justify-end mt-1.5">
                 <button onclick="openOrderDetailModal('${id}')" class="text-[11px] text-brand-600 font-bold hover:underline">Details</button>
-                <button onclick="switchTab('orders')" class="text-[11px] text-slate-500 font-bold hover:underline">Manage</button>
+                ${o.status !== 'CANCELLED' ? `
+                  <button onclick="forceCancelOrderByAdmin('${id}')" class="text-[11px] text-rose-600 font-black hover:underline" title="Force Cancel Order">Cancel</button>
+                ` : ''}
               </div>
             </div>
           </div>
         `;
       });
       container.innerHTML = html;
+    }
+
+    // =========================================================
+    // 📋 LIVE ORDERS TABLE & COMMAND RADAR
+    // =========================================================
+    function renderOrdersTable() {
+      const container = document.getElementById('ordersCardsContainer');
+      const filter = document.getElementById('orderStatusFilter')?.value || 'ALL';
+      const orderKeys = Object.keys(cachedOrders).reverse();
+
+      if (orderKeys.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs bg-white rounded-3xl border border-slate-200">No orders placed in system yet.</div>`;
+        return;
+      }
+
+      let html = '';
+      let matchCount = 0;
+
+      orderKeys.forEach(id => {
+        const o = cachedOrders[id];
+        if (!o) return;
+
+        if (filter !== 'ALL' && o.status !== filter) return;
+        matchCount++;
+
+        const restName = cachedRestaurants[o.restaurantId]?.name || 'Kitchen';
+        const riderName = (o.deliveryUid && cachedDelivery[o.deliveryUid]) ? cachedDelivery[o.deliveryUid].name : 'Unassigned';
+        const badgeClass = STATUS_BADGES[o.status] || 'bg-slate-100 text-slate-700';
+        const isOnlinePay = (o.paymentMethod === 'ONLINE');
+
+        html += `
+          <div class="bg-white p-4 rounded-3xl border ${o.status === 'CANCELLED' ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200/90'} shadow-xs space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-black text-xs sm:text-sm text-slate-900">#${id.slice(-6)}</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black border ${badgeClass}">
+                  ${o.status.replace(/_/g, ' ')}
+                </span>
+                ${o.deliveryOtp ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-black bg-brand-50 text-brand-700 border border-brand-200">OTP: ${o.deliveryOtp}</span>` : ''}
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono">${new Date(o.createdAt || Date.now()).toLocaleTimeString()}</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+              <div class="p-2.5 bg-slate-50 rounded-2xl border border-slate-100">
+                <span class="text-[9px] font-bold text-slate-400 uppercase block">Kitchen</span>
+                <p class="font-black text-slate-900 truncate">${escapeHtml(restName)}</p>
+                <p class="text-[10px] text-slate-500 font-mono">${cachedRestaurants[o.restaurantId]?.phone || 'No phone'}</p>
+              </div>
+
+              <div class="p-2.5 bg-slate-50 rounded-2xl border border-slate-100">
+                <span class="text-[9px] font-bold text-slate-400 uppercase block">Customer & Drop</span>
+                <p class="font-black text-slate-900 truncate">${escapeHtml(o.phone || 'Customer')}</p>
+                <p class="text-[10px] text-slate-500 truncate">${escapeHtml(o.address || 'Address provided')}</p>
+              </div>
+
+              <div class="p-2.5 rounded-2xl border ${o.deliveryUid ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/50 border-amber-200'} flex items-center justify-between">
+                <div>
+                  <span class="text-[9px] font-bold text-slate-400 uppercase block">Delivery Rider</span>
+                  <p class="font-black text-slate-900 truncate">${escapeHtml(riderName)}</p>
+                  <p class="text-[10px] text-slate-500 font-mono">${o.deliveryUid ? 'Assigned' : 'Searching rider...'}</p>
+                </div>
+                <button onclick="openReassignModal('${id}')" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-extrabold rounded-lg border border-slate-200 shadow-2xs active:scale-95 transition">
+                  Change
+                </button>
+              </div>
+            </div>
+
+            <div class="p-2.5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between text-xs">
+              <div>
+                <span class="font-extrabold text-slate-700">${isOnlinePay ? 'Prepaid Online' : 'Cash on Delivery'}</span>
+                ${o.razorpayPaymentId ? `<span class="text-[10px] font-mono text-emerald-700 block font-bold">Razorpay ID: ${escapeHtml(o.razorpayPaymentId)}</span>` : ''}
+              </div>
+              <span class="text-sm font-black text-emerald-700">₹${o.totalAmount || 0}</span>
+            </div>
+
+            ${o.cancelReason ? `
+              <div class="p-2 rounded-xl bg-rose-100/60 border border-rose-200 text-rose-800 text-[11px] font-semibold">
+                <i class="fa-solid fa-ban mr-1 text-rose-600"></i> Cancel Reason: ${escapeHtml(o.cancelReason)}
+              </div>
+            ` : ''}
+
+            <div class="flex items-center justify-between pt-1 gap-2">
+              <div class="flex gap-2">
+                <button onclick="openOrderDetailModal('${id}')" class="min-h-[36px] px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-receipt"></i> <span>Full Details</span>
+                </button>
+                <button onclick="openReassignModal('${id}')" class="min-h-[36px] px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold rounded-xl text-xs transition">
+                  <i class="fa-solid fa-motorcycle"></i> Assign Fleet
+                </button>
+              </div>
+
+              ${o.status !== 'CANCELLED' ? `
+                <button onclick="forceCancelOrderByAdmin('${id}')" class="min-h-[36px] px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 border border-rose-200 font-extrabold rounded-xl text-xs transition flex items-center gap-1.5 shadow-2xs">
+                  <i class="fa-solid fa-ban"></i> <span>Cancel Order</span>
+                </button>
+              ` : `
+                <span class="text-[11px] font-black text-rose-600 bg-rose-100 px-3 py-1 rounded-xl">Cancelled ✓</span>
+              `}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = matchCount > 0 ? html : `<div class="p-8 text-center text-slate-400 text-xs bg-white rounded-3xl border border-slate-200">No orders match the "${filter}" filter.</div>`;
     }
 
     // =========================================================
@@ -2273,33 +2491,6 @@
       db.ref(`deliveryPartners/${uid}`).update({ approved: approve })
         .then(() => showModernFloatingToast("Rider Status", `Approval state changed.`, "fa-solid fa-motorcycle"))
         .catch(err => alert("Failed to update rider: " + err.message));
-    }
-
-    // =========================================================
-    // 💳 AUTO-REFUND ON ORDER CANCELLATION
-    // =========================================================
-    async function cancelOrder(orderId) {
-      if (!confirm(`Cancel order #${orderId.slice(-6)}? If paid online, automated refund will be initiated.`)) return;
-      try {
-        await db.ref(`orders/${orderId}`).update({
-          status: 'CANCELLED',
-          cancelReason: 'Cancelled by Super Admin',
-          updatedAt: Date.now()
-        });
-
-        await db.ref(`unassignedOrders/${orderId}`).remove();
-
-        const res = await fetch(`${BACKEND_URL}/api/refund-order`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderId: orderId, reason: 'Cancelled by Super Admin' })
-        });
-        const data = await res.json();
-
-        showModernFloatingToast("Order Cancelled", data.refundId ? "Order cancelled and online refund initiated!" : "Order cancelled.", "fa-solid fa-ban", true);
-      } catch (err) {
-        alert("Failed to cancel order: " + err.message);
-      }
     }
 
     function populateDeliveryModalDropdown() {
@@ -2556,7 +2747,7 @@
 
   <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
   <script>
-    const CURRENT_APP_VERSION = "1.0.6";
+    const CURRENT_APP_VERSION = "1.0.7";
 
     async function checkForAppUpdate() {
       try {

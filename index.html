@@ -187,7 +187,7 @@
     </div>
   </div>
 
-  <!-- ================= AUTH VIEW (LOGIN / SIGNUP) ================= -->
+  <!-- ================= AUTH VIEW (LOGIN / SIGNUP WITH EYE ICON) ================= -->
   <div id="authView" class="hidden min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-brand-600 to-orange-500">
     <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
       <div class="text-center mb-6">
@@ -201,7 +201,7 @@
         <button type="button" onclick="toggleAuthMode('signup')" id="authTabSignup" class="min-h-[40px] rounded-lg text-slate-500 hover:text-slate-800 transition active:scale-95">Sign Up</button>
       </div>
 
-      <!-- Login Form -->
+      <!-- Login Form with Eye Icon -->
       <form id="loginForm" onsubmit="handleCustomerLogin(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Email Address</label>
@@ -215,9 +215,12 @@
             <label class="block text-xs font-bold text-slate-600">Password</label>
             <button type="button" onclick="openCustomerForgotModal()" class="text-xs text-brand-600 hover:text-brand-700 font-extrabold transition">Forgot Password?</button>
           </div>
-          <div class="relative">
-            <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
-            <input type="password" id="loginPassword" required class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="••••••••">
+          <div class="relative flex items-center">
+            <i class="fa-solid fa-lock absolute left-3.5 text-slate-400 text-xs pointer-events-none"></i>
+            <input type="password" id="loginPassword" required class="w-full pl-9 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition" placeholder="••••••••">
+            <button type="button" onclick="togglePasswordVisibility('loginPassword', 'custLoginEyeIcon')" class="absolute right-3 p-1 text-slate-400 hover:text-slate-700 transition active:scale-90" title="Show / Hide Password">
+              <i id="custLoginEyeIcon" class="fa-solid fa-eye text-xs"></i>
+            </button>
           </div>
         </div>
         <div id="loginAuthError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
@@ -229,7 +232,7 @@
         </button>
       </form>
 
-      <!-- Signup Form -->
+      <!-- Signup Form with Eye Icon -->
       <form id="signupForm" onsubmit="handleCustomerSignup(event)" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
@@ -254,7 +257,12 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Create Password</label>
-          <input type="password" id="regPassword" minlength="6" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Min. 6 characters">
+          <div class="relative flex items-center">
+            <input type="password" id="regPassword" minlength="6" required class="w-full px-3.5 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none transition" placeholder="Min. 6 characters">
+            <button type="button" onclick="togglePasswordVisibility('regPassword', 'custRegEyeIcon')" class="absolute right-3 p-1 text-slate-400 hover:text-slate-700 transition active:scale-90" title="Show / Hide Password">
+              <i id="custRegEyeIcon" class="fa-solid fa-eye text-xs"></i>
+            </button>
+          </div>
         </div>
         <div id="signupAuthError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
           <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
@@ -270,15 +278,12 @@
   <!-- ================= CUSTOMER APP VIEW ================= -->
   <div id="appView" class="hidden max-w-lg mx-auto bg-white min-h-screen relative shadow-2xl pb-safe flex flex-col">
 
-    <!-- ================= 🌟 ENLARGED & PROMINENT TOPBAR HEADER ================= -->
+    <!-- ================= 🌟 ENLARGED TOPBAR HEADER ================= -->
     <header class="sticky top-0 z-30 bg-white/98 backdrop-blur-md border-b border-slate-200/90 px-4 py-4 sm:py-4.5 flex items-center justify-between shadow-xs">
       <div onclick="switchAppTab('profile')" class="flex items-center gap-3.5 overflow-hidden cursor-pointer active:scale-98 transition flex-1 mr-2">
-        <!-- Enlarged App Icon -->
         <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-orange-600 text-white flex items-center justify-center font-black text-2xl shadow-md shadow-brand-500/30 flex-shrink-0">
           <i class="fa-solid fa-bowl-food"></i>
         </div>
-        
-        <!-- Enlarged Delivery Address & Customer Name -->
         <div class="overflow-hidden flex-1 min-w-0">
           <div class="flex items-center gap-1.5">
             <i class="fa-solid fa-location-dot text-brand-600 text-base flex-shrink-0 animate-bounce"></i>
@@ -289,7 +294,6 @@
         </div>
       </div>
 
-      <!-- Enlarged Action Badges -->
       <div class="flex items-center gap-2.5 flex-shrink-0">
         <button onclick="toggleNotifCenter(true)" class="relative w-11 h-11 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 flex items-center justify-center text-lg transition shadow-2xs">
           <i class="fa-solid fa-bell"></i>
@@ -308,7 +312,7 @@
       <!-- ================= 1. HOME TAB ================= -->
       <section id="tab-home" class="p-3.5 space-y-4 bg-slate-50 min-h-screen">
         
-        <!-- 1. LIVE SEARCH BAR WITH CLEAR & MIC -->
+        <!-- SEARCH BAR WITH CLEAR & MIC -->
         <div class="relative flex items-center">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-slate-400 text-sm"></i>
           <input type="text" id="restaurantSearchInput" oninput="handleUniversalSearch(this.value)" placeholder="Search 'Pizza', 'Biryani', 'Burger'..." class="w-full pl-10 pr-16 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-semibold shadow-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
@@ -322,7 +326,7 @@
           </div>
         </div>
 
-        <!-- 2. LIVE SEARCH RESULTS OVERLAY -->
+        <!-- SEARCH RESULTS OVERLAY -->
         <div id="searchResultsSection" class="hidden space-y-4 bg-white p-4 rounded-3xl border border-brand-200 shadow-md">
           <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <h4 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
@@ -343,7 +347,7 @@
           </div>
         </div>
 
-        <!-- 3. CITY BEST / OFFER ZONE PILLS -->
+        <!-- CITY BEST / OFFER ZONE PILLS -->
         <div id="mainHomePills" class="grid grid-cols-2 p-1 bg-slate-200/80 rounded-2xl text-xs font-black">
           <button onclick="toggleHomeFilter('CITY_BEST')" id="pillCityBest" class="py-2 rounded-xl bg-white text-slate-900 shadow-sm transition active:scale-95">
             CITY BEST
@@ -353,14 +357,14 @@
           </button>
         </div>
 
-        <!-- 4. TOP FEATURED DEALS CAROUSEL -->
+        <!-- TOP FEATURED DEALS CAROUSEL -->
         <div id="topFeaturedSection" class="space-y-2">
           <div id="topFeaturedDealsCarousel" class="flex gap-3 overflow-x-auto no-scrollbar pb-1 snap-x">
             <div class="p-4 text-center text-slate-400 text-xs w-full">Loading kitchens...</div>
           </div>
         </div>
 
-        <!-- 5. POPULAR CATEGORIES -->
+        <!-- POPULAR CATEGORIES -->
         <div id="categoriesSection" class="space-y-2.5 pt-1">
           <div class="flex items-center justify-between">
             <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">What's on your mind?</h3>
@@ -426,7 +430,7 @@
           </div>
         </div>
 
-        <!-- 6. 99 STORE (TAP ANYWHERE ON DISH TO ADD) -->
+        <!-- 99 STORE -->
         <div id="budgetDealsSection" class="space-y-3 bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -443,7 +447,7 @@
           </div>
         </div>
 
-        <!-- 7. ALL APPROVED KITCHENS (SHOWS 🔴 CLOSED IF RESTAURANT IS INACTIVE) -->
+        <!-- ALL APPROVED KITCHENS -->
         <div id="allKitchensSection" class="space-y-3 pt-1">
           <div class="flex items-center justify-between">
             <div>
@@ -614,7 +618,7 @@
       <!-- ================= 5. PROFILE TAB ================= -->
       <section id="tab-profile" class="hidden p-4 space-y-4">
         
-        <!-- 1. READ-ONLY VIEW CARD -->
+        <!-- READ-ONLY VIEW CARD -->
         <div id="custProfileViewCard" class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-5 space-y-5">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
@@ -649,7 +653,7 @@
           </div>
         </div>
 
-        <!-- 2. EDIT PROFILE CARD -->
+        <!-- EDIT PROFILE CARD -->
         <div id="custProfileEditCard" class="hidden bg-white rounded-3xl border border-brand-300 shadow-md p-5 space-y-4">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 class="font-black text-slate-900 text-base flex items-center gap-2">
@@ -753,7 +757,7 @@
     </nav>
   </div>
 
-  <!-- ================= CHECKOUT MODAL (WITH FLEXIBLE DELIVERY ADDRESS) ================= -->
+  <!-- ================= CHECKOUT MODAL (FLEXIBLE ADDRESS & SECURE PAY) ================= -->
   <div id="checkoutModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
       <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -775,7 +779,7 @@
           <div id="checkoutCartItemsList" class="divide-y divide-slate-100 bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1"></div>
         </div>
 
-        <!-- ================= 📍 FLEXIBLE DELIVERY ADDRESS (DEFAULT VS OFFICE / OTHER) ================= -->
+        <!-- FLEXIBLE DELIVERY ADDRESS -->
         <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-2.5">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -784,7 +788,6 @@
             <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">Choose Address</span>
           </div>
 
-          <!-- 1-Tap Toggle: Default vs Custom Location -->
           <div class="grid grid-cols-2 gap-2 text-xs font-bold">
             <button type="button" onclick="selectCheckoutAddressType('DEFAULT')" id="addrTypeBtnDefault" class="min-h-[38px] py-1.5 px-2.5 rounded-xl border-2 border-brand-500 bg-brand-50/60 text-brand-700 flex items-center justify-center gap-1.5 transition active:scale-95">
               <i class="fa-solid fa-house text-[11px]"></i>
@@ -796,7 +799,7 @@
             </button>
           </div>
 
-          <!-- Option A: Default Profile Address Box -->
+          <!-- Option A: Default Profile Address -->
           <div id="checkoutDefaultAddressBox" class="p-2.5 bg-white rounded-xl border border-slate-200/80 text-xs space-y-1">
             <div class="flex items-center justify-between text-[11px] text-slate-500 font-bold">
               <span>Saved Profile Address:</span>
@@ -806,7 +809,7 @@
             <p class="text-[11px] text-slate-500 font-mono" id="checkoutPhone">Phone: ...</p>
           </div>
 
-          <!-- Option B: Custom / Office Address Box (Temporary for this order) -->
+          <!-- Option B: Custom / Office Address -->
           <div id="checkoutCustomAddressBox" class="hidden space-y-2 pt-0.5">
             <div class="flex items-center justify-between">
               <label class="block text-[11px] font-bold text-slate-700">Enter Location for this Order:</label>
@@ -965,6 +968,37 @@
     let checkoutCustomLat = null;
     let checkoutCustomLng = null;
 
+    // ---------------- HELPER: SAFE ESCAPING ----------------
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function escapeJsString(str) {
+      if (!str) return '';
+      return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // =========================================================
+    // 👁️ SHOW / HIDE PASSWORD TOGGLE FUNCTION
+    // =========================================================
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (!input || !icon) return;
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash', 'text-brand-600');
+        icon.classList.remove('text-slate-400');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash', 'text-brand-600');
+        icon.classList.add('fa-eye', 'text-slate-400');
+      }
+    }
+
     // =========================================================
     // 🔔 NATIVE NOTIFICATIONS & BACKGROUND TRACKING
     // =========================================================
@@ -974,7 +1008,7 @@
           const { LocalNotifications } = window.Capacitor.Plugins;
           await LocalNotifications.requestPermissions();
           await LocalNotifications.createChannel({
-            id: 'fw_customer_orders_v3',
+            id: 'fw_customer_orders_v4',
             name: 'FoodWorld Order Tracking Alerts',
             description: 'Live alerts for food preparation and delivery progress',
             importance: 5,
@@ -996,7 +1030,7 @@
                 title: title,
                 body: message,
                 id: Math.floor(Math.random() * 99999),
-                channelId: 'fw_customer_orders_v3',
+                channelId: 'fw_customer_orders_v4',
                 ongoing: false,
                 autoCancel: true
               }
@@ -1619,7 +1653,9 @@
         btn.disabled = false;
       }
     }
-// ---------------- REALTIME LISTENERS ----------------
+// =========================================================
+    // ---------------- REALTIME LISTENERS ----------------
+    // =========================================================
     function initAppListeners() {
       db.ref('restaurants').on('value', snap => {
         cachedRestaurants = snap.val() || {};
@@ -1638,6 +1674,7 @@
         renderOrdersList();
       });
 
+      // REAL-TIME ORDERS LISTENER (WITH STATUS ALERT & CANCELLATION NOTIFIER)
       db.ref('orders').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').limitToLast(20).on('value', snap => {
         const orders = snap.val() || {};
         let hasActiveOrders = false;
@@ -1670,7 +1707,8 @@
               sendCustomerNativeAlert("✅ Order Delivered!", `Order ${orderRef}: Food delivered! Enjoy your meal.`);
               playModernNotifChime();
             } else if (currentStatus === 'CANCELLED') {
-              sendCustomerNativeAlert("❌ Order Cancelled", `Order ${orderRef}: Your order has been cancelled.`);
+              sendCustomerNativeAlert("❌ Order Cancelled", `Order ${orderRef}: ${o.cancelReason || 'Your order was cancelled.'}`);
+              playModernNotifChime();
             }
           }
 
@@ -2319,7 +2357,6 @@
         checkoutPhoneEl.innerText = `Phone: ${currentCustomer?.phone || 'N/A'}`;
       }
 
-      // Always reset to Default Address mode initially
       selectCheckoutAddressType('DEFAULT');
 
       renderCheckoutCartItems();
@@ -2390,7 +2427,6 @@
     // 🛡️ PLACE ORDER WITH FLEXIBLE DELIVERY ADDRESS
     // =========================================================
     async function placeCustomerOrder() {
-      // 1. Determine final delivery address (Default Profile vs Office / Other)
       let finalDeliveryAddress = currentCustomer?.address || '';
       let finalDeliveryLat = customerLat;
       let finalDeliveryLng = customerLng;
@@ -2474,7 +2510,7 @@
             paymentMethod: 'COD',
             paymentStatus: 'PENDING_CASH',
             razorpayPaymentId: null,
-            address: finalDeliveryAddress,        // <--- Custom or Default address attached
+            address: finalDeliveryAddress,
             customerLat: finalDeliveryLat || null,
             customerLng: finalDeliveryLng || null,
             phone: currentCustomer.phone,
@@ -2491,7 +2527,7 @@
             restaurantId: restId,
             restaurantName: rest.name || 'Kitchen',
             restaurantAddress: rest.address || 'Address',
-            customerAddress: finalDeliveryAddress,  // <--- Custom or Default address attached
+            customerAddress: finalDeliveryAddress,
             totalAmount: grandTotal,
             paymentMethod: 'COD',
             createdAt: Date.now()
@@ -2535,7 +2571,7 @@
           paymentMethod: 'ONLINE',
           paymentStatus: 'PENDING_ONLINE',
           razorpayPaymentId: null,
-          address: finalDeliveryAddress,         // <--- Custom or Default address attached
+          address: finalDeliveryAddress,
           customerLat: finalDeliveryLat || null,
           customerLng: finalDeliveryLng || null,
           phone: currentCustomer.phone,
@@ -2597,7 +2633,7 @@
                 restaurantId: restId,
                 restaurantName: rest.name || 'Kitchen',
                 restaurantAddress: rest.address || 'Address',
-                customerAddress: finalDeliveryAddress, // <--- Custom or Default address attached
+                customerAddress: finalDeliveryAddress,
                 totalAmount: grandTotal,
                 paymentMethod: 'ONLINE',
                 razorpayPaymentId: response.razorpay_payment_id,
@@ -2836,6 +2872,7 @@
                   <h4 class="font-extrabold text-xs text-slate-800">${escapeHtml(restName)}</h4>
                   <span class="text-[10px] text-slate-400 font-mono">${new Date(o.createdAt || Date.now()).toLocaleDateString()} • ₹${o.totalAmount} (${isOnlinePay ? 'Online' : 'COD'})</span>
                   ${o.razorpayPaymentId ? `<p class="text-[9px] font-mono font-bold text-emerald-700 mt-0.5">Ref: ${escapeHtml(o.razorpayPaymentId)}</p>` : ''}
+                  ${o.cancelReason ? `<p class="text-[10px] text-rose-600 font-semibold mt-0.5"><i class="fa-solid fa-circle-info"></i> ${escapeHtml(o.cancelReason)}</p>` : ''}
                 </div>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${o.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
                   ${o.status}
@@ -2852,7 +2889,8 @@
                   <i class="fa-solid fa-rotate-right text-[10px]"></i> Reorder
                 </button>
                 ${o.status === 'DELIVERED' ? `
-                  <button onclick="openRatingModal('${orderId}', '${o.restaurantId}', '${escapeHtml(restName)}')" class="flex-1 min-h-[38px] py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl text-xs font-bold active:scale-95 transition">
+                  <!-- 🌟 CRASH FIXED: Single-quote safely escaped for names like McDonald's -->
+                  <button onclick="openRatingModal('${orderId}', '${o.restaurantId}', '${escapeJsString(restName)}')" class="flex-1 min-h-[38px] py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl text-xs font-bold active:scale-95 transition">
                     <i class="fa-solid fa-star text-[10px]"></i> Rate Food
                   </button>
                 ` : ''}
@@ -3032,16 +3070,11 @@
       });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-    }
   </script>
 
   <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
   <script>
-    const CURRENT_APP_VERSION = "1.0.6";
+    const CURRENT_APP_VERSION = "1.0.7";
 
     async function checkForAppUpdate() {
       try {
