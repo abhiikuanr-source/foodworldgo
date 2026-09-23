@@ -107,7 +107,7 @@
   </div>
 
   <!-- ================= NOTIFICATION CENTER DRAWER ================= -->
-  <div id="notifCenterDrawer" class="hidden fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-xs flex items-end justify-center">
+  <div id="notifCenterDrawer" class="hidden fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-end justify-center">
     <div class="bg-white w-full max-w-lg rounded-t-3xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
       <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
         <div class="flex items-center gap-2">
@@ -126,7 +126,7 @@
   </div>
 
   <!-- ================= FORGOT PASSWORD MODAL ================= -->
-  <div id="customerForgotModal" class="hidden fixed inset-0 z-[98] bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="customerForgotModal" class="hidden fixed inset-0 z-[98] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2.5">
@@ -173,7 +173,7 @@
   </div>
 
   <!-- ================= EXIT CONFIRMATION MODAL ================= -->
-  <div id="exitAppModal" class="hidden fixed inset-0 z-[99] bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="exitAppModal" class="hidden fixed inset-0 z-[99] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl space-y-4 text-center">
       <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl mx-auto shadow-inner"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
       <div>
@@ -187,7 +187,7 @@
     </div>
   </div>
 
-  <!-- ================= AUTH VIEW (LOGIN / SIGNUP WITH EYE ICON) ================= -->
+  <!-- ================= AUTH VIEW (LOGIN / SIGNUP) ================= -->
   <div id="authView" class="hidden min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-brand-600 to-orange-500">
     <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
       <div class="text-center mb-6">
@@ -299,7 +299,8 @@
           <i class="fa-solid fa-bell"></i>
           <span id="notifBellBadge" class="hidden absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-brand-600 text-white font-black text-[10px] flex items-center justify-center border-2 border-white animate-pulse">0</span>
         </button>
-        <span class="px-3.5 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-xs sm:text-sm font-black flex items-center gap-1.5 shadow-2xs">
+        <!-- Dynamic Header Badge: Controlled by Super Admin Gateway Toggle -->
+        <span id="topRazorpayBadge" class="px-3.5 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-xs sm:text-sm font-black flex items-center gap-1.5 shadow-2xs">
           <i class="fa-solid fa-shield-halved text-emerald-600 text-sm"></i>
           <span class="hidden sm:inline">Live</span> Razorpay
         </span>
@@ -430,14 +431,15 @@
           </div>
         </div>
 
-        <!-- 99 STORE -->
+        <!-- 99 STORE (WITH DIRECT VIEW ALL TAB BUTTON) -->
         <div id="budgetDealsSection" class="space-y-3 bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="px-2 py-0.5 rounded-lg bg-yellow-400 text-slate-950 font-black text-xs italic shadow-2xs">99 store</span>
               <span class="text-xs font-bold text-slate-800">Budget Meals Under ₹99</span>
             </div>
-            <button onclick="filterByMaxPrice(99)" class="text-xs font-black text-brand-600 hover:underline flex items-center gap-0.5">
+            <!-- 🌟 OPENS DEDICATED FULL GRID VIEW -->
+            <button onclick="openNinetyNineStore()" class="text-xs font-black text-brand-600 hover:underline flex items-center gap-0.5 active:scale-95 transition">
               <span>View All</span>
               <i class="fa-solid fa-chevron-right text-[10px]"></i>
             </button>
@@ -463,9 +465,47 @@
 
       </section>
 
-      <!-- ================= 2. RESTAURANT MENU INTERFACE ================= -->
+      <!-- ================= 🌟 2. DEDICATED 99 STORE FULL GRID TAB ================= -->
+      <section id="tab-ninety-nine" class="hidden min-h-screen bg-slate-50 flex flex-col pb-36">
+        <!-- Top Bar Navigation -->
+        <div class="bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 py-3 sticky top-0 z-20 shadow-xs flex items-center justify-between">
+          <button onclick="closeNinetyNineStore()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 flex items-center justify-center text-slate-700 text-sm transition flex-shrink-0">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <div class="text-center truncate px-2 flex-1">
+            <div class="inline-flex items-center gap-1.5">
+              <span class="px-2 py-0.5 rounded-md bg-yellow-400 text-slate-950 font-black text-[11px] italic shadow-2xs">99 store</span>
+              <h3 class="font-black text-xs sm:text-sm text-slate-900 truncate">Budget Meals Under ₹99</h3>
+            </div>
+            <p class="text-[10px] text-emerald-600 font-bold">Sorted: Lowest to ₹99</p>
+          </div>
+          <div class="w-9"></div>
+        </div>
+
+        <!-- Info Header Strip -->
+        <div class="p-3.5 bg-gradient-to-r from-amber-500/10 via-yellow-400/10 to-brand-500/10 border-b border-amber-200/60 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-xl bg-yellow-400 text-slate-950 flex items-center justify-center font-black text-sm shadow-2xs">₹</span>
+            <div>
+              <h4 class="text-xs font-black text-slate-900">Affordable Feasts</h4>
+              <p class="text-[10px] text-slate-500">Tap card to view restaurant or ADD directly</p>
+            </div>
+          </div>
+          <span id="ninetyNineCountBadge" class="px-2.5 py-1 rounded-full bg-slate-900 text-white text-[10px] font-black">0 Dishes</span>
+        </div>
+
+        <!-- 2-Column Responsive Grid Container -->
+        <div class="p-3.5 flex-1">
+          <div id="ninetyNineGridContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <p class="text-xs text-slate-400 text-center py-8 col-span-full">Scanning budget meals...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. RESTAURANT MENU INTERFACE ================= -->
       <section id="tab-menu" class="hidden min-h-screen bg-slate-50 flex flex-col pb-36">
         
+        <!-- Top Bar Navigation -->
         <div class="bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 py-3 sticky top-0 z-20 shadow-xs flex items-center justify-between">
           <button onclick="closeRestaurantMenu()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 flex items-center justify-center text-slate-700 text-sm transition flex-shrink-0">
             <i class="fa-solid fa-arrow-left"></i>
@@ -477,23 +517,33 @@
           <div class="w-9"></div>
         </div>
 
+        <!-- 🌟 SWIGGY/ZOMATO STYLE RESTAURANT HEADER WITH (i) BUTTON & DYNAMIC RATING -->
         <div class="p-4 bg-white border-b border-slate-100 space-y-3">
           <div class="flex items-start justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
               <img id="heroRestAvatar" src="" class="w-14 h-14 rounded-2xl object-cover border border-slate-100 shadow-xs hidden" alt="Kitchen">
               <div class="min-w-0">
-                <h2 class="text-base sm:text-lg font-black text-slate-900 leading-tight truncate" id="heroRestTitle">Restaurant Name</h2>
+                <div class="flex items-center gap-2">
+                  <h2 class="text-base sm:text-lg font-black text-slate-900 leading-tight truncate" id="heroRestTitle">Restaurant Name</h2>
+                  <!-- ℹ️ SWIGGY/ZOMATO STYLE INFO BUTTON -->
+                  <button type="button" onclick="openRestaurantInfoModal()" class="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-90 text-slate-600 flex items-center justify-center text-xs flex-shrink-0" title="Restaurant Details & FSSAI">
+                    <i class="fa-solid fa-circle-info text-brand-600"></i>
+                  </button>
+                </div>
                 <p class="text-xs text-slate-500 font-medium mt-0.5 truncate" id="heroRestCuisineTag">Biryani, North Indian</p>
                 <p class="text-[11px] text-slate-400 mt-0.5 truncate" id="heroRestAddress"><i class="fa-solid fa-location-dot text-slate-300"></i> Main Road, City</p>
               </div>
             </div>
+            
+            <!-- Dynamic Rating Card -->
             <div class="p-2 rounded-2xl bg-emerald-600 text-white text-center shadow-md shadow-emerald-600/20 flex-shrink-0">
-              <span class="block text-xs font-black">4.5 ★</span>
-              <span class="block text-[8px] uppercase tracking-wider font-bold text-white/80">Verified</span>
+              <span class="block text-xs font-black" id="heroRestRating">4.5 ★</span>
+              <span class="block text-[8px] uppercase tracking-wider font-bold text-white/80" id="heroRestReviewsCount">Verified</span>
             </div>
           </div>
         </div>
 
+        <!-- Menu Search and Veg/Non-Veg Filter -->
         <div class="px-4 py-3 bg-white border-b border-slate-100 space-y-2.5 sticky top-[57px] z-10 shadow-xs">
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
@@ -511,14 +561,32 @@
           </div>
         </div>
 
+        <!-- Menu Items List -->
         <div class="p-4 space-y-3 flex-1">
           <div id="menuItemsContainer" class="space-y-3">
             <p class="text-xs text-slate-400 text-center py-8">Loading dishes...</p>
           </div>
+
+          <!-- 🌟 SWIGGY/ZOMATO STYLE REAL FSSAI FOOTER CARD -->
+          <div class="mt-6 p-4 bg-white rounded-3xl border border-slate-200/80 space-y-2 text-slate-600 shadow-xs">
+            <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+              <div class="w-7 h-7 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center text-xs font-black border border-orange-200">
+                <i class="fa-solid fa-shield-check"></i>
+              </div>
+              <div>
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Food Safety & Standards</span>
+                <p class="text-xs font-black text-slate-800 font-mono">FSSAI Lic. No. <span id="fssaiLicNumber" class="text-brand-600">Not Provided (Optional)</span></p>
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-500 space-y-0.5 pt-1">
+              <p class="font-bold text-slate-800" id="fssaiOutletName">Restaurant Outlet</p>
+              <p class="text-slate-400 leading-relaxed" id="fssaiOutletAddress">Shop Address, City</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- ================= 3. ORDERS TRACKING & HISTORY ================= -->
+      <!-- ================= 4. ORDERS TRACKING & HISTORY ================= -->
       <section id="tab-orders" class="hidden p-4 space-y-5">
         <div>
           <h3 class="font-extrabold text-slate-900 text-base">Your Orders & Real-Time Tracking</h3>
@@ -542,7 +610,7 @@
         </div>
       </section>
 
-      <!-- ================= 4. CUSTOMER SUPPORT & HELPDESK ================= -->
+      <!-- ================= 5. CUSTOMER SUPPORT & HELPDESK ================= -->
       <section id="tab-support" class="hidden p-4 space-y-4">
         <div>
           <h3 class="font-extrabold text-slate-900 text-base">24/7 Customer Helpdesk</h3>
@@ -610,12 +678,12 @@
         <div class="space-y-2.5">
           <h4 class="font-extrabold text-xs text-slate-700 uppercase tracking-wider">My Support Requests</h4>
           <div id="myTicketsList" class="space-y-2.5">
-            <div class="p-6 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200">No support tickets raised yet.</div>
+            <div class="p-6 text-center text-slate-400 text-xs bg-white rounded-2xl border border-slate-200">No support requests submitted yet.</div>
           </div>
         </div>
       </section>
 
-      <!-- ================= 5. PROFILE TAB ================= -->
+      <!-- ================= 6. PROFILE TAB ================= -->
       <section id="tab-profile" class="hidden p-4 space-y-4">
         
         <!-- READ-ONLY VIEW CARD -->
@@ -718,7 +786,7 @@
 
     </main>
 
-    <!-- FLOATING CART STRIP -->
+    <!-- 🌟 FLOATING CART STRIP (CLASSIC SINGLE RESTAURANT) -->
     <div id="floatingCartBar" class="hidden fixed bottom-safe left-1/2 -translate-x-1/2 w-full max-w-md px-3 z-40">
       <div class="bg-slate-900/95 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-2xl flex items-center justify-between border border-slate-800">
         <div class="min-w-0 flex-1 mr-2">
@@ -757,8 +825,63 @@
     </nav>
   </div>
 
-  <!-- ================= CHECKOUT MODAL (FLEXIBLE ADDRESS & SECURE PAY) ================= -->
-  <div id="checkoutModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+  <!-- ================= 🌟 OUTLET & REAL FSSAI INFO MODAL (SWIGGY/ZOMATO STYLE) ================= -->
+  <div id="restInfoModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+        <h3 class="font-black text-slate-900 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-store text-brand-500"></i> Outlet & Legal Details
+        </h3>
+        <button onclick="closeRestaurantInfoModal()" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="p-3 bg-slate-50 rounded-2xl space-y-1">
+          <span class="text-[10px] font-black uppercase text-slate-400">Trading Name</span>
+          <h4 class="font-black text-sm text-slate-900" id="modalInfoRestName">Restaurant Name</h4>
+          <p class="text-slate-500 text-[11px]" id="modalInfoCuisine">Cuisine</p>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-2xl space-y-1">
+          <span class="text-[10px] font-black uppercase text-slate-400">Complete Address</span>
+          <p class="font-bold text-slate-800 leading-relaxed" id="modalInfoAddress">Full address</p>
+          <div id="modalInfoMapBox" class="pt-1 hidden">
+            <a id="modalInfoMapLink" href="#" target="_blank" class="text-[11px] text-blue-600 font-bold hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-map-location-dot"></i> View Outlet on Google Maps ➔
+            </a>
+          </div>
+        </div>
+
+        <div class="p-3 bg-brand-50/60 border border-brand-200 rounded-2xl space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-black uppercase text-brand-800">FSSAI License</span>
+            <span class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">Govt. Mandate</span>
+          </div>
+          <p class="font-mono font-black text-xs text-brand-900" id="modalInfoFssai">Not Provided (Optional)</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-[11px]">
+          <div class="p-2.5 bg-slate-50 rounded-xl">
+            <span class="text-slate-400 block text-[9px] font-bold">Timings</span>
+            <span class="font-bold text-slate-800" id="modalInfoHours">10 AM - 11 PM</span>
+          </div>
+          <div class="p-2.5 bg-slate-50 rounded-xl">
+            <span class="text-slate-400 block text-[9px] font-bold">Contact</span>
+            <span class="font-bold text-slate-800" id="modalInfoPhone">+91 XXXXX XXXXX</span>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="closeRestaurantInfoModal()" class="w-full min-h-[40px] py-2 bg-slate-900 text-white font-extrabold rounded-xl text-xs active:scale-95 transition">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= 🛒 CHECKOUT MODAL (FLAT ₹30 DELIVERY FEE) ================= -->
+  <div id="checkoutModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
       <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
         <div>
@@ -776,6 +899,7 @@
             <h4 class="text-xs font-bold text-slate-700">Selected Dishes</h4>
             <span class="text-[10px] text-slate-400 font-bold">Add / Subtract Quantity</span>
           </div>
+          <!-- Single Restaurant Cart Items List -->
           <div id="checkoutCartItemsList" class="divide-y divide-slate-100 bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1"></div>
         </div>
 
@@ -825,9 +949,10 @@
           </div>
         </div>
 
+        <!-- PAYMENT METHOD -->
         <div class="space-y-2">
           <h4 class="text-xs font-bold text-slate-700">Choose Payment Method</h4>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 gap-2" id="paymentMethodGrid">
             <label onclick="selectPaymentMethod('COD')" id="payOptionCOD" class="p-3 rounded-2xl border-2 border-brand-500 bg-brand-50/50 cursor-pointer flex flex-col justify-between transition">
               <div class="flex items-center justify-between">
                 <i class="fa-solid fa-hand-holding-dollar text-brand-600 text-base"></i>
@@ -864,14 +989,15 @@
           </p>
         </div>
 
+        <!-- 🌟 BILL BREAKDOWN (STANDARD FLAT ₹30 DELIVERY FEE) -->
         <div class="space-y-1.5 text-xs bg-slate-50 p-3 rounded-2xl border border-slate-100">
           <div class="flex justify-between text-slate-600">
             <span>Item Total</span>
             <span id="checkoutSubtotal">₹0</span>
           </div>
-          <div class="flex justify-between text-slate-600">
+          <div class="flex justify-between text-slate-600 items-center">
             <span>Delivery Charge</span>
-            <span class="font-bold text-slate-800">₹30</span>
+            <span class="font-bold text-slate-800" id="checkoutDeliveryFee">₹30</span>
           </div>
           <div class="border-t border-slate-200 pt-1.5 flex justify-between font-black text-slate-900 text-sm">
             <span>Grand Total</span>
@@ -890,7 +1016,7 @@
   </div>
 
   <!-- ================= RATING MODAL ================= -->
-  <div id="ratingModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="ratingModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
       <div class="text-center space-y-1">
         <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center text-xl mx-auto mb-1"><i class="fa-solid fa-star"></i></div>
@@ -924,7 +1050,7 @@
       <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Later</button>
     </div>
   </div>
-<!-- ================= JAVASCRIPT LOGIC (PART 2A) ================= -->
+<!-- ================= JAVASCRIPT LOGIC (PART 2A: SETUP, SEARCH & 99 STORE) ================= -->
   <script>
     // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
@@ -943,7 +1069,7 @@
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
     // 2. CONFIGURATION & CONSTANTS
-    const DELIVERY_FEE = 30;
+    const DELIVERY_FEE = 30; // 🌟 Standard Flat ₹30 Single Restaurant Delivery Fee
     const BACKEND_URL = "https://foodworld-backend.vercel.app";
     const RAZORPAY_KEY_ID = "rzp_live_TXVKN9bGeN4CAv";
 
@@ -957,6 +1083,7 @@
     let navHistoryStack = ['home'];
     let currentVegFilter = 'ALL';
     let currentPaymentMethod = 'ONLINE';
+    let isOnlinePaymentEnabled = true; // Controlled by Super Admin Gateway Switch
     let knownNotifIds = new Set();
     let toastTimeout = null;
     let audioCtx = null;
@@ -979,9 +1106,7 @@
       return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    // =========================================================
-    // 👁️ SHOW / HIDE PASSWORD TOGGLE FUNCTION
-    // =========================================================
+    // ---------------- 👁️ PASSWORD TOGGLE ----------------
     function togglePasswordVisibility(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
@@ -999,9 +1124,7 @@
       }
     }
 
-    // =========================================================
-    // 🔔 NATIVE NOTIFICATIONS & BACKGROUND TRACKING
-    // =========================================================
+    // ---------------- NATIVE NOTIFICATIONS & TRACKING ----------------
     async function initCustomerNativeChannels() {
       if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
         try {
@@ -1059,9 +1182,7 @@
       }
     }
 
-    // =========================================================
-    // 🔄 PULL TO REFRESH ENGINE
-    // =========================================================
+    // ---------------- 🔄 PULL TO REFRESH ENGINE ----------------
     let touchStartY = 0;
     let touchStartX = 0;
     let isPulling = false;
@@ -1071,8 +1192,9 @@
       const isRatingOpen = !document.getElementById('ratingModal')?.classList.contains('hidden');
       const isNotifOpen = !document.getElementById('notifCenterDrawer')?.classList.contains('hidden');
       const isForgotOpen = !document.getElementById('customerForgotModal')?.classList.contains('hidden');
+      const isRestInfoOpen = !document.getElementById('restInfoModal')?.classList.contains('hidden');
 
-      if (isCheckoutOpen || isRatingOpen || isNotifOpen || isForgotOpen) {
+      if (isCheckoutOpen || isRatingOpen || isNotifOpen || isForgotOpen || isRestInfoOpen) {
         isPulling = false;
         return;
       }
@@ -1228,7 +1350,7 @@
     }
 
     // =========================================================
-    // 📍 DUAL DELIVERY ADDRESS TOGGLE (DEFAULT VS CUSTOM)
+    // 📍 DUAL DELIVERY ADDRESS SELECTION (DEFAULT VS CUSTOM)
     // =========================================================
     function selectCheckoutAddressType(mode) {
       checkoutAddressMode = mode;
@@ -1251,7 +1373,49 @@
       }
     }
 
-    // ---------------- PAYMENT METHOD SELECTOR ----------------
+    // =========================================================
+    // 🔒 SUPER ADMIN ONLINE PAYMENT GATEWAY LIVE SYNC
+    // =========================================================
+    function applyOnlinePaymentStatus(enabled) {
+      isOnlinePaymentEnabled = enabled;
+      const payOptionONLINE = document.getElementById('payOptionONLINE');
+      const payOptionCOD = document.getElementById('payOptionCOD');
+      const paymentGrid = document.getElementById('paymentMethodGrid');
+      const headerBadge = document.getElementById('topRazorpayBadge');
+
+      if (!enabled) {
+        // 1. Hide Online Payment Card in Checkout
+        if (payOptionONLINE) payOptionONLINE.classList.add('hidden');
+        
+        // 2. COD Card full width me convert ho jayega
+        if (paymentGrid) {
+          paymentGrid.classList.remove('grid-cols-2');
+          paymentGrid.classList.add('grid-cols-1');
+        }
+        
+        // 3. User ko auto COD par lock karein
+        selectPaymentMethod('COD');
+
+        // 4. Header ka Razorpay badge hide karein
+        if (headerBadge) headerBadge.classList.add('hidden');
+      } else {
+        // 1. Show Online Payment Card
+        if (payOptionONLINE) payOptionONLINE.classList.remove('hidden');
+        
+        // 2. Restore 2-column grid layout
+        if (paymentGrid) {
+          paymentGrid.classList.remove('grid-cols-1');
+          paymentGrid.classList.add('grid-cols-2');
+        }
+
+        // 3. Show Header Razorpay badge
+        if (headerBadge) headerBadge.classList.remove('hidden');
+      }
+    }
+
+    // =========================================================
+    // 💳 PAYMENT METHOD TOGGLE (FLAT ₹30 DELIVERY FEE)
+    // =========================================================
     function selectPaymentMethod(method) {
       currentPaymentMethod = method;
       const optCOD = document.getElementById('payOptionCOD');
@@ -1261,7 +1425,11 @@
       const onlineBox = document.getElementById('onlineUpiBox');
 
       let subtotal = 0;
-      Object.keys(cart).forEach(k => { subtotal += (cart[k].price * cart[k].qty); });
+      Object.keys(cart).forEach(k => {
+        subtotal += (cart[k].price * cart[k].qty);
+      });
+
+      // 🌟 Standard Single Restaurant Flat ₹30 Delivery Fee
       const grandTotal = subtotal + DELIVERY_FEE;
 
       if (method === 'ONLINE') {
@@ -1357,7 +1525,7 @@
       container.innerHTML = html;
     }
 
-    // ---------------- NAVIGATION & CAPACITOR BACK ----------------
+    // ---------------- NAVIGATION & HARDWARE BACK BUTTON (WITH GESTURE FIX) ----------------
     function pushNavState(stateName) { history.pushState({ screen: stateName }, ''); }
     pushNavState('root_home');
     window.addEventListener('popstate', () => handleStepByStepBack());
@@ -1368,28 +1536,52 @@
       });
     }
 
+    // 🌟 MOBILE HARDWARE BACK BUTTON & BACK GESTURE CONTROLLER
     function handleStepByStepBack() {
-      const openModals = ['checkoutModal', 'ratingModal', 'notifCenterDrawer', 'customerForgotModal', 'custEmailSentSuccessModal', 'exitAppModal'];
+      // 1. Agar koi modal khula hai toh pehle modal close karein
+      const openModals = ['restInfoModal', 'checkoutModal', 'ratingModal', 'notifCenterDrawer', 'customerForgotModal', 'custEmailSentSuccessModal', 'exitAppModal'];
       for (let mId of openModals) {
         const m = document.getElementById(mId);
         if (m && !m.classList.contains('hidden')) { m.classList.add('hidden'); return; }
       }
+
+      // 2. 🌟 SEARCH OVERLAY BACK FIX: Agar search active hai toh clear karke seedhe Home par aayein
+      const searchSection = document.getElementById('searchResultsSection');
+      if (searchSection && !searchSection.classList.contains('hidden')) {
+        clearSearchFilter();
+        return;
+      }
+
+      // 3. 🌟 99 STORE DEDICATED TAB FIX: Agar 99 store khula hai toh use close karke Home par aayein
+      const ninetyNineTab = document.getElementById('tab-ninety-nine');
+      if (ninetyNineTab && !ninetyNineTab.classList.contains('hidden')) {
+        closeNinetyNineStore();
+        return;
+      }
+
+      // 4. Agar Restaurant Menu open hai toh Home par jayein
       const menuView = document.getElementById('tab-menu');
       if (menuView && !menuView.classList.contains('hidden')) {
         closeRestaurantMenu();
         if (navHistoryStack[navHistoryStack.length - 1] === 'menu') navHistoryStack.pop();
         return;
       }
+
+      // 5. Agar Profile Edit card open hai
       const editProfileCard = document.getElementById('custProfileEditCard');
       if (editProfileCard && !editProfileCard.classList.contains('hidden')) {
         toggleCustomerProfileEdit(false);
         return;
       }
+
+      // 6. Agar bottom tabs (Orders, Helpdesk, Profile) par hai toh Home par aayein
       if (navHistoryStack.length > 1) {
         navHistoryStack.pop();
         switchAppTab(navHistoryStack[navHistoryStack.length - 1], true);
         return;
       }
+
+      // 7. Agar seedhe Root Home par hain tabhi exit confirmation maangein
       openExitAppModal();
     }
 
@@ -1584,6 +1776,7 @@
         db.ref('orders').off();
         db.ref('admin/notifications').off();
         db.ref('settings/support').off();
+        db.ref('settings/payment').off();
         db.ref('supportTickets').off();
       }
     }
@@ -1653,7 +1846,8 @@
         btn.disabled = false;
       }
     }
-// =========================================================
+
+    // =========================================================
     // ---------------- REALTIME LISTENERS ----------------
     // =========================================================
     function initAppListeners() {
@@ -1663,10 +1857,17 @@
         renderModernHomeSections();
       });
 
+      // Root menus listener (Eliminates memory leak)
       db.ref('menus').on('value', snap => {
         cachedMenus = snap.val() || {};
         renderModernHomeSections();
         if (activeRestaurantId) renderFoodWorldMenuItems(activeRestaurantId);
+        
+        // Agar 99 Store khula hai toh real-time refresh karein
+        const ninetyNineTab = document.getElementById('tab-ninety-nine');
+        if (ninetyNineTab && !ninetyNineTab.classList.contains('hidden')) {
+          renderNinetyNineGrid();
+        }
       });
 
       db.ref('deliveryPartners').on('value', snap => {
@@ -1674,8 +1875,15 @@
         renderOrdersList();
       });
 
-      // REAL-TIME ORDERS LISTENER (WITH STATUS ALERT & CANCELLATION NOTIFIER)
-      db.ref('orders').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').limitToLast(20).on('value', snap => {
+      // Super Admin Online Payment Gateway Live Sync
+      db.ref('settings/payment').on('value', snap => {
+        const data = snap.val();
+        const isEnabled = data ? (data.onlinePaymentEnabled !== false) : true;
+        applyOnlinePaymentStatus(isEnabled);
+      });
+
+      // Orders listener with status change detector
+      db.ref('orders').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').limitToLast(25).on('value', snap => {
         const orders = snap.val() || {};
         let hasActiveOrders = false;
 
@@ -1697,7 +1905,7 @@
               sendCustomerNativeAlert("🎉 Order Confirmed!", `Order ${orderRef}: Kitchen has accepted your order.`);
               playModernNotifChime();
             } else if (currentStatus === 'PREPARING') {
-              sendCustomerNativeAlert("👨‍🍳 Cooking in Progress!", `Order ${orderRef}: Kitchen is preparing your fresh meal.`);
+              sendCustomerNativeAlert("👨‍🍳 Cooking in Progress!", `Order ${orderRef}: Kitchen is preparing your meal.`);
             } else if (currentStatus === 'READY_FOR_PICKUP') {
               sendCustomerNativeAlert("📦 Food Packed!", `Order ${orderRef}: Food is packed and awaiting rider pickup.`);
             } else if (currentStatus === 'PICKED_UP' || currentStatus === 'OUT_FOR_DELIVERY') {
@@ -1756,7 +1964,7 @@
     }
 
     // =========================================================
-    // 🔍 REAL-TIME UNIVERSAL SEARCH
+    // 🔍 SEARCH WITH MOBILE BACK-GESTURE INTEGRATION
     // =========================================================
     function handleUniversalSearch(queryText) {
       const query = (queryText || '').trim().toLowerCase();
@@ -1772,6 +1980,11 @@
         searchSection.classList.add('hidden');
         homeSections.forEach(id => document.getElementById(id)?.classList.remove('hidden'));
         return;
+      }
+
+      // 🌟 History state push taaki back gesture capture hokar home par laa sake
+      if (searchSection.classList.contains('hidden')) {
+        pushNavState('search_view');
       }
 
       searchSection.classList.remove('hidden');
@@ -1812,7 +2025,7 @@
             : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300';
 
           exactHtml += `
-            <div onclick="handleDishCardClick(event, '${item.restaurantId}', '${item.itemId}')" class="bg-slate-50 p-3 rounded-2xl border ${!item.isStoreOpen ? 'border-rose-200 opacity-80' : 'border-slate-200 hover:bg-slate-100'} flex items-center justify-between gap-3 cursor-pointer transition">
+            <div onclick="openRestaurantMenu('${item.restaurantId}', '${item.itemId}')" class="bg-slate-50 p-3 rounded-2xl border ${!item.isStoreOpen ? 'border-rose-200 opacity-80' : 'border-slate-200 hover:bg-slate-100'} flex items-center justify-between gap-3 cursor-pointer transition">
               <div class="flex-1 min-w-0 pr-2">
                 <div class="flex items-center gap-1.5 mb-0.5">
                   <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'} scale-90"></span>
@@ -1851,7 +2064,7 @@
               ? sim.imageUrl.trim() 
               : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200';
             similarHtml += `
-              <div onclick="handleDishCardClick(event, '${sim.restaurantId}', '${sim.itemId}')" class="min-w-[120px] max-w-[125px] flex-shrink-0 space-y-1 bg-white p-2 rounded-2xl border border-slate-200 cursor-pointer active:scale-95 transition">
+              <div onclick="openRestaurantMenu('${sim.restaurantId}', '${sim.itemId}')" class="min-w-[120px] max-w-[125px] flex-shrink-0 space-y-1 bg-white p-2 rounded-2xl border border-slate-200 cursor-pointer active:scale-95 transition">
                 <div class="relative w-full h-20 rounded-xl overflow-hidden">
                   <img src="${photo}" class="w-full h-full object-cover">
                   <button type="button" onclick="event.stopPropagation(); addToCart('${sim.restaurantId}', '${sim.itemId}')" class="absolute bottom-1 right-1 w-6 h-6 bg-white text-emerald-600 font-black text-xs rounded-lg shadow-sm flex items-center justify-center">
@@ -1892,6 +2105,7 @@
       lastSearchQuery = "";
       handleUniversalSearch('');
       renderRestaurantsList();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function quickFilterDishes(categoryWord) {
@@ -1903,7 +2117,7 @@
     }
 
     // =========================================================
-    // 🌟 MODERN HOME SECTIONS (TAP ON DISH TO ADD)
+    // 🌟 HOME SECTIONS RENDERING
     // =========================================================
     function renderModernHomeSections() {
       const topCarousel = document.getElementById('topFeaturedDealsCarousel');
@@ -1963,7 +2177,7 @@
         topCarousel.innerHTML = carouselHtml || '<div class="p-4 text-center text-slate-400 text-xs w-full">Currently no restaurants with active menus.</div>';
       }
 
-      // 2. 99 STORE
+      // 2. 99 STORE HORIZONTAL PREVIEW
       let budgetHtml = '';
       let budgetCount = 0;
 
@@ -1984,14 +2198,14 @@
             const strikePrice = Math.round(Number(it.price) * 1.3);
 
             budgetHtml += `
-              <div onclick="handleDishCardClick(event, '${rId}', '${itemId}')" class="min-w-[135px] max-w-[140px] flex-shrink-0 space-y-1.5 flex flex-col justify-between cursor-pointer active:scale-95 transition bg-white p-2 rounded-2xl border ${!isStoreOpen ? 'border-rose-200 opacity-75' : 'border-slate-200/80 hover:border-brand-300'} shadow-xs">
+              <div onclick="openRestaurantMenu('${rId}', '${itemId}')" class="min-w-[135px] max-w-[140px] flex-shrink-0 space-y-1.5 flex flex-col justify-between cursor-pointer active:scale-95 transition bg-white p-2 rounded-2xl border ${!isStoreOpen ? 'border-rose-200 opacity-75' : 'border-slate-200/80 hover:border-brand-300'} shadow-xs">
                 <div class="relative w-full h-28 rounded-2xl overflow-hidden shadow-xs border border-slate-100 bg-white">
                   <img src="${dishPhoto}" class="w-full h-full object-cover ${!isStoreOpen ? 'grayscale' : ''}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300'">
                   <button type="button" onclick="event.stopPropagation(); addToCart('${rId}', '${itemId}')" class="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-xl bg-white text-emerald-600 font-black text-base flex items-center justify-center shadow-md active:scale-90 transition border border-emerald-200">
                     +
                   </button>
                   ${!isStoreOpen ? `
-                    <div class="absolute inset-0 bg-slate-950/40 backdrop-blur-2xs flex items-center justify-center">
+                    <div class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center">
                       <span class="text-[9px] font-black text-white bg-rose-600 px-2 py-0.5 rounded-full">CLOSED</span>
                     </div>
                   ` : ''}
@@ -2022,9 +2236,7 @@
     }
 
     function filterByMaxPrice(maxPrice) {
-      const budgetSection = document.getElementById('budgetDealsContainer');
-      if (budgetSection) budgetSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      showModernFloatingToast("99 Store", `All meals under ₹${maxPrice} listed. Tap any dish to Add.`, "fa-solid fa-tag");
+      openNinetyNineStore();
     }
 
     function toggleHomeFilter(type) {
@@ -2037,12 +2249,127 @@
       } else {
         pillOffer.className = "py-2 rounded-xl bg-white text-slate-900 shadow-sm transition active:scale-95";
         pillCity.className = "py-2 rounded-xl text-slate-500 hover:text-slate-800 transition active:scale-95";
-        filterByMaxPrice(99);
+        openNinetyNineStore();
       }
     }
 
     // =========================================================
-    // 🏬 RESTAURANT LISTING (WITH 🔴 CLOSED BADGE)
+    // 🌟 DEDICATED 99 STORE FULL GRID TAB & LOWEST-TO-99 SORTING
+    // =========================================================
+    function openNinetyNineStore() {
+      pushNavState('ninety_nine_tab');
+      
+      document.getElementById('tab-home').classList.add('hidden');
+      document.getElementById('tab-menu').classList.add('hidden');
+      document.getElementById('tab-ninety-nine').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      renderNinetyNineGrid();
+    }
+
+    function closeNinetyNineStore() {
+      document.getElementById('tab-ninety-nine').classList.add('hidden');
+      document.getElementById('tab-home').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderNinetyNineGrid() {
+      const container = document.getElementById('ninetyNineGridContainer');
+      const countBadge = document.getElementById('ninetyNineCountBadge');
+      
+      const allBudgetDishes = [];
+
+      Object.keys(cachedMenus).forEach(rId => {
+        const rInfo = cachedRestaurants[rId];
+        if (!rInfo || (rInfo.approved !== true && rInfo.approved !== 'true')) return;
+
+        const isStoreOpen = (rInfo.isOpen !== false);
+        const menu = cachedMenus[rId] || {};
+
+        Object.keys(menu).forEach(itemId => {
+          const it = menu[itemId];
+          if (it && it.available !== false && it.available !== 'false' && Number(it.price) <= 99) {
+            allBudgetDishes.push({
+              ...it,
+              itemId: itemId,
+              restaurantId: rId,
+              restaurantName: rInfo.name || 'Kitchen Partner',
+              isStoreOpen: isStoreOpen,
+              numericPrice: Number(it.price) || 0
+            });
+          }
+        });
+      });
+
+      // 🌟 LOWEST PRICE SE ₹99 TAK ASCENDING SORT KAREIN
+      allBudgetDishes.sort((a, b) => a.numericPrice - b.numericPrice);
+
+      if (countBadge) {
+        countBadge.innerText = `${allBudgetDishes.length} Dishes`;
+      }
+
+      if (allBudgetDishes.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full p-8 text-center text-slate-400 text-xs bg-white rounded-3xl border border-slate-200">
+            <i class="fa-solid fa-tag text-2xl text-slate-300 mb-2"></i>
+            <p>Filhal koi dish ₹99 ke under available nahi hai.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      allBudgetDishes.forEach(item => {
+        const isNonVeg = (item.foodType === 'NONVEG');
+        const dishPhoto = (item.imageUrl && item.imageUrl.trim().length > 10) 
+          ? item.imageUrl.trim() 
+          : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300';
+        const strikePrice = Math.round(item.numericPrice * 1.3);
+
+        html += `
+          <div onclick="openRestaurantMenu('${item.restaurantId}', '${item.itemId}')" class="bg-white p-2.5 rounded-3xl border ${!item.isStoreOpen ? 'border-rose-200 opacity-75' : 'border-slate-200/80 hover:border-brand-400'} shadow-xs cursor-pointer active:scale-95 transition flex flex-col justify-between space-y-2">
+            <div class="relative w-full h-32 rounded-2xl overflow-hidden shadow-xs border border-slate-100 bg-slate-100">
+              <img src="${dishPhoto}" class="w-full h-full object-cover ${!item.isStoreOpen ? 'grayscale' : ''}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300'">
+              
+              <!-- + ADD Button directly adds to cart -->
+              <button type="button" onclick="event.stopPropagation(); addToCart('${item.restaurantId}', '${item.itemId}')" ${!item.isStoreOpen ? 'disabled' : ''} class="absolute bottom-1.5 right-1.5 px-3 py-1 bg-white text-emerald-600 font-black text-xs rounded-xl shadow-md border border-emerald-300 active:scale-90 transition flex items-center gap-1 ${!item.isStoreOpen ? 'opacity-50 cursor-not-allowed' : ''}">
+                <span>ADD</span>
+                <span class="text-sm leading-none">+</span>
+              </button>
+
+              ${!item.isStoreOpen ? `
+                <div class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center">
+                  <span class="text-[9px] font-black text-white bg-rose-600 px-2 py-0.5 rounded-full">CLOSED</span>
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="space-y-1">
+              <div class="flex items-center gap-1">
+                <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'} scale-90"></span>
+                <h5 class="font-extrabold text-xs text-slate-900 truncate flex-1">${escapeHtml(item.name)}</h5>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <span class="text-[10px] text-slate-400 line-through">₹${strikePrice}</span>
+                <span class="px-1.5 py-0.2 rounded bg-amber-300 text-slate-950 font-black text-xs">₹${item.price}</span>
+              </div>
+
+              <!-- Restaurant Indicator -->
+              <div class="pt-1 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
+                <span class="truncate font-bold text-brand-600 mr-1"><i class="fa-solid fa-store text-[9px] mr-0.5"></i> ${escapeHtml(item.restaurantName)}</span>
+                <span class="text-[9px] text-slate-400 flex-shrink-0">View &rarr;</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // =========================================================
+    // 🏬 ALL APPROVED RESTAURANTS LISTING
     // =========================================================
     function renderRestaurantsList(filter = '') {
       const container = document.getElementById('restaurantsListContainer');
@@ -2132,27 +2459,54 @@
         heroAvatar.classList.add('hidden');
       }
 
+      // 🌟 Real Dynamic Rating Calculation from actual reviews
+      let calculatedRating = "4.5";
+      let reviewCount = "Verified";
+      if (r.reviews && typeof r.reviews === 'object') {
+        const revKeys = Object.keys(r.reviews);
+        if (revKeys.length > 0) {
+          let totalStars = 0;
+          revKeys.forEach(k => totalStars += (Number(r.reviews[k].stars) || 5));
+          calculatedRating = (totalStars / revKeys.length).toFixed(1);
+          reviewCount = `${revKeys.length}+ ratings`;
+        }
+      }
+      document.getElementById('heroRestRating').innerText = `${calculatedRating} ★`;
+      document.getElementById('heroRestReviewsCount').innerText = reviewCount;
+
+      // 🌟 Real FSSAI Bottom Footer Display (No dummy numbers)
+      const fssaiVal = (r.fssaiNumber || '').trim();
+      const fssaiLicEl = document.getElementById('fssaiLicNumber');
+      if (fssaiLicEl) {
+        if (fssaiVal) {
+          fssaiLicEl.innerText = fssaiVal;
+          fssaiLicEl.className = "font-mono font-black text-emerald-700 tracking-wider";
+        } else {
+          fssaiLicEl.innerText = "Not Provided (Optional)";
+          fssaiLicEl.className = "font-mono font-semibold text-slate-400 italic";
+        }
+      }
+
+      document.getElementById('fssaiOutletName').innerText = r.name || 'Restaurant Outlet';
+      document.getElementById('fssaiOutletAddress').innerText = r.address || 'Registered FoodWorld Outlet';
+
       currentVegFilter = 'ALL';
       updateFilterButtonsUI();
 
       document.getElementById('tab-home').classList.add('hidden');
+      document.getElementById('tab-ninety-nine').classList.add('hidden');
       document.getElementById('tab-menu').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      const menuContainer = document.getElementById('menuItemsContainer');
-      menuContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-8">Loading fresh dishes...</p>';
+      // Clean cached render (No memory leak)
+      renderFoodWorldMenuItems(restId);
 
-      db.ref(`menus/${restId}`).on('value', snap => {
-        cachedMenus[restId] = snap.val() || {};
-        renderFoodWorldMenuItems(restId);
-        
-        if (highlightItemId) {
-          setTimeout(() => {
-            const el = document.getElementById(`dishCard_${highlightItemId}`);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }, 300);
-        }
-      });
+      if (highlightItemId) {
+        setTimeout(() => {
+          const el = document.getElementById(`dishCard_${highlightItemId}`);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+      }
     }
 
     function closeRestaurantMenu() {
@@ -2182,12 +2536,51 @@
     function filterMenuDishes() { renderFoodWorldMenuItems(activeRestaurantId); }
 
     // =========================================================
-    // 🥢 TAP ANYWHERE ON DISH CARD TO ADD TO CART
+    // ℹ️ SWIGGY/ZOMATO STYLE OUTLET INFO MODAL HANDLERS
+    // =========================================================
+    function openRestaurantInfoModal() {
+      const r = cachedRestaurants[activeRestaurantId] || {};
+
+      document.getElementById('modalInfoRestName').innerText = r.name || 'Restaurant';
+      document.getElementById('modalInfoCuisine').innerText = r.cuisine || 'Multi-Cuisine';
+      document.getElementById('modalInfoAddress').innerText = r.address || 'Address not provided';
+      document.getElementById('modalInfoHours').innerText = r.hours || 'Open Today';
+      document.getElementById('modalInfoPhone').innerText = r.phone ? r.phone : 'Not Available';
+
+      // 🌟 Real FSSAI details display
+      const fssaiVal = (r.fssaiNumber || '').trim();
+      const fssaiTextEl = document.getElementById('modalInfoFssai');
+      if (fssaiTextEl) {
+        if (fssaiVal) {
+          fssaiTextEl.innerHTML = `<span class="font-mono font-black text-sm text-slate-900 tracking-wider">Lic. No. ${escapeHtml(fssaiVal)}</span>`;
+        } else {
+          fssaiTextEl.innerHTML = `<span class="font-mono text-xs text-slate-400 italic">License Not Provided by Merchant</span>`;
+        }
+      }
+
+      // Google Maps Pin link if GPS coordinates exist
+      const mapBox = document.getElementById('modalInfoMapBox');
+      const mapLink = document.getElementById('modalInfoMapLink');
+      if (r.restaurantLat && r.restaurantLng) {
+        mapLink.href = `https://www.google.com/maps?q=${r.restaurantLat},${r.restaurantLng}`;
+        mapBox.classList.remove('hidden');
+      } else {
+        mapBox.classList.add('hidden');
+      }
+
+      document.getElementById('restInfoModal').classList.remove('hidden');
+    }
+
+    function closeRestaurantInfoModal() {
+      document.getElementById('restInfoModal').classList.add('hidden');
+    }
+// =========================================================
+    // 🥢 DISH CLICK & RENDER CONTROLLER
     // =========================================================
     function handleDishCardClick(event, restId, itemId) {
       const rest = cachedRestaurants[restId];
       if (rest && rest.isOpen === false) {
-        alert("⚠️ This restaurant is currently closed (Inactive)! Please place your order when it reopens.");
+        alert("⚠️ Yeh restaurant abhi band hai (Closed)! Kripya open hone par order karein.");
         return;
       }
 
@@ -2275,14 +2668,17 @@
       menuContainer.innerHTML = html || '<div class="p-8 text-center text-slate-400 text-xs">No matching dishes in menu.</div>';
     }
 
-    // ---------------- CART ENGINE ----------------
+    // =========================================================
+    // 🛒 SINGLE-RESTAURANT CLASSIC CART ENGINE
+    // =========================================================
     function addToCart(restId, itemId) {
       const rest = cachedRestaurants[restId];
       if (rest && rest.isOpen === false) {
-        alert("⚠️ This restaurant is currently closed (Inactive)! Please place your order when it reopens.");
+        alert("⚠️ Yeh restaurant abhi band hai (Closed)! Kripya open hone par order karein.");
         return;
       }
 
+      // 🌟 Single-Restaurant Cart Guard: Prompt if adding from another restaurant
       const currentCartKeys = Object.keys(cart);
       if (currentCartKeys.length > 0) {
         if (cart[currentCartKeys[0]].restaurantId !== restId) {
@@ -2294,7 +2690,18 @@
       const item = cachedMenus[restId]?.[itemId];
       if (!item) return;
 
-      cart[itemId] = { itemId, restaurantId: restId, name: item.name, price: Number(item.price) || 0, qty: 1 };
+      if (cart[itemId]) {
+        cart[itemId].qty += 1;
+      } else {
+        cart[itemId] = { 
+          itemId, 
+          restaurantId: restId, 
+          name: item.name, 
+          price: Number(item.price) || 0, 
+          qty: 1 
+        };
+      }
+
       if (activeRestaurantId === restId) renderFoodWorldMenuItems(restId);
       updateCartFloatingBar();
       showModernFloatingToast("Item Added", `${item.name} added to your cart!`, "fa-solid fa-basket-shopping");
@@ -2329,7 +2736,7 @@
     }
 
     // =========================================================
-    // 🛒 CHECKOUT MODAL
+    // 🛍️ CHECKOUT MODAL (FLAT ₹30 DELIVERY FEE)
     // =========================================================
     function openCheckoutModal() {
       const keys = Object.keys(cart);
@@ -2358,7 +2765,6 @@
       }
 
       selectCheckoutAddressType('DEFAULT');
-
       renderCheckoutCartItems();
       selectPaymentMethod(currentPaymentMethod || 'ONLINE');
       document.getElementById('checkoutModal').classList.remove('hidden');
@@ -2395,6 +2801,7 @@
 
       listContainer.innerHTML = html;
       document.getElementById('checkoutSubtotal').innerText = `₹${subtotal}`;
+      document.getElementById('checkoutDeliveryFee').innerText = `₹${DELIVERY_FEE}`;
       document.getElementById('checkoutGrandTotal').innerText = `₹${subtotal + DELIVERY_FEE}`;
       document.getElementById('upiAmountTag').innerText = `₹${subtotal + DELIVERY_FEE}`;
     }
@@ -2424,7 +2831,7 @@
     function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
 
     // =========================================================
-    // 🛡️ PLACE ORDER WITH FLEXIBLE DELIVERY ADDRESS
+    // 🛡️ PLACE ORDER (SINGLE ORDER & 1 OTP CODE)
     // =========================================================
     async function placeCustomerOrder() {
       let finalDeliveryAddress = currentCustomer?.address || '';
@@ -2452,6 +2859,13 @@
         alert("Please update your phone number in your profile first.");
         closeCheckoutModal();
         switchAppTab('profile');
+        return;
+      }
+
+      // 🌟 Security Guard: Super Admin Online Gateway Switch Check
+      if (currentPaymentMethod === 'ONLINE' && !isOnlinePaymentEnabled) {
+        alert("⚠️ Online Payment abhi temporary roop se band hai. Kripya Cash on Delivery (COD) chunein.");
+        selectPaymentMethod('COD');
         return;
       }
 
@@ -2489,8 +2903,9 @@
         });
       }
 
+      // 🌟 Standard Flat ₹30 Delivery Fee
       const grandTotal = calculatedItemsTotal + DELIVERY_FEE;
-      const uniqueOtp = generateDeliveryOtp();
+      const uniqueOtp = generateDeliveryOtp(); // 1 Single OTP Code
       const newOrderKey = db.ref('orders').push().key;
 
       // 1. CASH ON DELIVERY (COD)
@@ -2537,7 +2952,7 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId: newOrderKey, restaurantId: restId, totalAmount: grandTotal })
-          }).catch(e => console.log("Push note:", e));
+          }).catch(() => {});
 
           cart = {};
           updateCartFloatingBar();
@@ -2644,7 +3059,7 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ orderId: newOrderKey, restaurantId: restId, totalAmount: grandTotal })
-              }).catch(e => console.log("Push note:", e));
+              }).catch(() => {});
 
               cart = {};
               updateCartFloatingBar();
@@ -2683,6 +3098,7 @@
       }
     }
 
+    // ---------------- ORDER CANCELLATION ----------------
     async function cancelOrderByCustomer(orderId) {
       if (!confirm(`Are you sure you want to cancel order #${orderId.slice(-6)}?`)) return;
 
@@ -2732,7 +3148,9 @@
       }
     }
 
-    // ---------------- LIVE ORDERS LIST ----------------
+    // =========================================================
+    // 🛵 LIVE ORDERS TRACKING LIST
+    // =========================================================
     function renderOrdersList() {
       const activeContainer = document.getElementById('activeOrdersList');
       const pastContainer = document.getElementById('pastOrdersList');
@@ -2770,7 +3188,7 @@
             </div>
             
             <p class="text-[10px] text-slate-500 text-center font-bold">
-              <i class="fa-solid fa-circle-info text-brand-500 mr-1"></i> Share this 4-digit code with the delivery partner only after receiving your food.
+              <i class="fa-solid fa-circle-info text-brand-500 mr-1"></i> Share this 4-digit code with the delivery partner only after receiving food from ${escapeHtml(restName)}.
             </p>
           </div>
         `;
@@ -2796,10 +3214,10 @@
                 <a href="tel:${escapeHtml(d.phone || '')}" class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs"><i class="fa-solid fa-phone"></i></a>
               </div>
               
-              ${liveGpsLink ? `
-                <a href="${escapeHtml(liveGpsLink)}" target="_blank" class="w-full min-h-[38px] py-2 px-3 bg-blue-600 active:scale-95 text-white text-[11px] font-extrabold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition">
+              ${(liveGpsLink && /^https?:\/\//i.test(liveGpsLink.trim())) ? `
+                <a href="${escapeHtml(liveGpsLink.trim())}" target="_blank" class="w-full min-h-[38px] py-2 px-3 bg-blue-600 active:scale-95 text-white text-[11px] font-extrabold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition">
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 
-                  <span>Track Rider Live (Live GPS Stream)</span>
+                  <span>Track Rider Live (GPS Map)</span>
                 </a>
               ` : `
                 <div class="text-[10px] text-slate-400 bg-white p-2 rounded-xl border border-slate-100 text-center">Rider assigned! Live GPS coordinates acquiring...</div>
@@ -2889,7 +3307,6 @@
                   <i class="fa-solid fa-rotate-right text-[10px]"></i> Reorder
                 </button>
                 ${o.status === 'DELIVERED' ? `
-                  <!-- 🌟 CRASH FIXED: Single-quote safely escaped for names like McDonald's -->
                   <button onclick="openRatingModal('${orderId}', '${o.restaurantId}', '${escapeJsString(restName)}')" class="flex-1 min-h-[38px] py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl text-xs font-bold active:scale-95 transition">
                     <i class="fa-solid fa-star text-[10px]"></i> Rate Food
                   </button>
@@ -3048,6 +3465,9 @@
     function switchAppTab(tabId, isBackAction = false) {
       if (currentAppTab === tabId && !isBackAction) return;
       document.getElementById('tab-menu').classList.add('hidden');
+      
+      const ninetyNineTab = document.getElementById('tab-ninety-nine');
+      if (ninetyNineTab) ninetyNineTab.classList.add('hidden');
 
       if (!isBackAction) {
         navHistoryStack.push(tabId);
@@ -3074,7 +3494,7 @@
 
   <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
   <script>
-    const CURRENT_APP_VERSION = "1.0.7";
+    const CURRENT_APP_VERSION = "1.0.8";
 
     async function checkForAppUpdate() {
       try {

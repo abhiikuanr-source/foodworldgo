@@ -91,7 +91,7 @@
   </div>
 
   <!-- ================= 1. FORGOT PASSWORD MODAL ================= -->
-  <div id="forgotPasswordModal" class="hidden fixed inset-0 z-[98] bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="forgotPasswordModal" class="hidden fixed inset-0 z-[98] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2.5">
@@ -142,7 +142,7 @@
   </div>
 
   <!-- ================= 3. EXIT CONFIRMATION MODAL ================= -->
-  <div id="exitAppModal" class="hidden fixed inset-0 z-[99] bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="exitAppModal" class="hidden fixed inset-0 z-[99] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl space-y-4 text-center">
       <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl mx-auto shadow-inner"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
       <div>
@@ -157,7 +157,7 @@
   </div>
 
   <!-- ================= 4. REASSIGN RIDER MODAL ================= -->
-  <div id="reassignModal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+  <div id="reassignModal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-3xl p-5 max-w-sm w-full shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <h3 class="font-black text-slate-900 text-sm">Assign / Override Delivery Partner</h3>
@@ -178,7 +178,7 @@
   </div>
 
   <!-- ================= 4.5 ORDER DETAIL INSPECTION MODAL (WITH FORCE CANCEL BUTTON) ================= -->
-  <div id="orderDetailModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="orderDetailModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
       <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
         <div class="flex items-center gap-2.5">
@@ -257,7 +257,7 @@
   <!-- ================= DASHBOARD VIEW ================= -->
   <div id="dashboardView" class="hidden min-h-screen flex flex-col md:flex-row">
     
-    <div id="sidebarBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 hidden md:hidden transition-opacity"></div>
+    <div id="sidebarBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
 
     <!-- Sidebar Navigation -->
     <aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 max-w-[85vw] bg-slate-950 text-slate-300 flex-shrink-0 flex flex-col justify-between border-r border-slate-900 z-50 transform -translate-x-full md:translate-x-0 md:sticky md:h-screen transition-transform duration-300 ease-in-out shadow-2xl">
@@ -624,6 +624,33 @@
 
         <!-- 8. RAZORPAY, COD & SALES PULSE TAB -->
         <section id="section-reports" class="hidden space-y-4">
+          
+          <!-- ================= ⚡ ONLINE PAYMENT GATEWAY MASTER SWITCH ================= -->
+          <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div id="adminGatewayIconBox" class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center text-xl flex-shrink-0 shadow-inner">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-black text-slate-900 text-sm sm:text-base">Customer Online Payment (Razorpay/UPI)</h3>
+                  <span id="adminGatewayStatusBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                    🟢 Active
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5" id="adminGatewayDesc">
+                  Customers can pay via Google Pay, PhonePe, Paytm, Cards or Netbanking.
+                </p>
+              </div>
+            </div>
+
+            <!-- 1-TAP ACTIVE / DEACTIVATE TOGGLE BUTTON -->
+            <button type="button" id="btnTogglePaymentGateway" onclick="toggleOnlinePaymentGateway()" class="w-full sm:w-auto min-h-[44px] px-5 py-2.5 bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-black rounded-2xl text-xs shadow-md transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-power-off"></i>
+              <span id="btnTogglePaymentText">Deactivate Online Payment</span>
+            </button>
+          </div>
+
           <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
             <div class="p-4 rounded-3xl bg-emerald-50 border border-emerald-100">
               <p class="text-[10px] text-emerald-800 font-black uppercase">Delivered Sales</p>
@@ -752,7 +779,8 @@
       <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Later</button>
     </div>
   </div>
-<!-- ================= JAVASCRIPT LOGIC (PART 2A) ================= -->
+
+  <!-- ================= JAVASCRIPT LOGIC (SETUP & CORE UTILITIES) ================= -->
   <script>
     // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
@@ -784,6 +812,7 @@
     let audioCtx = null;
     let wakeLockSentinel = null;
     let knownOrderIds = new Set();
+    let isOnlinePaymentActive = true;
     const ADMIN_EMAILS = ["abhiikuanr@gmail.com", "superadmin@foodworld.com"];
 
     // ---------------- HELPER: SAFE ESCAPING ----------------
@@ -806,9 +835,7 @@
       return '';
     }
 
-    // =========================================================
-    // 👁️ SHOW / HIDE PASSWORD TOGGLE FUNCTION
-    // =========================================================
+    // ---------------- 👁️ SHOW / HIDE PASSWORD TOGGLE ----------------
     function togglePasswordVisibility(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
@@ -826,9 +853,7 @@
       }
     }
 
-    // =========================================================
-    // 🚨 ADMIN FOREGROUND SERVICE & SCREEN-LOCK WAKE
-    // =========================================================
+    // ---------------- 🚨 ADMIN FOREGROUND SERVICE & WAKELOCK ----------------
     async function startAdminForegroundRadar() {
       try {
         if ('wakeLock' in navigator) {
@@ -865,9 +890,7 @@
       }
     }
 
-    // =========================================================
-    // 🔔 NATIVE NOTIFICATION CHANNEL (ANDROID 13+ FIX)
-    // =========================================================
+    // ---------------- 🔔 NATIVE NOTIFICATION CHANNEL ----------------
     async function initAdminNotificationChannel() {
       if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
         try {
@@ -911,9 +934,7 @@
       }
     }
 
-    // =========================================================
-    // 🔄 PULL TO REFRESH ENGINE FOR ADMIN PANEL
-    // =========================================================
+    // ---------------- 🔄 PULL TO REFRESH ENGINE ----------------
     let touchStartY = 0;
     let touchStartX = 0;
     let isPulling = false;
@@ -1094,8 +1115,7 @@
         placeholder.classList.remove('hidden');
       }
     }
-
-    // ---------------- FORGOT PASSWORD ----------------
+// ---------------- FORGOT PASSWORD ----------------
     function openForgotPasswordModal() {
       const loginEmail = document.getElementById('loginEmail').value.trim();
       if (loginEmail) document.getElementById('resetEmailInput').value = loginEmail;
@@ -1275,6 +1295,7 @@
       db.ref('orders').off();
       db.ref('admin/notifications').off();
       db.ref('settings/support').off();
+      db.ref('settings/payment').off();
       db.ref('supportTickets').off();
       if (auth.currentUser) db.ref(`admins/${auth.currentUser.uid}`).off();
     }
@@ -1334,6 +1355,9 @@
         document.getElementById('suppHours').value = conf.hours || '24/7 Live Support';
         document.getElementById('suppDescription').value = conf.description || 'Have an issue with your food or delivery? FoodWorld Helpdesk is here for you 24/7.';
       });
+
+      // 🌟 Listen to Online Payment Gateway Status
+      listenPaymentGatewayStatus();
 
       db.ref('supportTickets').limitToLast(30).on('value', snap => {
         cachedTickets = snap.val() || {};
@@ -1405,6 +1429,100 @@
     }
 
     // =========================================================
+    // ⚡ ONLINE PAYMENT GATEWAY MASTER CONTROLLER (RAZORPAY)
+    // =========================================================
+    function listenPaymentGatewayStatus() {
+      db.ref('settings/payment').on('value', snap => {
+        const data = snap.val();
+        isOnlinePaymentActive = data ? (data.onlinePaymentEnabled !== false) : true;
+        updateAdminPaymentToggleUI(isOnlinePaymentActive);
+      });
+    }
+
+    function updateAdminPaymentToggleUI(isActive) {
+      const iconBox = document.getElementById('adminGatewayIconBox');
+      const badge = document.getElementById('adminGatewayStatusBadge');
+      const desc = document.getElementById('adminGatewayDesc');
+      const btn = document.getElementById('btnTogglePaymentGateway');
+      const btnText = document.getElementById('btnTogglePaymentText');
+
+      if (isActive) {
+        if (iconBox) iconBox.className = "w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center text-xl flex-shrink-0 shadow-inner";
+        if (badge) {
+          badge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800";
+          badge.innerText = "🟢 Active (Online Enabled)";
+        }
+        if (desc) desc.innerText = "Customers are allowed to pay via Online Razorpay/UPI & COD.";
+        if (btn) {
+          btn.className = "w-full sm:w-auto min-h-[44px] px-5 py-2.5 bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-black rounded-2xl text-xs shadow-md transition flex items-center justify-center gap-2";
+        }
+        if (btnText) btnText.innerText = "Deactivate Online Payment";
+      } else {
+        if (iconBox) iconBox.className = "w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center text-xl flex-shrink-0 shadow-inner";
+        if (badge) {
+          badge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-800";
+          badge.innerText = "🔴 Deactivated (Only COD)";
+        }
+        if (desc) desc.innerText = "Online payment option is hidden on Customer app. Only COD is available.";
+        if (btn) {
+          btn.className = "w-full sm:w-auto min-h-[44px] px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black rounded-2xl text-xs shadow-md transition flex items-center justify-center gap-2";
+        }
+        if (btnText) btnText.innerText = "Activate Online Payment";
+      }
+    }
+
+    async function toggleOnlinePaymentGateway() {
+      const newStatus = !isOnlinePaymentActive;
+      const btn = document.getElementById('btnTogglePaymentGateway');
+      if (btn) btn.disabled = true;
+
+      try {
+        await db.ref('settings/payment').update({
+          onlinePaymentEnabled: newStatus,
+          updatedAt: Date.now()
+        });
+
+        showModernFloatingToast(
+          "Payment Gateway Updated",
+          newStatus 
+            ? "Online Payment activated! Customers can now pay online." 
+            : "Online Payment deactivated! Customers can only order via COD.",
+          newStatus ? "fa-solid fa-check" : "fa-solid fa-ban",
+          !newStatus
+        );
+      } catch (err) {
+        alert("Error updating payment status: " + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    // =========================================================
+    // 🏪 ADMIN OVERRIDE: KITCHEN STORE ACTIVE / INACTIVE TOGGLE
+    // =========================================================
+    async function setRestaurantStoreStatus(uid, shouldOpen) {
+      const rName = cachedRestaurants[uid]?.name || 'Kitchen';
+      try {
+        await db.ref(`restaurants/${uid}`).update({
+          isOpen: shouldOpen,
+          statusUpdatedAt: Date.now(),
+          statusUpdatedBy: 'SUPER_ADMIN'
+        });
+
+        showModernFloatingToast(
+          "Kitchen Status Changed",
+          shouldOpen 
+            ? `"${rName}" ko ACTIVE (Open) mark kar diya gaya hai.` 
+            : `"${rName}" ko INACTIVE (Closed) mark kar diya gaya hai.`,
+          shouldOpen ? "fa-solid fa-store" : "fa-solid fa-store-slash",
+          !shouldOpen
+        );
+      } catch (err) {
+        alert("Store status update karne me error: " + err.message);
+      }
+    }
+
+    // =========================================================
     // 🛑 UNIVERSAL FORCE-CANCEL ORDER (ADMIN ROOT OVERRIDE)
     // =========================================================
     async function forceCancelOrderByAdmin(orderId) {
@@ -1433,7 +1551,6 @@
       const finalReason = customReason.trim() || "Cancelled by Super Admin (Technical Issue / Accidental Order)";
 
       try {
-        // 1. Update order status in Firebase
         await db.ref(`orders/${orderId}`).update({
           status: 'CANCELLED',
           cancelledBy: 'SUPER_ADMIN',
@@ -1441,10 +1558,8 @@
           updatedAt: Date.now()
         });
 
-        // 2. Remove from unassigned queue if rider was not assigned
         await db.ref(`unassignedOrders/${orderId}`).remove().catch(() => {});
 
-        // 3. Trigger automatic Razorpay refund if prepaid online
         let refundTriggered = false;
         if (o.paymentMethod === 'ONLINE' && o.razorpayPaymentId) {
           try {
@@ -1539,7 +1654,8 @@
         btn.innerHTML = 'Save Profile';
       }
     }
-// =========================================================
+
+    // =========================================================
     // 💵 SETTLE RIDER CASH (COD SETTLEMENT)
     // =========================================================
     async function settleRiderCash(uid, riderName, amount) {
@@ -1617,7 +1733,12 @@
 
       const isStoreOpen = (r.isOpen !== false);
 
+      // 🌟 Realtime Store Active/Inactive Toggle Button in Inspector Header
       document.getElementById('detailActionButtons').innerHTML = `
+        <button onclick="setRestaurantStoreStatus('${uid}', ${!isStoreOpen}); openRestaurantDetail('${uid}');" class="px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5 active:scale-95 transition border ${isStoreOpen ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'}">
+          <i class="fa-solid ${isStoreOpen ? 'fa-store-slash' : 'fa-store'}"></i>
+          <span>${isStoreOpen ? 'Set Inactive (Close)' : 'Set Active (Open)'}</span>
+        </button>
         ${r.phone ? `<a href="tel:${escapeHtml(r.phone)}" class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-xl text-xs font-black flex items-center gap-1.5 active:scale-95 transition"><i class="fa-solid fa-phone"></i> Call</a>` : ''}
         <button onclick="deleteUserPermanently('${uid}', 'restaurant', '${escapeJsString(r.name || 'Kitchen')}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black border border-rose-200 flex items-center gap-1.5 transition"><i class="fa-solid fa-trash-can"></i> Delete</button>
       `;
@@ -1652,12 +1773,28 @@
             <div class="flex items-center justify-center sm:justify-start gap-2">
               <h4 class="text-lg font-black text-slate-900">${escapeHtml(r.name || '')}</h4>
               <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${r.approved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${r.approved ? 'Approved' : 'Pending'}</span>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${isStoreOpen ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isStoreOpen ? '🟢 Active Today' : '🔴 Inactive Today'}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${isStoreOpen ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${isStoreOpen ? '🟢 Active' : '🔴 Inactive'}</span>
             </div>
             <p class="text-xs text-brand-600 font-bold">${escapeHtml(r.cuisine || 'Multi-Cuisine')} • ${escapeHtml(r.hours || 'Hours not set')}</p>
             <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> ${escapeHtml(r.address || 'Address not provided')}</p>
             <p class="text-[11px] text-slate-400 font-mono">Email: ${escapeHtml(r.email || 'N/A')} | Phone: ${escapeHtml(r.phone || 'N/A')}</p>
           </div>
+        </div>
+
+        <!-- 🌟 PROPER REAL FSSAI LICENSE INSPECTION -->
+        <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-orange-50 border border-orange-200 text-brand-600 flex items-center justify-center text-sm font-black">
+              <i class="fa-solid fa-certificate"></i>
+            </div>
+            <div>
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">FSSAI Food License</span>
+              <span class="font-mono font-black text-xs text-slate-900">${r.fssaiNumber ? escapeHtml(r.fssaiNumber) : '<span class="text-slate-400 italic">Not Provided (Optional)</span>'}</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black ${r.fssaiNumber ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-500'}">
+            ${r.fssaiNumber ? '✓ FSSAI Linked' : 'Unregistered'}
+          </span>
         </div>
 
         <div class="grid grid-cols-3 gap-3">
@@ -1874,9 +2011,8 @@
         </div>
       `;
     }
-
-    // =========================================================
-    // 🔍 ORDER DETAILS INSPECTION MODAL (WITH FORCE CANCEL BUTTON)
+// =========================================================
+    // 🔍 ORDER DETAILS INSPECTION MODAL (WITH FORCE CANCEL)
     // =========================================================
     function openOrderDetailModal(orderId) {
       const o = cachedOrders[orderId];
@@ -1994,7 +2130,6 @@
         </div>
       `;
 
-      // Set force cancel button in modal footer
       const cancelBtn = document.getElementById('odModalCancelBtn');
       if (o.status === 'CANCELLED') {
         cancelBtn.classList.add('hidden');
@@ -2289,7 +2424,7 @@
     }
 
     // =========================================================
-    // 🏬 RESTAURANTS TABLE (WITH 🟢 ACTIVE / 🔴 INACTIVE BADGE)
+    // 🏬 RESTAURANTS TABLE (WITH 🟢 / 🔴 1-TAP STATUS TOGGLE & FSSAI)
     // =========================================================
     function renderRestaurantsTable(filterText = '') {
       const container = document.getElementById('restaurantsCardList');
@@ -2340,7 +2475,14 @@
                 <div class="flex items-center gap-2.5 min-w-0">
                   ${logoHtml}
                   <div class="min-w-0">
-                    <h4 class="font-black text-xs sm:text-sm text-slate-900 truncate">${escapeHtml(name)}</h4>
+                    <div class="flex items-center gap-1.5">
+                      <h4 class="font-black text-xs sm:text-sm text-slate-900 truncate">${escapeHtml(name)}</h4>
+                      <!-- FSSAI Badge -->
+                      ${r.fssaiNumber 
+                        ? `<span class="px-1.5 py-0.2 rounded text-[8px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200">FSSAI</span>` 
+                        : `<span class="px-1.5 py-0.2 rounded text-[8px] font-bold bg-slate-100 text-slate-400">No FSSAI</span>`
+                      }
+                    </div>
                     <p class="text-[10px] text-slate-400 font-mono truncate">${escapeHtml(email)} • ${escapeHtml(r.phone || '')}</p>
                   </div>
                 </div>
@@ -2357,14 +2499,24 @@
               ${bankHtml}
             </div>
 
-            <div class="pt-2 border-t border-slate-100 flex gap-2">
-              <div class="flex-1">
+            <!-- Action Buttons: Approval + 🟢/🔴 Make Active/Inactive + Delete -->
+            <div class="pt-2.5 border-t border-slate-100 flex flex-wrap gap-1.5 items-center">
+              <div class="flex-1 min-w-[90px]">
                 ${!isApproved 
-                  ? `<button onclick="setRestaurantApproval('${uid}', true)" class="w-full min-h-[38px] py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black shadow-sm transition"><i class="fa-solid fa-check"></i> Approve</button>`
-                  : `<button onclick="setRestaurantApproval('${uid}', false)" class="w-full min-h-[38px] py-2 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 rounded-xl text-xs font-black transition border border-amber-200"><i class="fa-solid fa-ban"></i> Suspend</button>`
+                  ? `<button onclick="setRestaurantApproval('${uid}', true)" class="w-full min-h-[36px] py-1.5 px-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-[11px] font-black shadow-xs transition flex items-center justify-center gap-1"><i class="fa-solid fa-check"></i> Approve</button>`
+                  : `<button onclick="setRestaurantApproval('${uid}', false)" class="w-full min-h-[36px] py-1.5 px-2 bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 rounded-xl text-[11px] font-black transition border border-amber-200 flex items-center justify-center gap-1"><i class="fa-solid fa-user-xmark"></i> Suspend</button>`
                 }
               </div>
-              <button onclick="deleteUserPermanently('${uid}', 'restaurant', '${escapeJsString(name)}')" class="w-10 min-h-[38px] bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black transition border border-rose-200 flex items-center justify-center" title="Delete">
+
+              <!-- 🌟 1-TAP MAKE ACTIVE / INACTIVE TOGGLE BUTTON -->
+              <div class="flex-1 min-w-[100px]">
+                ${isStoreOpen
+                  ? `<button onclick="setRestaurantStoreStatus('${uid}', false)" class="w-full min-h-[36px] py-1.5 px-2 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-700 rounded-xl text-[11px] font-black transition border border-rose-200 flex items-center justify-center gap-1" title="Click to Mark Inactive (Close Kitchen)"><i class="fa-solid fa-store-slash"></i> Make Inactive</button>`
+                  : `<button onclick="setRestaurantStoreStatus('${uid}', true)" class="w-full min-h-[36px] py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-emerald-800 rounded-xl text-[11px] font-black transition border border-emerald-200 flex items-center justify-center gap-1" title="Click to Mark Active (Open Kitchen)"><i class="fa-solid fa-store"></i> Make Active</button>`
+                }
+              </div>
+
+              <button onclick="deleteUserPermanently('${uid}', 'restaurant', '${escapeJsString(name)}')" class="w-9 min-h-[36px] bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-600 rounded-xl text-xs font-black transition border border-rose-200 flex items-center justify-center" title="Delete">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -2382,6 +2534,9 @@
         .catch(err => alert("Failed to update status: " + err.message));
     }
 
+    // =========================================================
+    // 🛵 DELIVERY FLEET TABLE
+    // =========================================================
     function renderDeliveryTable(filterText = '') {
       const container = document.getElementById('deliveryCardList');
       const keys = Object.keys(cachedDelivery);
@@ -2532,6 +2687,9 @@
       }
     }
 
+    // =========================================================
+    // 👥 CUSTOMER BASE TABLE
+    // =========================================================
     function renderCustomersTable() {
       const container = document.getElementById('customersCardsList');
       const keys = Object.keys(cachedCustomers);
@@ -2574,6 +2732,9 @@
       container.innerHTML = html;
     }
 
+    // =========================================================
+    // 📢 PUSH BROADCASTS
+    // =========================================================
     async function handleSendNotification(e) {
       e.preventDefault();
       const msgInput = document.getElementById('notifMessage');
@@ -2624,6 +2785,9 @@
       }
     }
 
+    // =========================================================
+    // 📊 SALES REPORTS & COD REVENUE CALCULATOR
+    // =========================================================
     function renderTopRestaurants() {
       const container = document.getElementById('topRestaurantsMobileList');
       const stats = {};
@@ -2747,7 +2911,7 @@
 
   <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
   <script>
-    const CURRENT_APP_VERSION = "1.0.7";
+    const CURRENT_APP_VERSION = "1.0.8";
 
     async function checkForAppUpdate() {
       try {

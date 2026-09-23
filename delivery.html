@@ -61,7 +61,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
 
-  <!-- ================= 🔄 PULL TO REFRESH SPINNER INDICATOR ================= -->
+  <!-- ================= 🔄 PULL TO REFRESH SPINNER ================= -->
   <div id="pullToRefreshIndicator" class="hidden fixed top-3 left-1/2 -translate-x-1/2 z-[99] bg-white shadow-lg rounded-full p-2.5 text-brand-600 border border-slate-200 transition-transform">
     <i class="fa-solid fa-arrows-rotate fa-spin text-sm"></i>
   </div>
@@ -97,7 +97,7 @@
   </div>
 
   <!-- ================= 1. FORGOT PASSWORD MODAL ================= -->
-  <div id="riderForgotModal" class="hidden fixed inset-0 z-[98] bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="riderForgotModal" class="hidden fixed inset-0 z-[98] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2.5">
@@ -216,14 +216,14 @@
   </div>
 
   <!-- ================= 5. CANCELLED ORDER POPUP MODAL ================= -->
-  <div id="orderCancelledModal" class="hidden fixed inset-0 z-[98] bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="orderCancelledModal" class="hidden fixed inset-0 z-[98] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl space-y-3 text-center border border-rose-200">
       <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl mx-auto animate-bounce">
         <i class="fa-solid fa-ban"></i>
       </div>
       <div>
         <h3 class="font-black text-rose-600 text-base">Order Cancelled!</h3>
-        <p class="text-xs text-slate-600 mt-1" id="orderCancelledMsg">Customer or kitchen has cancelled this order.</p>
+        <p class="text-xs text-slate-600 mt-1" id="orderCancelledMsg">Customer or Admin has cancelled this order.</p>
       </div>
       <button onclick="dismissCancelledModal()" class="w-full min-h-[42px] py-2 bg-slate-900 text-white font-bold rounded-xl text-xs shadow-md active:scale-95 transition">
         Understood, Return to Duty
@@ -232,7 +232,7 @@
   </div>
 
   <!-- ================= 6. EXIT CONFIRMATION MODAL ================= -->
-  <div id="exitAppModal" class="hidden fixed inset-0 z-[99] bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="exitAppModal" class="hidden fixed inset-0 z-[99] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl space-y-4 text-center">
       <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl mx-auto">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -249,7 +249,7 @@
   </div>
 
   <!-- ================= 7. LOCATION MODAL ================= -->
-  <div id="locationModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="locationModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
         <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
@@ -284,7 +284,7 @@
     </div>
   </div>
 
-  <!-- ================= AUTH VIEW (LOGIN / REGISTER) ================= -->
+  <!-- ================= AUTH VIEW (LOGIN / REGISTER WITH EYE ICON) ================= -->
   <div id="authView" class="hidden min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-brand-900">
     <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
       
@@ -301,7 +301,7 @@
         <button type="button" onclick="toggleAuthMode('signup')" id="authTabSignup" class="min-h-[40px] rounded-lg text-slate-500 hover:text-slate-800 transition active:scale-95">Register Rider</button>
       </div>
 
-      <!-- Login Form -->
+      <!-- Login Form with Eye Icon -->
       <form id="riderLoginForm" onsubmit="handleRiderLogin(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Rider Email</label>
@@ -316,9 +316,12 @@
             <label class="block text-xs font-bold text-slate-600">Password</label>
             <button type="button" onclick="openRiderForgotModal()" class="text-xs text-brand-600 hover:text-brand-700 font-extrabold transition">Forgot?</button>
           </div>
-          <div class="relative">
-            <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
-            <input type="password" id="loginPassword" required class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="••••••••">
+          <div class="relative flex items-center">
+            <i class="fa-solid fa-lock absolute left-3.5 text-slate-400 text-xs pointer-events-none"></i>
+            <input type="password" id="loginPassword" required class="w-full pl-9 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition" placeholder="••••••••">
+            <button type="button" onclick="togglePasswordVisibility('loginPassword', 'riderLoginEyeIcon')" class="absolute right-3 p-1 text-slate-400 hover:text-slate-700 transition active:scale-90" title="Show / Hide Password">
+              <i id="riderLoginEyeIcon" class="fa-solid fa-eye text-xs"></i>
+            </button>
           </div>
         </div>
 
@@ -333,7 +336,7 @@
         </button>
       </form>
 
-      <!-- Signup Form with OPTIONAL Bank Details -->
+      <!-- Signup Form with Eye Icon + Optional Bank Details -->
       <form id="riderSignupForm" onsubmit="handleRiderSignup(event)" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
@@ -342,11 +345,11 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1">Email Address</label>
-            <input type="email" id="regEmail" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="alex@gmail.com">
+            <input type="email" id="regEmail" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="alex@gmail.com">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1">Phone Number</label>
-            <input type="tel" id="regPhone" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="+91 9876543210">
+            <input type="tel" id="regPhone" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="+91 9876543210">
           </div>
         </div>
 
@@ -390,7 +393,12 @@
 
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Create Password</label>
-          <input type="password" id="regPassword" minlength="6" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none" placeholder="Min. 6 characters">
+          <div class="relative flex items-center">
+            <input type="password" id="regPassword" minlength="6" required class="w-full px-3.5 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition" placeholder="Min. 6 characters">
+            <button type="button" onclick="togglePasswordVisibility('regPassword', 'riderRegEyeIcon')" class="absolute right-3 p-1 text-slate-400 hover:text-slate-700 transition active:scale-90" title="Show / Hide Password">
+              <i id="riderRegEyeIcon" class="fa-solid fa-eye text-xs"></i>
+            </button>
+          </div>
         </div>
 
         <div id="signupError" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium flex items-center gap-2">
@@ -409,10 +417,9 @@
   <!-- ================= DELIVERY BOY APP VIEW ================= -->
   <div id="appView" class="hidden max-w-md mx-auto bg-white min-h-screen relative shadow-2xl pb-safe flex flex-col">
 
-    <!-- ================= 🌟 ENLARGED RIDER TOPBAR ================= -->
+    <!-- ================= 🌟 ENLARGED RIDER TOPBAR (WITH LIVE RATING BADGE) ================= -->
     <header class="sticky top-0 z-30 bg-white/98 backdrop-blur-md border-b border-slate-200/90 px-4 py-3.5 flex items-center justify-between shadow-xs">
       <div class="flex items-center gap-3 overflow-hidden">
-        <!-- Enlarged Rider Avatar -->
         <div class="w-12 h-12 rounded-2xl bg-brand-500 text-white flex items-center justify-center font-black text-xl shadow-md shadow-brand-500/30 flex-shrink-0 overflow-hidden">
           <img id="topRiderAvatar" src="" class="w-full h-full object-cover hidden" alt="Rider">
           <i id="topRiderIcon" class="fa-solid fa-motorcycle"></i>
@@ -421,6 +428,12 @@
           <div class="flex items-center gap-2">
             <h2 class="text-sm sm:text-base font-black text-slate-900 truncate" id="topRiderName">Rider</h2>
             <span id="riderApprovalPill" class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-800">Pending</span>
+            
+            <!-- 🌟 LIVE STAR RATING BADGE IN HEADER -->
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-900 border border-amber-200 flex items-center gap-1 shadow-2xs">
+              <i class="fa-solid fa-star text-amber-500 text-[9px]"></i>
+              <span id="topRiderRating">5.0 ★</span>
+            </span>
           </div>
           <p class="text-xs text-slate-500 font-bold truncate mt-0.5" id="topVehicleInfo">Bike</p>
         </div>
@@ -430,7 +443,6 @@
         <span id="wakeLockBadge" class="hidden px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-black" title="Screen Stay Awake Active">
           <i class="fa-solid fa-sun text-[10px]"></i> Awake
         </span>
-        <!-- Enlarged Duty Status Button -->
         <button onclick="toggleOnlineDuty()" id="dutyStatusBtn" class="min-h-[42px] px-4 py-2 rounded-full text-xs sm:text-sm font-black flex items-center gap-2 transition active:scale-95 shadow-xs bg-emerald-100 text-emerald-800 border-2 border-emerald-300">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="dutyStatusText">Online</span>
@@ -450,25 +462,38 @@
       <!-- ================= 1. DELIVERIES TAB ================= -->
       <section id="tab-deliveries" class="space-y-4">
         
-        <!-- Live Duty Quick Stats -->
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex items-center justify-between">
-            <div>
-              <p class="text-[10px] font-bold text-slate-400 uppercase">Assigned Trips</p>
-              <h3 class="text-xl font-black text-slate-900 mt-0.5" id="statAssignedCount">0</h3>
+        <!-- 🌟 LIVE DUTY QUICK STATS (3-CARD GRID WITH LIVE RATING) -->
+        <div class="grid grid-cols-3 gap-2 sm:gap-3">
+          <div class="bg-slate-50 p-2.5 sm:p-3 rounded-2xl border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-bold text-slate-400 uppercase">Trips</span>
+              <div class="w-6 h-6 rounded-lg bg-orange-100 text-brand-600 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-box"></i>
+              </div>
             </div>
-            <div class="w-8 h-8 rounded-xl bg-orange-100 text-brand-600 flex items-center justify-center text-sm">
-              <i class="fa-solid fa-box"></i>
-            </div>
+            <h3 class="text-lg sm:text-xl font-black text-slate-900 mt-1" id="statAssignedCount">0</h3>
           </div>
           
-          <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200 flex items-center justify-between">
-            <div>
-              <p class="text-[10px] font-bold text-emerald-800 uppercase">Cash in Hand</p>
-              <h3 class="text-xl font-black text-emerald-700 mt-0.5" id="statCodCashInHand">₹0</h3>
+          <div class="bg-emerald-50 p-2.5 sm:p-3 rounded-2xl border border-emerald-200 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-bold text-emerald-800 uppercase">Cash</span>
+              <div class="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+              </div>
             </div>
-            <div class="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-sm">
-              <i class="fa-solid fa-hand-holding-dollar"></i>
+            <h3 class="text-lg sm:text-xl font-black text-emerald-700 mt-1" id="statCodCashInHand">₹0</h3>
+          </div>
+
+          <div class="bg-amber-50 p-2.5 sm:p-3 rounded-2xl border border-amber-200 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-bold text-amber-800 uppercase">Rating</span>
+              <div class="w-6 h-6 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center text-xs font-black">
+                <i class="fa-solid fa-star"></i>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-lg sm:text-xl font-black text-amber-950 mt-1" id="statRiderRating">5.0 ★</h3>
+              <span class="text-[8px] font-bold text-amber-700 block truncate" id="statRiderRatingCount">0 ratings</span>
             </div>
           </div>
         </div>
@@ -541,7 +566,7 @@
       <!-- ================= 3. RIDER PROFILE TAB ================= -->
       <section id="tab-profile" class="hidden space-y-4">
         
-        <!-- 1. READ-ONLY RIDER CARD -->
+        <!-- 1. READ-ONLY RIDER CARD (WITH LIVE RATING ROW) -->
         <div id="riderProfileViewCard" class="bg-white rounded-3xl border border-slate-200 shadow-xs p-5 space-y-5">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
@@ -553,7 +578,7 @@
             </button>
           </div>
 
-          <div class="text-center space-y-2">
+          <div class="text-center space-y-1.5">
             <div class="relative w-24 h-24 mx-auto rounded-full ring-4 ring-emerald-500/20 shadow-md overflow-hidden bg-slate-100 flex items-center justify-center">
               <img id="viewRiderPhoto" src="" class="w-full h-full object-cover hidden" alt="Rider">
               <div id="viewRiderPlaceholder" class="w-full h-full bg-emerald-600 text-white flex items-center justify-center text-3xl">
@@ -561,7 +586,17 @@
               </div>
             </div>
             <h4 class="font-black text-base text-slate-900" id="viewRiderName">Rider Name</h4>
-            <p class="text-xs text-slate-500 font-mono" id="viewRiderVehicle">Bike • DL-01-AB-1234</p>
+            
+            <!-- 🌟 LIVE STAR RATING ROW IN PROFILE -->
+            <div class="flex items-center justify-center gap-1.5 text-xs">
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-black flex items-center gap-1 border border-amber-200 shadow-2xs">
+                <i class="fa-solid fa-star text-amber-500 text-[10px]"></i>
+                <span id="viewRiderRating">5.0 ★</span>
+              </span>
+              <span class="text-slate-400 text-[11px] font-semibold" id="viewRiderRatingCount">(0 reviews)</span>
+            </div>
+
+            <p class="text-xs text-slate-500 font-mono mt-0.5" id="viewRiderVehicle">Bike • DL-01-AB-1234</p>
           </div>
 
           <div class="space-y-2.5 text-xs border-t border-slate-100 pt-3">
@@ -612,7 +647,6 @@
                     <i class="fa-solid fa-camera"></i> <span>Choose from Gallery / Camera</span>
                     <input type="file" id="riderPhotoFileInput" accept="image/*" class="hidden" onchange="processImageUpload(this, 'profPhotoUrl', 'editRiderPhotoPreview', 'editRiderPlaceholder')">
                   </label>
-                  
                   <input type="text" id="profPhotoUrl" oninput="previewPhotoUrl(this.value, 'editRiderPhotoPreview', 'editRiderPlaceholder')" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none" placeholder="Or enter photo URL...">
                 </div>
               </div>
@@ -711,8 +745,110 @@
     let lastGpsPushTime = 0;
     let currentCodCashInHand = 0;
 
+    // ---------------- 👁️ PASSWORD TOGGLE ----------------
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (!input || !icon) return;
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash', 'text-brand-600');
+        icon.classList.remove('text-slate-400');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash', 'text-brand-600');
+        icon.classList.add('fa-eye', 'text-slate-400');
+      }
+    }
+
+    // ---------------- HELPER: SAFE ESCAPING ----------------
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function escapeJsString(str) {
+      if (!str) return '';
+      return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     // =========================================================
-    // 🚨 100% OFFLINE CONTINUOUS RIDER SIREN ENGINE (0ms LAG)
+    // 🔋 BACKGROUND ANTI-SLEEP & AUTO-RECONNECT ENGINE
+    // =========================================================
+    // 1. Firebase Socket Heartbeat Ping (Har 2 minute me socket zinda rakhega)
+    setInterval(() => {
+      if (auth.currentUser) {
+        db.ref('.info/connected').once('value', snap => {
+          if (!snap.val()) {
+            console.log("Reconnecting Firebase Socket for Rider...");
+            db.goOnline();
+          }
+        });
+      }
+    }, 120000);
+
+    // 2. Visibility Change Detector (App open / screen-on hote hi turant re-sync)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        console.log("Rider App focused! Syncing live radar...");
+        db.goOnline();
+        if (typeof checkBroadcastTasksAndAlarm === 'function') checkBroadcastTasksAndAlarm();
+      }
+    });
+
+    // 3. Capacitor Native State Listener
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      window.Capacitor.Plugins.App.addListener('appStateChange', (state) => {
+        if (state.isActive) {
+          db.goOnline();
+          initGlobalAudioContext();
+        } else {
+          if ('wakeLock' in navigator) {
+            navigator.wakeLock.request('screen').catch(() => {});
+          }
+        }
+      });
+    }
+
+    // =========================================================
+    // 🔔 FCM TOKEN REGISTRATION (BACKEND EXACT PATH MATCH)
+    // =========================================================
+    async function registerRiderFcmToken(uid) {
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications) {
+        const { PushNotifications } = window.Capacitor.Plugins;
+        try {
+          const perm = await PushNotifications.requestPermissions();
+          if (perm.receive === 'granted') {
+            await PushNotifications.register();
+          }
+
+          PushNotifications.addListener('registration', async (token) => {
+            console.log('Rider FCM Token:', token.value);
+            // Vercel backend api/send-order-push.js isi exact path se token uthata hai:
+            await db.ref(`deviceTokens/riders/${uid}`).update({
+              fcmToken: token.value,
+              online: (currentRider && currentRider.online !== false),
+              updatedAt: Date.now()
+            });
+          });
+
+          // Background High-Priority message aane par continuous siren trigger karein
+          PushNotifications.addListener('pushNotificationReceived', (notification) => {
+            console.log('High Priority Push Received in Rider App:', notification);
+            if (typeof startContinuousRiderAlarm === 'function') {
+              startContinuousRiderAlarm();
+            }
+          });
+        } catch (e) {
+          console.warn("Rider push token register note:", e);
+        }
+      }
+    }
+
+    // =========================================================
+    // 🚨 OFFLINE CONTINUOUS RIDER SIREN (ZERO-LAG SYNTH)
     // =========================================================
     let isRiderAlarmRinging = false;
     let riderVibrateInterval = null;
@@ -812,7 +948,7 @@
     }
 
     // =========================================================
-    // 🔔 NATIVE ANDROID NOTIFICATION (ANDROID 13+ COMPATIBLE)
+    // 🔔 NATIVE ANDROID NOTIFICATION CHANNEL
     // =========================================================
     async function initNativeNotificationChannel() {
       if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
@@ -821,9 +957,9 @@
           await LocalNotifications.requestPermissions();
 
           await LocalNotifications.createChannel({
-            id: 'fw_rider_siren_v3',
-            name: 'Rider Urgent Task Siren',
-            description: 'Loud alert siren for incoming delivery tasks',
+            id: 'fw_rider_siren_v4',
+            name: 'Rider Urgent Task Siren (Loud)',
+            description: 'High-priority alert siren for incoming delivery tasks',
             importance: 5,
             visibility: 1,
             vibration: true,
@@ -845,10 +981,10 @@
           await LocalNotifications.schedule({
             notifications: [
               {
-                title: "🚨 NEW DELIVERY TASK!",
-                body: `Pickup order #${orderId.slice(-6)} (₹${amount}) from ${kitchenName || 'Kitchen'}!`,
+                title: "🚨 NAYA DELIVERY TASK!",
+                body: `${kitchenName || 'Kitchen'} se order #${orderId.slice(-6)} (₹${amount}) pickup karein!`,
                 id: Math.floor(Math.random() * 99999),
-                channelId: 'fw_rider_siren_v3',
+                channelId: 'fw_rider_siren_v4',
                 ongoing: false,
                 autoCancel: true
               }
@@ -910,6 +1046,7 @@
         setTimeout(() => {
           if (typeof renderAllDeliveryFeeds === 'function') renderAllDeliveryFeeds();
           if (typeof renderEarningsAndTrips === 'function') renderEarningsAndTrips();
+          if (typeof updateRiderDynamicRating === 'function') updateRiderDynamicRating();
 
           if (indicator) indicator.classList.add('hidden');
           showModernFloatingToast("Refreshed", "Delivery radar synced with latest orders!", "fa-solid fa-arrows-rotate");
@@ -1004,7 +1141,8 @@
 
     function showOrderCancelledAlert(orderId, reason) {
       playCancelSound();
-      document.getElementById('orderCancelledMsg').innerHTML = `Order <strong>#${orderId.slice(-6)}</strong> has been cancelled.<br><span class="text-[11px] text-slate-400">Reason: ${escapeHtml(reason || 'N/A')}</span>`;
+      stopContinuousRiderAlarm();
+      document.getElementById('orderCancelledMsg').innerHTML = `Order <strong>#${orderId.slice(-6)}</strong> has been cancelled.<br><span class="text-[11px] text-slate-400">Reason: ${escapeHtml(reason || 'Cancelled by Super Admin / Customer')}</span>`;
       document.getElementById('orderCancelledModal').classList.remove('hidden');
     }
 
@@ -1088,7 +1226,7 @@
       }
     }
 
-    // ---------------- NAVIGATION & CAPACITOR BACK ----------------
+    // ---------------- NAVIGATION & HARDWARE BACK BUTTON ----------------
     function pushNavState(stateName) { history.pushState({ screen: stateName }, ''); }
     pushNavState('root_deliveries');
     window.addEventListener('popstate', () => handleStepByStepBack());
@@ -1263,10 +1401,7 @@
 
         await db.ref(`deliveryPartners/${userCredential.user.uid}`).set({
           name, email, phone, vehicle, photoUrl: "",
-          bankName: bankName,
-          accountHolderName: accountHolderName,
-          bankAccountNo: bankAccountNo,
-          ifscCode: ifscCode,
+          bankName, accountHolderName, bankAccountNo, ifscCode,
           approved: false, online: true, createdAt: Date.now()
         });
       } catch (err) {
@@ -1286,6 +1421,7 @@
       }
       if (currentRider && currentRider.uid) {
         db.ref(`deliveryPartners/${currentRider.uid}`).update({ online: false });
+        db.ref(`deviceTokens/riders/${currentRider.uid}/online`).set(false);
       }
       releaseScreenWakeLock();
       if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ForegroundService) {
@@ -1313,6 +1449,7 @@
           document.getElementById('appView').classList.remove('hidden');
           initNativeNotificationChannel();
           listenToRiderData(user.uid);
+          registerRiderFcmToken(user.uid);
         } catch (err) {
           console.warn("Connection glitch, keeping rider session alive:", err);
           document.getElementById('authView').classList.add('hidden');
@@ -1350,6 +1487,50 @@
       }
     }
 
+    // =========================================================
+    // ⭐ RIDER LIVE DYNAMIC STAR RATING ENGINE
+    // =========================================================
+    function updateRiderDynamicRating() {
+      let totalStars = 0;
+      let ratedOrdersCount = 0;
+
+      // Sabhi delivered orders me se customer ratings scan karein
+      Object.keys(assignedOrders).forEach(id => {
+        const o = assignedOrders[id];
+        if (o && o.status === 'DELIVERED' && o.rating && o.rating.stars) {
+          totalStars += Number(o.rating.stars);
+          ratedOrdersCount++;
+        }
+      });
+
+      let avgRating = "5.0";
+      let countLabel = "0 ratings";
+
+      if (ratedOrdersCount > 0) {
+        avgRating = (totalStars / ratedOrdersCount).toFixed(1);
+        countLabel = `${ratedOrdersCount} rating${ratedOrdersCount > 1 ? 's' : ''}`;
+      } else if (currentRider && currentRider.rating) {
+        avgRating = Number(currentRider.rating).toFixed(1);
+        countLabel = `${currentRider.ratingCount || 1} ratings`;
+      }
+
+      // 1. Update Top Bar Header Badge
+      const topRatingEl = document.getElementById('topRiderRating');
+      if (topRatingEl) topRatingEl.innerText = `${avgRating} ★`;
+
+      // 2. Update Deliveries Tab Quick Stat Card
+      const statRatingEl = document.getElementById('statRiderRating');
+      if (statRatingEl) statRatingEl.innerText = `${avgRating} ★`;
+      const statRatingCountEl = document.getElementById('statRiderRatingCount');
+      if (statRatingCountEl) statRatingCountEl.innerText = countLabel;
+
+      // 3. Update Profile Card Display
+      const viewRatingEl = document.getElementById('viewRiderRating');
+      if (viewRatingEl) viewRatingEl.innerText = `${avgRating} ★`;
+      const viewRatingCountEl = document.getElementById('viewRiderRatingCount');
+      if (viewRatingCountEl) viewRatingCountEl.innerText = `(${countLabel})`;
+    }
+
     function listenToRiderData(uid) {
       db.ref(`deliveryPartners/${uid}`).on('value', snap => {
         currentRider = snap.val() || {};
@@ -1383,8 +1564,17 @@
 
         const isOnline = (currentRider.online !== false);
         updateDutyBtnUI(isOnline);
-        if (isOnline) requestScreenWakeLock();
-        else {
+        
+        if (isOnline) {
+          requestScreenWakeLock();
+          if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ForegroundService) {
+            window.Capacitor.Plugins.ForegroundService.startForegroundService({
+              title: "FW Rider - Radar Active",
+              body: "Duty On: Live order monitoring active.",
+              smallIcon: "ic_launcher"
+            }).catch(() => {});
+          }
+        } else {
           releaseScreenWakeLock();
           stopContinuousRiderAlarm();
         }
@@ -1417,6 +1607,8 @@
         document.getElementById('profAccHolder').value = currentRider.accountHolderName || '';
         document.getElementById('profBankAcc').value = currentRider.bankAccountNo || '';
         document.getElementById('profIfsc').value = currentRider.ifscCode || '';
+
+        updateRiderDynamicRating();
       });
 
       db.ref('restaurants').on('value', snap => {
@@ -1424,7 +1616,7 @@
         renderAllDeliveryFeeds();
       });
 
-      // UNASSIGNED BROADCAST ORDERS (WITH NON-STOP SIREN & NATIVE PUSH)
+      // UNASSIGNED BROADCAST ORDERS (1:1 CLASSIC ORDER DISPATCH)
       db.ref('unassignedOrders').limitToLast(20).on('value', snap => {
         unassignedTasks = snap.val() || {};
         
@@ -1443,11 +1635,13 @@
         renderAllDeliveryFeeds();
       });
 
+      // MY ASSIGNED ORDERS (WITH REAL-TIME STAR RATING & CANCELLATIONS)
       db.ref('orders').orderByChild('deliveryUid').equalTo(uid).limitToLast(100).on('value', snap => {
         assignedOrders = snap.val() || {};
         checkAssignedOrderCancellations();
         renderAllDeliveryFeeds();
         renderEarningsAndTrips();
+        updateRiderDynamicRating(); // 🌟 Live star rating calculate karega
       });
     }
 
@@ -1464,7 +1658,7 @@
             gpsWatchId = null;
             activeGpsOrderId = null;
           }
-          showOrderCancelledAlert(id, o.cancelReason || 'Cancelled by customer or kitchen');
+          showOrderCancelledAlert(id, o.cancelReason || 'Cancelled by Super Admin / Customer');
         }
       });
     }
@@ -1481,7 +1675,7 @@
         if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.ForegroundService) {
           try {
             await window.Capacitor.Plugins.ForegroundService.startForegroundService({
-              title: "FW Rider - Live Radar Active",
+              title: "FW Rider - Radar Active",
               body: "Duty On: Background radar active for new delivery tasks.",
               smallIcon: "ic_launcher"
             });
@@ -1499,6 +1693,7 @@
 
       db.ref(`deliveryPartners/${currentRider.uid}`).update({ online: newStatus })
         .then(() => {
+          db.ref(`deviceTokens/riders/${currentRider.uid}/online`).set(newStatus);
           checkBroadcastTasksAndAlarm();
         })
         .catch(err => alert("Failed to change duty status: " + err.message));
@@ -1639,7 +1834,7 @@
 
     function dismissSuccessModal() { document.getElementById('deliverySuccessModal').classList.add('hidden'); }
 
-    // ---------------- FEEDS RENDERER ----------------
+    // ---------------- FEEDS RENDERER (CLASSIC 1:1 ORDER) ----------------
     function renderAllDeliveryFeeds() {
       const openContainer = document.getElementById('openOrdersBroadcastList');
       const assignedContainer = document.getElementById('assignedDeliveriesList');
@@ -1688,7 +1883,7 @@
 
             <div class="text-xs space-y-1 bg-black/15 p-2.5 rounded-2xl">
               <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-utensils text-amber-200"></i> ${escapeHtml(task.restaurantName || 'Kitchen')}</p>
-              <p class="text-[11px] text-white/90 truncate"><i class="fa-solid fa-location-dot text-amber-200"></i> ${escapeHtml(task.restaurantAddress || 'Pickup address')}</p>
+              <p class="text-[11px] text-white/90 truncate"><i class="fa-solid fa-location-dot text-amber-200"></i> Pickup: ${escapeHtml(task.restaurantAddress || 'Kitchen Address')}</p>
               <p class="text-[11px] text-white/90 truncate"><i class="fa-solid fa-house text-emerald-200"></i> Drop: ${escapeHtml(task.customerAddress || 'Customer Location')}</p>
             </div>
 
@@ -1721,7 +1916,7 @@
                 <span class="font-mono font-black text-rose-700">#${id.slice(-6)}</span>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-200 text-rose-800">CANCELLED</span>
               </div>
-              <p class="text-xs font-bold text-rose-800"><i class="fa-solid fa-ban mr-1"></i> ${escapeHtml(o.cancelReason || 'Order cancelled')}</p>
+              <p class="text-xs font-bold text-rose-800"><i class="fa-solid fa-ban mr-1"></i> ${escapeHtml(o.cancelReason || 'Order cancelled by Admin / Customer')}</p>
               <p class="text-[10px] text-slate-500">No further delivery required.</p>
             </div>
           `;
@@ -1975,16 +2170,11 @@
       });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-    }
   </script>
 
   <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
   <script>
-    const CURRENT_APP_VERSION = "1.0.6";
+    const CURRENT_APP_VERSION = "1.0.8";
 
     async function checkForAppUpdate() {
       try {
