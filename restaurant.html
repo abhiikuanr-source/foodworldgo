@@ -875,28 +875,50 @@
     // =========================================================
     // 🔔 FCM TOKEN REGISTRATION (BACKEND EXACT PATH MATCH)
     // =========================================================
+   // =========================================================
+    // 🔔 FCM TOKEN REGISTRATION (CORRECT ORDER & EXACT PATH)
+    // =========================================================
     async function registerKitchenFcmToken(uid) {
       if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications) {
         const { PushNotifications } = window.Capacitor.Plugins;
         try {
-          const perm = await PushNotifications.requestPermissions();
-          if (perm.receive === 'granted') {
-            await PushNotifications.register();
-          }
+          // 1. Pehle listeners attach karein taaki token event miss na ho
+          await PushNotifications.removeAllListeners();
 
           PushNotifications.addListener('registration', async (token) => {
             console.log('Kitchen FCM Token:', token.value);
-            // Vercel backend api/send-order-push.js isi exact path se token uthata hai:
+
+            // Database me token save karein
             await db.ref(`deviceTokens/restaurants/${uid}/fcmToken`).set(token.value);
+
+            // 🌟 Screen par toast aayega ki token save ho gaya
+            showModernFloatingToast("Token Linked!", "Device token Firebase se connect ho gaya!", "fa-solid fa-check");
           });
 
-          // Background High-Priority message aane par loud continuous siren start karein
+          PushNotifications.addListener('registrationError', (err) => {
+            alert("FCM Error: " + JSON.stringify(err));
+          });
+
           PushNotifications.addListener('pushNotificationReceived', (notification) => {
-            console.log('High Priority Push Received in Kitchen App:', notification);
+            console.log('High Priority Push Received:', notification);
             if (typeof startContinuousKitchenAlarm === 'function') {
               startContinuousKitchenAlarm();
             }
           });
+
+          // 2. Permission maangein
+          let perm = await PushNotifications.checkPermissions();
+          if (perm.receive !== 'granted') {
+            perm = await PushNotifications.requestPermissions();
+          }
+
+          // 3. Register call karein (Listeners lagne ke baad)
+          if (perm.receive === 'granted') {
+            await PushNotifications.register();
+          } else {
+            alert("⚠️ Notification permission Block hai! Phone settings se Allow karein.");
+          }
+
         } catch (e) {
           console.warn("Kitchen push token register note:", e);
         }

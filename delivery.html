@@ -815,32 +815,53 @@
     // =========================================================
     // 🔔 FCM TOKEN REGISTRATION (BACKEND EXACT PATH MATCH)
     // =========================================================
+   // =========================================================
+    // 🔔 RIDER FCM TOKEN REGISTRATION (FIXED ORDER)
+    // =========================================================
     async function registerRiderFcmToken(uid) {
       if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications) {
         const { PushNotifications } = window.Capacitor.Plugins;
         try {
-          const perm = await PushNotifications.requestPermissions();
-          if (perm.receive === 'granted') {
-            await PushNotifications.register();
-          }
+          // 1. 🌟 Pehle Listeners lagayein (taaki token event miss na ho)
+          await PushNotifications.removeAllListeners();
 
           PushNotifications.addListener('registration', async (token) => {
             console.log('Rider FCM Token:', token.value);
-            // Vercel backend api/send-order-push.js isi exact path se token uthata hai:
+
+            // Database me token aur online status save karein
             await db.ref(`deviceTokens/riders/${uid}`).update({
               fcmToken: token.value,
-              online: (currentRider && currentRider.online !== false),
+             online: (currentRider ? currentRider.online !== false : true),
               updatedAt: Date.now()
             });
+
+            showModernFloatingToast("Rider Connected", "FCM Device Token Linked!", "fa-solid fa-motorcycle");
           });
 
-          // Background High-Priority message aane par continuous siren trigger karein
+          PushNotifications.addListener('registrationError', (err) => {
+            alert("Rider FCM Error: " + JSON.stringify(err));
+          });
+
           PushNotifications.addListener('pushNotificationReceived', (notification) => {
             console.log('High Priority Push Received in Rider App:', notification);
             if (typeof startContinuousRiderAlarm === 'function') {
               startContinuousRiderAlarm();
             }
           });
+
+          // 2. Permission maangein
+          let perm = await PushNotifications.checkPermissions();
+          if (perm.receive !== 'granted') {
+            perm = await PushNotifications.requestPermissions();
+          }
+
+          // 3. 🌟 Ab Register call karein
+          if (perm.receive === 'granted') {
+            await PushNotifications.register();
+          } else {
+            alert("⚠️ Notification permission block hai! Phone settings se Allow karein.");
+          }
+
         } catch (e) {
           console.warn("Rider push token register note:", e);
         }
@@ -1430,10 +1451,12 @@
       auth.signOut().catch(err => alert("Logout error: " + err.message));
     }
 
-    // ---------------- AUTH STATE LISTENER ----------------
+   // ---------------- AUTH STATE LISTENER ----------------
     auth.onAuthStateChanged(async (user) => {
-      const splash = document.getElementById('splashScreen');
+      // 🌟 Sirf ek baar declare karein:
+      const splash = document.getElementById('splashScreen') || document.getElementById('splashscreen');
       if (isRoleChecking) return;
+
       if (user) {
         isRoleChecking = true;
         try {
@@ -1442,11 +1465,13 @@
             await auth.signOut();
             document.getElementById('loginError').classList.remove('hidden');
             document.getElementById('loginErrorMsg').innerText = "Access Denied: Not registered as Delivery Partner.";
-            splash.classList.add('hidden');
+            if (splash) splash.classList.add('hidden');
             return;
           }
+
           document.getElementById('authView').classList.add('hidden');
           document.getElementById('appView').classList.remove('hidden');
+          
           initNativeNotificationChannel();
           listenToRiderData(user.uid);
           registerRiderFcmToken(user.uid);
@@ -1456,12 +1481,12 @@
           document.getElementById('appView').classList.remove('hidden');
         } finally {
           isRoleChecking = false;
-          splash.classList.add('hidden');
+          if (splash) splash.classList.add('hidden');
         }
       } else {
         document.getElementById('appView').classList.add('hidden');
         document.getElementById('authView').classList.remove('hidden');
-        splash.classList.add('hidden');
+        if (splash) splash.classList.add('hidden');
         currentRider = null;
         stopContinuousRiderAlarm();
         releaseScreenWakeLock();
