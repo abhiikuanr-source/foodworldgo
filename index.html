@@ -201,7 +201,7 @@
         <button type="button" onclick="toggleAuthMode('signup')" id="authTabSignup" class="min-h-[40px] rounded-lg text-slate-500 hover:text-slate-800 transition active:scale-95">Sign Up</button>
       </div>
 
-      <!-- Login Form with Eye Icon -->
+      <!-- Login Form with Eye Icon (FCM test button completely removed) -->
       <form id="loginForm" onsubmit="handleCustomerLogin(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Email Address</label>
@@ -227,6 +227,7 @@
           <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
           <span id="loginErrorMsg">Error</span>
         </div>
+
         <button type="submit" id="loginBtn" class="w-full min-h-[48px] py-3 bg-brand-600 hover:bg-brand-500 active:scale-98 text-white font-bold rounded-xl text-xs shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2">
           <span>Sign In</span><i class="fa-solid fa-arrow-right"></i>
         </button>
@@ -274,8 +275,7 @@
       </form>
     </div>
   </div>
-
-  <!-- ================= CUSTOMER APP VIEW ================= -->
+<!-- ================= CUSTOMER APP VIEW ================= -->
   <div id="appView" class="hidden max-w-lg mx-auto bg-white min-h-screen relative shadow-2xl pb-safe flex flex-col">
 
     <!-- ================= 🌟 ENLARGED TOPBAR HEADER ================= -->
@@ -365,80 +365,40 @@
           </div>
         </div>
 
-        <!-- POPULAR CATEGORIES -->
-        <div id="categoriesSection" class="space-y-2.5 pt-1">
+        <!-- POPULAR CATEGORIES (DYNAMIC CONTAINER: HIDES EMPTY CATEGORIES) -->
+        <div id="categoriesSection" class="space-y-2.5 pt-1 hidden">
           <div class="flex items-center justify-between">
             <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider">What's on your mind?</h3>
             <span class="text-[10px] text-slate-400 font-bold">Swipe &rarr;</span>
           </div>
 
-          <div class="grid grid-rows-2 grid-flow-col gap-x-4 gap-y-3 overflow-x-auto no-scrollbar pb-1">
-            <div onclick="quickFilterDishes('Biryani')" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 active:scale-95 transition w-16">
-              <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
-                <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=150" class="w-full h-full object-cover" alt="Biryani">
-              </div>
-              <span class="text-[11px] font-bold text-slate-700 text-center">Biryani</span>
-            </div>
-
-            <div onclick="quickFilterDishes('Pizza')" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 active:scale-95 transition w-16">
-              <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
-                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150" class="w-full h-full object-cover" alt="Pizza">
-              </div>
-              <span class="text-[11px] font-bold text-slate-700 text-center">Pizza</span>
-            </div>
-
-            <div onclick="quickFilterDishes('Burger')" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 active:scale-95 transition w-16">
-              <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
-                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150" class="w-full h-full object-cover" alt="Burger">
-              </div>
-              <span class="text-[11px] font-bold text-slate-700 text-center">Burger</span>
-            </div>
-
-            <div onclick="quickFilterDishes('Paratha')" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 active:scale-95 transition w-16">
-              <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
-                <img src="https://images.unsplash.com/photo-1683533761804-5fc12be0f684?w=150" class="w-full h-full object-cover" alt="Paratha">
-              </div>
-              <span class="text-[11px] font-bold text-slate-700 text-center">Paratha</span>
-            </div>
-
-            <div onclick="quickFilterDishes('Thali')" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 active:scale-95 transition w-16">
-              <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
-                <img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=150" class="w-full h-full object-cover" alt="Thali">
-              </div>
-              <span class="text-[11px] font-bold text-slate-700 text-center">Thali</span>
-            </div>
-
-            <div onclick="quickFilterDishes('Kulfi')" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 active:scale-95 transition w-16">
-              <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
-                <img src="https://images.unsplash.com/photo-1505394033641-40c6ad1178d7?w=150" class="w-full h-full object-cover" alt="Kulfi">
-              </div>
-              <span class="text-[11px] font-bold text-slate-700 text-center">Kulfi</span>
-            </div>
-
-            <div onclick="quickFilterDishes('Momos')" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 active:scale-95 transition w-16">
-              <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
-                <img src="https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=150" class="w-full h-full object-cover" alt="Momos">
-              </div>
-              <span class="text-[11px] font-bold text-slate-700 text-center">Momos</span>
-            </div>
-
-            <div onclick="quickFilterDishes('Tea')" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 active:scale-95 transition w-16">
-              <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
-                <img src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=150" class="w-full h-full object-cover" alt="Chai">
-              </div>
-              <span class="text-[11px] font-bold text-slate-700 text-center">Tea / Beverages</span>
-            </div>
-          </div>
+          <!-- Dynamic Categories Inject Hogi Yahan -->
+          <div id="categoriesGridContainer" class="grid grid-rows-2 grid-flow-col gap-x-4 gap-y-3 overflow-x-auto no-scrollbar pb-1"></div>
         </div>
 
-        <!-- 99 STORE (WITH DIRECT VIEW ALL TAB BUTTON) -->
+        <!-- ================= 🌟 4-COLUMN COMPACT DISHES GRID ================= -->
+        <div id="quickDishesSection" class="space-y-2.5 pt-1 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-fire text-brand-500"></i> Top Picks For You
+              </h3>
+              <p class="text-[10px] text-slate-400 font-semibold">Fast delivery from live open kitchens</p>
+            </div>
+            <span class="text-[10px] font-black text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-200" id="quickDishesBadge">Popular</span>
+          </div>
+
+          <!-- 4-Column Responsive Grid -->
+          <div id="quickDishesGrid" class="grid grid-cols-4 gap-2"></div>
+        </div>
+
+        <!-- 99 STORE (BUDGET DEALS PREVIEW) -->
         <div id="budgetDealsSection" class="space-y-3 bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="px-2 py-0.5 rounded-lg bg-yellow-400 text-slate-950 font-black text-xs italic shadow-2xs">99 store</span>
               <span class="text-xs font-bold text-slate-800">Budget Meals Under ₹99</span>
             </div>
-            <!-- 🌟 OPENS DEDICATED FULL GRID VIEW -->
             <button onclick="openNinetyNineStore()" class="text-xs font-black text-brand-600 hover:underline flex items-center gap-0.5 active:scale-95 transition">
               <span>View All</span>
               <i class="fa-solid fa-chevron-right text-[10px]"></i>
@@ -585,8 +545,7 @@
           </div>
         </div>
       </section>
-
-      <!-- ================= 4. ORDERS TRACKING & HISTORY ================= -->
+<!-- ================= 4. ORDERS TRACKING & HISTORY ================= -->
       <section id="tab-orders" class="hidden p-4 space-y-5">
         <div>
           <h3 class="font-extrabold text-slate-900 text-base">Your Orders & Real-Time Tracking</h3>
@@ -825,7 +784,7 @@
     </nav>
   </div>
 
-  <!-- ================= 🌟 OUTLET & REAL FSSAI INFO MODAL (SWIGGY/ZOMATO STYLE) ================= -->
+  <!-- ================= 🌟 OUTLET & REAL FSSAI INFO MODAL ================= -->
   <div id="restInfoModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
@@ -1050,7 +1009,8 @@
       <button onclick="document.getElementById('updateModal').style.display='none'" style="background:transparent; color:#777; border:none; margin-top:12px; font-size:12px; cursor:pointer;">Later</button>
     </div>
   </div>
-<!-- ================= JAVASCRIPT LOGIC (PART 2A: SETUP, SEARCH & 99 STORE) ================= -->
+
+  <!-- ================= JAVASCRIPT LOGIC (CORE CONTROLLERS) ================= -->
   <script>
     // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
@@ -1069,7 +1029,7 @@
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
     // 2. CONFIGURATION & CONSTANTS
-    const DELIVERY_FEE = 30; // 🌟 Standard Flat ₹30 Single Restaurant Delivery Fee
+    const DELIVERY_FEE = 30; // 🌟 Standard Flat ₹30 Single-Restaurant Delivery Fee
     const BACKEND_URL = "https://foodworld-backend.vercel.app";
     const RAZORPAY_KEY_ID = "rzp_live_TXVKN9bGeN4CAv";
 
@@ -1235,6 +1195,8 @@
         setTimeout(() => {
           if (typeof renderModernHomeSections === 'function') renderModernHomeSections();
           if (typeof renderRestaurantsList === 'function') renderRestaurantsList();
+          if (typeof renderPopularCategories === 'function') renderPopularCategories();
+          if (typeof renderQuickDishesGrid === 'function') renderQuickDishesGrid();
           if (typeof renderOrdersList === 'function') renderOrdersList();
           if (activeRestaurantId && typeof renderFoodWorldMenuItems === 'function') {
             renderFoodWorldMenuItems(activeRestaurantId);
@@ -1348,8 +1310,7 @@
         placeholder.classList.remove('hidden');
       }
     }
-
-    // =========================================================
+// =========================================================
     // 📍 DUAL DELIVERY ADDRESS SELECTION (DEFAULT VS CUSTOM)
     // =========================================================
     function selectCheckoutAddressType(mode) {
@@ -1379,36 +1340,23 @@
     function applyOnlinePaymentStatus(enabled) {
       isOnlinePaymentEnabled = enabled;
       const payOptionONLINE = document.getElementById('payOptionONLINE');
-      const payOptionCOD = document.getElementById('payOptionCOD');
       const paymentGrid = document.getElementById('paymentMethodGrid');
       const headerBadge = document.getElementById('topRazorpayBadge');
 
       if (!enabled) {
-        // 1. Hide Online Payment Card in Checkout
         if (payOptionONLINE) payOptionONLINE.classList.add('hidden');
-        
-        // 2. COD Card full width me convert ho jayega
         if (paymentGrid) {
           paymentGrid.classList.remove('grid-cols-2');
           paymentGrid.classList.add('grid-cols-1');
         }
-        
-        // 3. User ko auto COD par lock karein
         selectPaymentMethod('COD');
-
-        // 4. Header ka Razorpay badge hide karein
         if (headerBadge) headerBadge.classList.add('hidden');
       } else {
-        // 1. Show Online Payment Card
         if (payOptionONLINE) payOptionONLINE.classList.remove('hidden');
-        
-        // 2. Restore 2-column grid layout
         if (paymentGrid) {
           paymentGrid.classList.remove('grid-cols-1');
           paymentGrid.classList.add('grid-cols-2');
         }
-
-        // 3. Show Header Razorpay badge
         if (headerBadge) headerBadge.classList.remove('hidden');
       }
     }
@@ -1429,7 +1377,6 @@
         subtotal += (cart[k].price * cart[k].qty);
       });
 
-      // 🌟 Standard Single Restaurant Flat ₹30 Delivery Fee
       const grandTotal = subtotal + DELIVERY_FEE;
 
       if (method === 'ONLINE') {
@@ -1525,7 +1472,7 @@
       container.innerHTML = html;
     }
 
-    // ---------------- NAVIGATION & HARDWARE BACK BUTTON (WITH GESTURE FIX) ----------------
+    // ---------------- NAVIGATION & HARDWARE/GESTURE BACK BUTTON CONTROLLER ----------------
     function pushNavState(stateName) { history.pushState({ screen: stateName }, ''); }
     pushNavState('root_home');
     window.addEventListener('popstate', () => handleStepByStepBack());
@@ -1536,30 +1483,25 @@
       });
     }
 
-    // 🌟 MOBILE HARDWARE BACK BUTTON & BACK GESTURE CONTROLLER
     function handleStepByStepBack() {
-      // 1. Agar koi modal khula hai toh pehle modal close karein
       const openModals = ['restInfoModal', 'checkoutModal', 'ratingModal', 'notifCenterDrawer', 'customerForgotModal', 'custEmailSentSuccessModal', 'exitAppModal'];
       for (let mId of openModals) {
         const m = document.getElementById(mId);
         if (m && !m.classList.contains('hidden')) { m.classList.add('hidden'); return; }
       }
 
-      // 2. 🌟 SEARCH OVERLAY BACK FIX: Agar search active hai toh clear karke seedhe Home par aayein
       const searchSection = document.getElementById('searchResultsSection');
       if (searchSection && !searchSection.classList.contains('hidden')) {
         clearSearchFilter();
         return;
       }
 
-      // 3. 🌟 99 STORE DEDICATED TAB FIX: Agar 99 store khula hai toh use close karke Home par aayein
       const ninetyNineTab = document.getElementById('tab-ninety-nine');
       if (ninetyNineTab && !ninetyNineTab.classList.contains('hidden')) {
         closeNinetyNineStore();
         return;
       }
 
-      // 4. Agar Restaurant Menu open hai toh Home par jayein
       const menuView = document.getElementById('tab-menu');
       if (menuView && !menuView.classList.contains('hidden')) {
         closeRestaurantMenu();
@@ -1567,21 +1509,18 @@
         return;
       }
 
-      // 5. Agar Profile Edit card open hai
       const editProfileCard = document.getElementById('custProfileEditCard');
       if (editProfileCard && !editProfileCard.classList.contains('hidden')) {
         toggleCustomerProfileEdit(false);
         return;
       }
 
-      // 6. Agar bottom tabs (Orders, Helpdesk, Profile) par hai toh Home par aayein
       if (navHistoryStack.length > 1) {
         navHistoryStack.pop();
         switchAppTab(navHistoryStack[navHistoryStack.length - 1], true);
         return;
       }
 
-      // 7. Agar seedhe Root Home par hain tabhi exit confirmation maangein
       openExitAppModal();
     }
 
@@ -1721,9 +1660,74 @@
       auth.signOut().catch(err => alert("Logout error: " + err.message));
     }
 
+    // =========================================================
+    // 🔋 BACKGROUND ANTI-SLEEP & AUTO-RECONNECT ENGINE
+    // =========================================================
+    setInterval(() => {
+      if (auth.currentUser) {
+        db.ref('.info/connected').once('value', snap => {
+          if (!snap.val()) {
+            console.log("Reconnecting Firebase Socket for Customer...");
+            db.goOnline();
+          }
+        });
+      }
+    }, 120000);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        console.log("Customer App focused! Syncing live orders...");
+        db.goOnline();
+      }
+    });
+
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      window.Capacitor.Plugins.App.addListener('appStateChange', (state) => {
+        if (state.isActive) {
+          db.goOnline();
+          initGlobalAudioContext();
+        }
+      });
+    }
+
+    // 🌟 AUTOMATIC BACKGROUND CUSTOMER FCM TOKEN REGISTRATION
+    async function registerCustomerFcmToken(uid) {
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications) {
+        const { PushNotifications } = window.Capacitor.Plugins;
+        try {
+          await PushNotifications.removeAllListeners();
+
+          PushNotifications.addListener('registration', async (token) => {
+            console.log('Customer FCM Token:', token.value);
+            await db.ref(`deviceTokens/customers/${uid}/fcmToken`).set(token.value);
+          });
+
+          PushNotifications.addListener('registrationError', (err) => {
+            console.warn('Customer FCM Error:', err);
+          });
+
+          PushNotifications.addListener('pushNotificationReceived', (notification) => {
+            console.log('Customer Order Status Push Received:', notification);
+            playModernNotifChime();
+          });
+
+          let perm = await PushNotifications.checkPermissions();
+          if (perm.receive !== 'granted') {
+            perm = await PushNotifications.requestPermissions();
+          }
+
+          if (perm.receive === 'granted') {
+            await PushNotifications.register();
+          }
+        } catch (e) {
+          console.warn("Customer push token error:", e);
+        }
+      }
+    }
+
     // ---------------- AUTH STATE LISTENER ----------------
     auth.onAuthStateChanged(async (user) => {
-      const splash = document.getElementById('splashScreen');
+      const splash = document.getElementById('splashScreen') || document.getElementById('splashscreen');
       if (isRoleChecking) return;
       if (user) {
         isRoleChecking = true;
@@ -1747,18 +1751,20 @@
           initCustomerNativeChannels();
           listenToCustomerProfile(user.uid);
           initAppListeners();
+          registerCustomerFcmToken(user.uid);
+
         } catch (err) {
           console.warn("Connection glitch, keeping customer session alive:", err);
           document.getElementById('authView').classList.add('hidden');
           document.getElementById('appView').classList.remove('hidden');
         } finally {
           isRoleChecking = false;
-          splash.classList.add('hidden');
+          if (splash) splash.classList.add('hidden');
         }
       } else {
         document.getElementById('appView').classList.add('hidden');
         document.getElementById('authView').classList.remove('hidden');
-        splash.classList.add('hidden');
+        if (splash) splash.classList.add('hidden');
         currentCustomer = null;
         cart = {};
         updateCartFloatingBar();
@@ -1781,7 +1787,6 @@
       }
     }
 
-    // ---------------- PROFILE HANDLERS ----------------
     function toggleCustomerProfileEdit(showEdit) {
       document.getElementById('custProfileViewCard').classList.toggle('hidden', showEdit);
       document.getElementById('custProfileEditCard').classList.toggle('hidden', !showEdit);
@@ -1846,127 +1851,202 @@
         btn.disabled = false;
       }
     }
+// =========================================================
+    // 🍔 MASTER CATEGORIES CONFIGURATION
+    // =========================================================
+    const MASTER_CATEGORIES = [
+      {
+        id: 'biryani',
+        title: 'Biryani',
+        keywords: ['biryani', 'biriyani'],
+        image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=150'
+      },
+      {
+        id: 'burger',
+        title: 'Burger',
+        keywords: ['burger', 'burgers'],
+        image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150'
+      },
+      {
+        id: 'thali',
+        title: 'Thali',
+        keywords: ['thali', 'meal', 'combo'],
+        image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=150'
+      },
+      {
+        id: 'momos',
+        title: 'Momos',
+        keywords: ['momo', 'momos', 'dimsum'],
+        image: 'https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=150'
+      },
+      {
+        id: 'pizza',
+        title: 'Pizza',
+        keywords: ['pizza', 'pizzas'],
+        image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=150'
+      },
+      {
+        id: 'paratha',
+        title: 'Paratha',
+        keywords: ['paratha', 'parantha', 'roti', 'naan'],
+        image: 'https://images.unsplash.com/photo-1683533761804-5fc12be0f684?w=150'
+      },
+      {
+        id: 'kulfi',
+        title: 'Kulfi / Ice Cream',
+        keywords: ['kulfi', 'ice cream', 'icecream', 'ice-cream'],
+        image: 'https://images.unsplash.com/photo-1505394033641-40c6ad1178d7?w=150'
+      },
+      {
+        id: 'pasta_chowmein',
+        title: 'Pasta / Chowmein',
+        keywords: ['pasta', 'chowmein', 'chowmin', 'noodle', 'noodles', 'maggi'],
+        image: 'https://images.unsplash.com/photo-1552611052-33e04de081de?w=150'
+      }
+    ];
 
     // =========================================================
-    // ---------------- REALTIME LISTENERS ----------------
+    // 🎯 RENDER DYNAMIC AVAILABLE CATEGORIES
     // =========================================================
-    function initAppListeners() {
-      db.ref('restaurants').on('value', snap => {
-        cachedRestaurants = snap.val() || {};
-        renderRestaurantsList();
-        renderModernHomeSections();
-      });
+    function renderPopularCategories() {
+      const section = document.getElementById('categoriesSection');
+      const container = document.getElementById('categoriesGridContainer');
+      if (!container || !section) return;
 
-      // Root menus listener (Eliminates memory leak)
-      db.ref('menus').on('value', snap => {
-        cachedMenus = snap.val() || {};
-        renderModernHomeSections();
-        if (activeRestaurantId) renderFoodWorldMenuItems(activeRestaurantId);
-        
-        // Agar 99 Store khula hai toh real-time refresh karein
-        const ninetyNineTab = document.getElementById('tab-ninety-nine');
-        if (ninetyNineTab && !ninetyNineTab.classList.contains('hidden')) {
-          renderNinetyNineGrid();
-        }
-      });
+      const openRestaurantIds = new Set(
+        Object.keys(cachedRestaurants).filter(id => {
+          const r = cachedRestaurants[id];
+          return r && (r.approved === true || r.approved === 'true') && r.isOpen !== false;
+        })
+      );
 
-      db.ref('deliveryPartners').on('value', snap => {
-        cachedDeliveryBoys = snap.val() || {};
-        renderOrdersList();
-      });
+      const availableCategoryIds = new Set();
 
-      // Super Admin Online Payment Gateway Live Sync
-      db.ref('settings/payment').on('value', snap => {
-        const data = snap.val();
-        const isEnabled = data ? (data.onlinePaymentEnabled !== false) : true;
-        applyOnlinePaymentStatus(isEnabled);
-      });
+      openRestaurantIds.forEach(rId => {
+        const menu = cachedMenus[rId] || {};
+        Object.keys(menu).forEach(itemId => {
+          const item = menu[itemId];
+          if (item && item.available !== false && item.available !== 'false') {
+            const nameLower = (item.name || '').toLowerCase();
+            const descLower = (item.description || '').toLowerCase();
 
-      // Orders listener with status change detector
-      db.ref('orders').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').limitToLast(25).on('value', snap => {
-        const orders = snap.val() || {};
-        let hasActiveOrders = false;
-
-        Object.keys(orders).forEach(id => {
-          const o = orders[id];
-          if (!o) return;
-
-          const currentStatus = o.status;
-          const prevStatus = previousOrderStatuses[id];
-
-          if (currentStatus !== 'DELIVERED' && currentStatus !== 'CANCELLED' && currentStatus !== 'PAYMENT_PENDING') {
-            hasActiveOrders = true;
+            MASTER_CATEGORIES.forEach(cat => {
+              const matches = cat.keywords.some(kw => nameLower.includes(kw) || descLower.includes(kw));
+              if (matches) {
+                availableCategoryIds.add(cat.id);
+              }
+            });
           }
-
-          if (prevStatus && prevStatus !== currentStatus) {
-            const orderRef = `#${id.slice(-6)}`;
-            
-            if (currentStatus === 'ACCEPTED') {
-              sendCustomerNativeAlert("🎉 Order Confirmed!", `Order ${orderRef}: Kitchen has accepted your order.`);
-              playModernNotifChime();
-            } else if (currentStatus === 'PREPARING') {
-              sendCustomerNativeAlert("👨‍🍳 Cooking in Progress!", `Order ${orderRef}: Kitchen is preparing your meal.`);
-            } else if (currentStatus === 'READY_FOR_PICKUP') {
-              sendCustomerNativeAlert("📦 Food Packed!", `Order ${orderRef}: Food is packed and awaiting rider pickup.`);
-            } else if (currentStatus === 'PICKED_UP' || currentStatus === 'OUT_FOR_DELIVERY') {
-              sendCustomerNativeAlert("🛵 Out for Delivery!", `Order ${orderRef}: Rider is on the way with your food.`);
-              playModernNotifChime();
-            } else if (currentStatus === 'DELIVERED') {
-              sendCustomerNativeAlert("✅ Order Delivered!", `Order ${orderRef}: Food delivered! Enjoy your meal.`);
-              playModernNotifChime();
-            } else if (currentStatus === 'CANCELLED') {
-              sendCustomerNativeAlert("❌ Order Cancelled", `Order ${orderRef}: ${o.cancelReason || 'Your order was cancelled.'}`);
-              playModernNotifChime();
-            }
-          }
-
-          previousOrderStatuses[id] = currentStatus;
         });
-
-        updateCustomerForegroundTracking(hasActiveOrders);
-        cachedOrders = orders;
-        renderOrdersList();
       });
 
-      db.ref('admin/notifications').limitToLast(10).on('value', snap => {
-        cachedBroadcasts = snap.val() || {};
-        const keys = Object.keys(cachedBroadcasts);
-        if (keys.length > 0) {
-          const latestKey = keys[keys.length - 1];
-          const latest = cachedBroadcasts[latestKey];
-          if (!knownNotifIds.has(latestKey) && latest && latest.message) {
-            showModernFloatingToast("FoodWorld Notice", latest.message, "fa-solid fa-bullhorn");
-            document.getElementById('notifBellBadge').innerText = keys.length;
-            document.getElementById('notifBellBadge').classList.remove('hidden');
-            knownNotifIds.add(latestKey);
-          }
-        }
+      let html = '';
+      let visibleCount = 0;
+
+      MASTER_CATEGORIES.forEach(cat => {
+        if (!availableCategoryIds.has(cat.id)) return; // Out of stock category gayab ho jayegi
+
+        visibleCount++;
+        html += `
+          <div onclick="quickFilterDishes('${escapeJsString(cat.title)}', '${cat.keywords.join(',')}')" class="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0 active:scale-95 transition w-16">
+            <div class="w-16 h-16 rounded-full overflow-hidden shadow-xs border border-slate-200 bg-white">
+              <img src="${cat.image}" class="w-full h-full object-cover" alt="${escapeHtml(cat.title)}">
+            </div>
+            <span class="text-[10px] font-bold text-slate-700 text-center leading-tight line-clamp-2">${escapeHtml(cat.title)}</span>
+          </div>
+        `;
       });
 
-      db.ref('settings/support').on('value', snap => {
-        cachedSupportConfig = snap.val() || {};
-        const phone = cachedSupportConfig.phone || '+91 9876543210';
-        const whatsapp = cachedSupportConfig.whatsapp || '919876543210';
-        const hours = cachedSupportConfig.hours || '24/7 Live Support';
-        const desc = cachedSupportConfig.description || 'Have an issue with your food or delivery? FoodWorld Helpdesk is here for you 24/7.';
-
-        document.getElementById('custSupportHours').innerText = hours;
-        document.getElementById('custSupportDesc').innerText = desc;
-        document.getElementById('custSupportPhoneText').innerText = `Call (${phone})`;
-        document.getElementById('custSupportCallLink').href = `tel:${phone}`;
-        document.getElementById('custSupportWaLink').href = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello FoodWorld Support, I need assistance with my order.')}`;
-      });
-
-      db.ref('supportTickets').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').limitToLast(10).on('value', snap => {
-        cachedMyTickets = snap.val() || {};
-        renderMyTicketsList();
-      });
+      if (visibleCount > 0) {
+        container.innerHTML = html;
+        section.classList.remove('hidden');
+      } else {
+        section.classList.add('hidden');
+      }
     }
 
     // =========================================================
-    // 🔍 SEARCH WITH MOBILE BACK-GESTURE INTEGRATION
+    // 🍱 4-COLUMN COMPACT DISHES GRID (AUTO-SORTED)
     // =========================================================
-    function handleUniversalSearch(queryText) {
+    function renderQuickDishesGrid() {
+      const section = document.getElementById('quickDishesSection');
+      const container = document.getElementById('quickDishesGrid');
+      if (!section || !container) return;
+
+      const dishesList = [];
+
+      Object.keys(cachedRestaurants).forEach(rId => {
+        const r = cachedRestaurants[rId];
+        if (!r || (r.approved !== true && r.approved !== 'true') || r.isOpen === false) return;
+
+        const menu = cachedMenus[rId] || {};
+        Object.keys(menu).forEach(itemId => {
+          const item = menu[itemId];
+          if (item && item.available !== false && item.available !== 'false') {
+            dishesList.push({
+              ...item,
+              itemId: itemId,
+              restaurantId: rId,
+              restaurantName: r.name || 'Kitchen',
+              numericPrice: Number(item.price) || 0
+            });
+          }
+        });
+      });
+
+      dishesList.sort((a, b) => a.numericPrice - b.numericPrice);
+      const topDishes = dishesList.slice(0, 8); // 2 rows of 4 columns
+
+      if (topDishes.length === 0) {
+        section.classList.add('hidden');
+        return;
+      }
+
+      let html = '';
+      topDishes.forEach(item => {
+        const isNonVeg = (item.foodType === 'NONVEG');
+        const dishPhoto = (item.imageUrl && item.imageUrl.trim().length > 10) 
+          ? item.imageUrl.trim() 
+          : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200';
+
+        html += `
+          <div onclick="openRestaurantMenu('${item.restaurantId}', '${item.itemId}')" class="bg-white p-1.5 rounded-2xl border border-slate-200/90 shadow-2xs hover:border-brand-400 active:scale-95 transition flex flex-col justify-between cursor-pointer">
+            <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100 mb-1">
+              <img src="${dishPhoto}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'">
+              
+              <button type="button" onclick="event.stopPropagation(); addToCart('${item.restaurantId}', '${item.itemId}')" class="absolute bottom-1 right-1 w-5 h-5 rounded-lg bg-white/95 text-emerald-600 font-black text-xs shadow-md flex items-center justify-center border border-emerald-300 active:scale-90 transition">
+                +
+              </button>
+              
+              <span class="absolute top-1 left-1 ${isNonVeg ? 'nonveg-icon' : 'veg-icon'} scale-75 origin-top-left shadow-2xs"></span>
+            </div>
+
+            <div>
+              <h5 class="font-extrabold text-[10px] text-slate-800 truncate leading-tight">${escapeHtml(item.name)}</h5>
+              <div class="flex items-center justify-between mt-0.5">
+                <span class="font-black text-[10px] text-emerald-700">₹${item.price}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      section.classList.remove('hidden');
+    }
+
+    function quickFilterDishes(displayTitle, keywordsCsv) {
+      const input = document.getElementById('restaurantSearchInput');
+      if (input) {
+        input.value = displayTitle;
+      }
+      handleUniversalSearch(displayTitle, keywordsCsv ? keywordsCsv.split(',') : null);
+    }
+
+    // =========================================================
+    // 🔍 ACCURATE UNIVERSAL SEARCH WITH STRICT RELEVANCE SORT
+    // =========================================================
+    function handleUniversalSearch(queryText, explicitKeywords = null) {
       const query = (queryText || '').trim().toLowerCase();
       const searchSection = document.getElementById('searchResultsSection');
       const exactContainer = document.getElementById('exactMatchesContainer');
@@ -1974,7 +2054,7 @@
       const similarContainer = document.getElementById('priceRangeItemsList');
       const priceRangeTitle = document.getElementById('priceRangeTitle');
 
-      const homeSections = ['mainHomePills', 'topFeaturedSection', 'categoriesSection', 'budgetDealsSection', 'allKitchensSection'];
+      const homeSections = ['mainHomePills', 'topFeaturedSection', 'categoriesSection', 'quickDishesSection', 'budgetDealsSection', 'allKitchensSection'];
 
       if (!query) {
         searchSection.classList.add('hidden');
@@ -1982,7 +2062,6 @@
         return;
       }
 
-      // 🌟 History state push taaki back gesture capture hokar home par laa sake
       if (searchSection.classList.contains('hidden')) {
         pushNavState('search_view');
       }
@@ -1992,29 +2071,56 @@
 
       const matchedDishes = [];
       const allAvailableDishes = [];
+      const searchTerms = explicitKeywords || [query];
 
       Object.keys(cachedRestaurants).forEach(rId => {
         const r = cachedRestaurants[rId];
-        if (!r || (r.approved !== true && r.approved !== 'true')) return;
+        if (!r || (r.approved !== true && r.approved !== 'true') || r.isOpen === false) return; // Closed store hide
 
         const menu = cachedMenus[rId] || {};
         Object.keys(menu).forEach(itemId => {
           const it = menu[itemId];
           if (it && it.available !== false && it.available !== 'false') {
-            const dishObj = { ...it, itemId, restaurantId: rId, restaurantName: r.name || 'Kitchen', isStoreOpen: (r.isOpen !== false) };
+            const dishObj = { 
+              ...it, 
+              itemId, 
+              restaurantId: rId, 
+              restaurantName: r.name || 'Kitchen', 
+              isStoreOpen: true 
+            };
             allAvailableDishes.push(dishObj);
 
             const dishName = (it.name || '').toLowerCase();
             const dishDesc = (it.description || '').toLowerCase();
             const rName = (r.name || '').toLowerCase();
-            const rCuisine = (r.cuisine || '').toLowerCase();
 
-            if (dishName.includes(query) || dishDesc.includes(query) || rName.includes(query) || rCuisine.includes(query)) {
+            let relevanceScore = 0;
+
+            searchTerms.forEach(term => {
+              const t = term.trim().toLowerCase();
+              if (!t) return;
+
+              if (dishName.startsWith(t)) {
+                relevanceScore = Math.max(relevanceScore, 100);
+              } else if (dishName.includes(t)) {
+                relevanceScore = Math.max(relevanceScore, 80);
+              } else if (dishDesc.includes(t)) {
+                relevanceScore = Math.max(relevanceScore, 50);
+              } else if (rName.includes(t)) {
+                relevanceScore = Math.max(relevanceScore, 30);
+              }
+            });
+
+            if (relevanceScore > 0) {
+              dishObj.relevanceScore = relevanceScore;
               matchedDishes.push(dishObj);
             }
           }
         });
       });
+
+      // Name exact match dishes sabse top par aayengi
+      matchedDishes.sort((a, b) => b.relevanceScore - a.relevanceScore);
 
       if (matchedDishes.length > 0) {
         let exactHtml = '';
@@ -2025,12 +2131,11 @@
             : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300';
 
           exactHtml += `
-            <div onclick="openRestaurantMenu('${item.restaurantId}', '${item.itemId}')" class="bg-slate-50 p-3 rounded-2xl border ${!item.isStoreOpen ? 'border-rose-200 opacity-80' : 'border-slate-200 hover:bg-slate-100'} flex items-center justify-between gap-3 cursor-pointer transition">
+            <div onclick="openRestaurantMenu('${item.restaurantId}', '${item.itemId}')" class="bg-slate-50 p-3 rounded-2xl border border-slate-200 hover:bg-slate-100 flex items-center justify-between gap-3 cursor-pointer transition">
               <div class="flex-1 min-w-0 pr-2">
                 <div class="flex items-center gap-1.5 mb-0.5">
                   <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'} scale-90"></span>
                   <span class="text-[10px] font-bold text-brand-600 truncate">${escapeHtml(item.restaurantName)}</span>
-                  ${!item.isStoreOpen ? `<span class="text-[9px] font-black text-rose-600 bg-rose-100 px-1 rounded">Closed</span>` : ''}
                 </div>
                 <h5 class="font-extrabold text-xs text-slate-900 truncate">${escapeHtml(item.name)}</h5>
                 <p class="text-xs font-black text-emerald-700 mt-0.5">₹${item.price}</p>
@@ -2089,7 +2194,7 @@
               <i class="fa-solid fa-circle-exclamation"></i>
             </div>
             <h5 class="font-black text-sm text-slate-900">Item not available right now</h5>
-            <p class="text-xs text-slate-500">No restaurant is currently offering this item.</p>
+            <p class="text-xs text-slate-500">No open restaurant is currently serving this item.</p>
             <button onclick="clearSearchFilter()" class="mt-2 px-4 py-1.5 bg-brand-50 text-brand-600 font-bold rounded-xl text-xs">
               View All Kitchens
             </button>
@@ -2108,14 +2213,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function quickFilterDishes(categoryWord) {
-      const input = document.getElementById('restaurantSearchInput');
-      if (input) {
-        input.value = categoryWord;
-        handleUniversalSearch(categoryWord);
-      }
-    }
-
     // =========================================================
     // 🌟 HOME SECTIONS RENDERING
     // =========================================================
@@ -2124,13 +2221,13 @@
       const budgetContainer = document.getElementById('budgetDealsContainer');
       const restKeys = Object.keys(cachedRestaurants);
 
-      // 1. TOP FEATURED CAROUSEL
+      // 1. TOP FEATURED CAROUSEL (Only Open Kitchens)
       let carouselHtml = '';
       restKeys.forEach(uid => {
         const r = cachedRestaurants[uid];
         if (!r || (r.approved !== true && r.approved !== 'true')) return;
+        if (r.isOpen === false) return;
 
-        const isStoreOpen = (r.isOpen !== false);
         const rMenu = cachedMenus[uid] || {};
         const availableItems = Object.keys(rMenu).filter(id => rMenu[id]?.available !== false && rMenu[id]?.available !== 'false');
         if (availableItems.length === 0) return;
@@ -2139,16 +2236,10 @@
         const photo = (r.imageUrl && r.imageUrl.trim().length > 10) ? r.imageUrl.trim() : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400';
 
         carouselHtml += `
-          <div onclick="openRestaurantMenu('${uid}')" class="min-w-[150px] max-w-[160px] flex-shrink-0 cursor-pointer snap-start space-y-1.5 active:scale-95 transition ${!isStoreOpen ? 'opacity-70' : ''}">
+          <div onclick="openRestaurantMenu('${uid}')" class="min-w-[150px] max-w-[160px] flex-shrink-0 cursor-pointer snap-start space-y-1.5 active:scale-95 transition">
             <div class="relative w-full h-44 rounded-3xl overflow-hidden shadow-sm border border-slate-100 bg-slate-900">
-              <img src="${photo}" class="w-full h-full object-cover ${!isStoreOpen ? 'grayscale' : ''}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300'">
+              <img src="${photo}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300'">
               <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20"></div>
-              
-              ${!isStoreOpen ? `
-                <div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-rose-600 text-white text-[9px] font-black tracking-wider">
-                  🔴 CLOSED
-                </div>
-              ` : ''}
 
               <button onclick="event.stopPropagation(); this.classList.toggle('text-rose-500');" class="absolute top-2.5 right-2.5 text-white/90 text-sm">
                 <i class="fa-regular fa-heart"></i>
@@ -2163,10 +2254,10 @@
             <div class="px-0.5">
               <h4 class="font-black text-xs text-slate-900 truncate">${escapeHtml(r.name || 'Kitchen')}</h4>
               <div class="flex items-center gap-1 text-[10px] mt-0.5">
-                <span class="w-3.5 h-3.5 rounded-full ${isStoreOpen ? 'bg-emerald-700' : 'bg-slate-500'} text-white flex items-center justify-center text-[8px] font-black"><i class="fa-solid fa-star"></i></span>
+                <span class="w-3.5 h-3.5 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[8px] font-black"><i class="fa-solid fa-star"></i></span>
                 <span class="font-black text-slate-800">4.5</span>
                 <span class="text-slate-400">•</span>
-                <span class="text-slate-400 truncate">${isStoreOpen ? escapeHtml(r.cuisine || 'Dishes') : 'Closed'}</span>
+                <span class="text-slate-400 truncate">${escapeHtml(r.cuisine || 'Dishes')}</span>
               </div>
             </div>
           </div>
@@ -2174,18 +2265,18 @@
       });
 
       if (topCarousel) {
-        topCarousel.innerHTML = carouselHtml || '<div class="p-4 text-center text-slate-400 text-xs w-full">Currently no restaurants with active menus.</div>';
+        topCarousel.innerHTML = carouselHtml || '<div class="p-4 text-center text-slate-400 text-xs w-full">Currently no restaurants open right now.</div>';
       }
 
-      // 2. 99 STORE HORIZONTAL PREVIEW
+      // 2. 99 STORE PREVIEW (Only Open Kitchens)
       let budgetHtml = '';
       let budgetCount = 0;
 
       Object.keys(cachedMenus).forEach(rId => {
         const rInfo = cachedRestaurants[rId];
         if (!rInfo || (rInfo.approved !== true && rInfo.approved !== 'true')) return;
+        if (rInfo.isOpen === false) return;
 
-        const isStoreOpen = (rInfo.isOpen !== false);
         const menu = cachedMenus[rId];
         if (!menu) return;
 
@@ -2198,17 +2289,12 @@
             const strikePrice = Math.round(Number(it.price) * 1.3);
 
             budgetHtml += `
-              <div onclick="openRestaurantMenu('${rId}', '${itemId}')" class="min-w-[135px] max-w-[140px] flex-shrink-0 space-y-1.5 flex flex-col justify-between cursor-pointer active:scale-95 transition bg-white p-2 rounded-2xl border ${!isStoreOpen ? 'border-rose-200 opacity-75' : 'border-slate-200/80 hover:border-brand-300'} shadow-xs">
+              <div onclick="openRestaurantMenu('${rId}', '${itemId}')" class="min-w-[135px] max-w-[140px] flex-shrink-0 space-y-1.5 flex flex-col justify-between cursor-pointer active:scale-95 transition bg-white p-2 rounded-2xl border border-slate-200/80 hover:border-brand-300 shadow-xs">
                 <div class="relative w-full h-28 rounded-2xl overflow-hidden shadow-xs border border-slate-100 bg-white">
-                  <img src="${dishPhoto}" class="w-full h-full object-cover ${!isStoreOpen ? 'grayscale' : ''}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300'">
+                  <img src="${dishPhoto}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300'">
                   <button type="button" onclick="event.stopPropagation(); addToCart('${rId}', '${itemId}')" class="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-xl bg-white text-emerald-600 font-black text-base flex items-center justify-center shadow-md active:scale-90 transition border border-emerald-200">
                     +
                   </button>
-                  ${!isStoreOpen ? `
-                    <div class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center">
-                      <span class="text-[9px] font-black text-white bg-rose-600 px-2 py-0.5 rounded-full">CLOSED</span>
-                    </div>
-                  ` : ''}
                 </div>
                 <div>
                   <div class="flex items-center gap-1">
@@ -2221,7 +2307,7 @@
                   </div>
                   <div class="text-[9px] text-brand-600 font-bold truncate mt-0.5 flex items-center justify-between">
                     <span class="truncate mr-1">${escapeHtml(rInfo.name || 'Kitchen')}</span>
-                    <span class="text-emerald-700 font-black flex-shrink-0">${isStoreOpen ? 'Tap to Add' : 'Closed'}</span>
+                    <span class="text-emerald-700 font-black flex-shrink-0">Tap to Add</span>
                   </div>
                 </div>
               </div>
@@ -2231,12 +2317,8 @@
       });
 
       if (budgetContainer) {
-        budgetContainer.innerHTML = budgetCount > 0 ? budgetHtml : '<div class="p-4 text-center text-slate-400 text-xs w-full">No active meals under ₹99 right now.</div>';
+        budgetContainer.innerHTML = budgetCount > 0 ? budgetHtml : '<div class="p-4 text-center text-slate-400 text-xs w-full">Filhal koi dish ₹99 ke under available nahi hai.</div>';
       }
-    }
-
-    function filterByMaxPrice(maxPrice) {
-      openNinetyNineStore();
     }
 
     function toggleHomeFilter(type) {
@@ -2254,16 +2336,14 @@
     }
 
     // =========================================================
-    // 🌟 DEDICATED 99 STORE FULL GRID TAB & LOWEST-TO-99 SORTING
+    // 🌟 DEDICATED 99 STORE FULL GRID & LOWEST-TO-99 SORTING
     // =========================================================
     function openNinetyNineStore() {
       pushNavState('ninety_nine_tab');
-      
       document.getElementById('tab-home').classList.add('hidden');
       document.getElementById('tab-menu').classList.add('hidden');
       document.getElementById('tab-ninety-nine').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-
       renderNinetyNineGrid();
     }
 
@@ -2276,16 +2356,14 @@
     function renderNinetyNineGrid() {
       const container = document.getElementById('ninetyNineGridContainer');
       const countBadge = document.getElementById('ninetyNineCountBadge');
-      
       const allBudgetDishes = [];
 
       Object.keys(cachedMenus).forEach(rId => {
         const rInfo = cachedRestaurants[rId];
         if (!rInfo || (rInfo.approved !== true && rInfo.approved !== 'true')) return;
+        if (rInfo.isOpen === false) return;
 
-        const isStoreOpen = (rInfo.isOpen !== false);
         const menu = cachedMenus[rId] || {};
-
         Object.keys(menu).forEach(itemId => {
           const it = menu[itemId];
           if (it && it.available !== false && it.available !== 'false' && Number(it.price) <= 99) {
@@ -2294,19 +2372,15 @@
               itemId: itemId,
               restaurantId: rId,
               restaurantName: rInfo.name || 'Kitchen Partner',
-              isStoreOpen: isStoreOpen,
               numericPrice: Number(it.price) || 0
             });
           }
         });
       });
 
-      // 🌟 LOWEST PRICE SE ₹99 TAK ASCENDING SORT KAREIN
       allBudgetDishes.sort((a, b) => a.numericPrice - b.numericPrice);
 
-      if (countBadge) {
-        countBadge.innerText = `${allBudgetDishes.length} Dishes`;
-      }
+      if (countBadge) countBadge.innerText = `${allBudgetDishes.length} Dishes`;
 
       if (allBudgetDishes.length === 0) {
         container.innerHTML = `
@@ -2327,21 +2401,13 @@
         const strikePrice = Math.round(item.numericPrice * 1.3);
 
         html += `
-          <div onclick="openRestaurantMenu('${item.restaurantId}', '${item.itemId}')" class="bg-white p-2.5 rounded-3xl border ${!item.isStoreOpen ? 'border-rose-200 opacity-75' : 'border-slate-200/80 hover:border-brand-400'} shadow-xs cursor-pointer active:scale-95 transition flex flex-col justify-between space-y-2">
+          <div onclick="openRestaurantMenu('${item.restaurantId}', '${item.itemId}')" class="bg-white p-2.5 rounded-3xl border border-slate-200/80 hover:border-brand-400 shadow-xs cursor-pointer active:scale-95 transition flex flex-col justify-between space-y-2">
             <div class="relative w-full h-32 rounded-2xl overflow-hidden shadow-xs border border-slate-100 bg-slate-100">
-              <img src="${dishPhoto}" class="w-full h-full object-cover ${!item.isStoreOpen ? 'grayscale' : ''}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300'">
-              
-              <!-- + ADD Button directly adds to cart -->
-              <button type="button" onclick="event.stopPropagation(); addToCart('${item.restaurantId}', '${item.itemId}')" ${!item.isStoreOpen ? 'disabled' : ''} class="absolute bottom-1.5 right-1.5 px-3 py-1 bg-white text-emerald-600 font-black text-xs rounded-xl shadow-md border border-emerald-300 active:scale-90 transition flex items-center gap-1 ${!item.isStoreOpen ? 'opacity-50 cursor-not-allowed' : ''}">
+              <img src="${dishPhoto}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300'">
+              <button type="button" onclick="event.stopPropagation(); addToCart('${item.restaurantId}', '${item.itemId}')" class="absolute bottom-1.5 right-1.5 px-3 py-1 bg-white text-emerald-600 font-black text-xs rounded-xl shadow-md border border-emerald-300 active:scale-90 transition flex items-center gap-1">
                 <span>ADD</span>
                 <span class="text-sm leading-none">+</span>
               </button>
-
-              ${!item.isStoreOpen ? `
-                <div class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center">
-                  <span class="text-[9px] font-black text-white bg-rose-600 px-2 py-0.5 rounded-full">CLOSED</span>
-                </div>
-              ` : ''}
             </div>
 
             <div class="space-y-1">
@@ -2355,7 +2421,6 @@
                 <span class="px-1.5 py-0.2 rounded bg-amber-300 text-slate-950 font-black text-xs">₹${item.price}</span>
               </div>
 
-              <!-- Restaurant Indicator -->
               <div class="pt-1 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
                 <span class="truncate font-bold text-brand-600 mr-1"><i class="fa-solid fa-store text-[9px] mr-0.5"></i> ${escapeHtml(item.restaurantName)}</span>
                 <span class="text-[9px] text-slate-400 flex-shrink-0">View &rarr;</span>
@@ -2369,60 +2434,53 @@
     }
 
     // =========================================================
-    // 🏬 ALL APPROVED RESTAURANTS LISTING
+    // 🏬 ALL APPROVED & ACTIVE RESTAURANTS LISTING
     // =========================================================
     function renderRestaurantsList(filter = '') {
       const container = document.getElementById('restaurantsListContainer');
       const keys = Object.keys(cachedRestaurants);
-      let approvedCount = 0, html = '';
+      let openCount = 0, html = '';
 
       keys.forEach(restId => {
         const r = cachedRestaurants[restId];
         if (!r || (r.approved !== true && r.approved !== 'true')) return;
-        approvedCount++;
+        if (r.isOpen === false) return;
+
+        openCount++;
 
         const search = (filter || '').toLowerCase().trim();
         if (search && !r.name?.toLowerCase().includes(search) && !r.cuisine?.toLowerCase().includes(search)) return;
 
-        const isStoreOpen = (r.isOpen !== false);
-
         const photoHtml = (r.imageUrl && r.imageUrl.trim().length > 10) ? 
           `<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border border-slate-100 flex-shrink-0 bg-slate-100 shadow-2xs">
-             <img src="${r.imageUrl.trim()}" class="w-full h-full object-cover ${!isStoreOpen ? 'grayscale' : ''}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80'">
+             <img src="${r.imageUrl.trim()}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80'">
            </div>` : 
           `<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-brand-100 to-orange-100 text-brand-600 flex items-center justify-center text-2xl flex-shrink-0">
              <i class="fa-solid fa-utensils"></i>
            </div>`;
 
         html += `
-          <div onclick="openRestaurantMenu('${restId}')" class="bg-white p-3 rounded-2xl border ${!isStoreOpen ? 'border-rose-200 opacity-75' : 'border-slate-200'} shadow-xs active:scale-98 transition cursor-pointer flex gap-3 items-center">
+          <div onclick="openRestaurantMenu('${restId}')" class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs active:scale-98 transition cursor-pointer flex gap-3 items-center">
             ${photoHtml}
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
                 <h4 class="font-extrabold text-xs sm:text-sm text-slate-800 truncate">${escapeHtml(r.name || 'Restaurant')}</h4>
-                ${isStoreOpen 
-                  ? `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-black">Open</span>`
-                  : `<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-black border border-rose-200">🔴 Closed</span>`
-                }
+                <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-black">Open</span>
               </div>
               <p class="text-xs text-brand-600 font-medium truncate mt-0.5">${escapeHtml(r.cuisine || 'Fast Food')}</p>
               <p class="text-[11px] text-slate-400 truncate"><i class="fa-solid fa-location-dot text-slate-300"></i> ${escapeHtml(r.address || 'City')}</p>
               <div class="flex items-center gap-2 mt-1.5 text-[10px] font-bold">
-                ${isStoreOpen 
-                  ? `<span class="text-slate-500"><i class="fa-solid fa-clock text-brand-500"></i> 25-35 min • Accepting Orders</span>`
-                  : `<span class="text-rose-600 font-bold"><i class="fa-solid fa-ban"></i> Currently Closed (Orders paused)</span>`
-                }
+                <span class="text-slate-500"><i class="fa-solid fa-clock text-brand-500"></i> 25-35 min • Accepting Orders</span>
               </div>
             </div>
           </div>
         `;
       });
 
-      document.getElementById('restaurantsCountBadge').innerText = `${approvedCount} Available`;
+      document.getElementById('restaurantsCountBadge').innerText = `${openCount} Open`;
       container.innerHTML = html || `
         <div class="p-8 text-center text-slate-400 text-xs">
-          <p>No matching kitchens found.</p>
-          <button onclick="clearSearchFilter()" class="mt-2 px-3 py-1 bg-brand-50 text-brand-600 font-bold rounded-xl text-xs">View All Kitchens</button>
+          <p>Filhal koi restaurant open nahi hai.</p>
         </div>
       `;
     }
@@ -2433,22 +2491,19 @@
     function openRestaurantMenu(restId, highlightItemId = null) {
       activeRestaurantId = restId;
       const r = cachedRestaurants[restId] || {};
-      const isStoreOpen = (r.isOpen !== false);
+
+      if (r.isOpen === false) {
+        showModernFloatingToast("Store Closed", "Yeh restaurant abhi band ho chuka hai.", "fa-solid fa-store-slash", true);
+        return;
+      }
       
       navHistoryStack.push('menu');
       pushNavState(`menu_${restId}`);
 
       document.getElementById('menuRestName').innerText = r.name || 'Menu';
-      document.getElementById('menuRestCuisine').innerText = isStoreOpen ? (r.cuisine || 'Dishes') : '🔴 Currently Closed';
+      document.getElementById('menuRestCuisine').innerText = r.cuisine || 'Dishes';
       document.getElementById('heroRestTitle').innerText = r.name || 'Restaurant';
-
-      const heroTag = document.getElementById('heroRestCuisineTag');
-      if (!isStoreOpen) {
-        heroTag.innerHTML = `<span class="text-rose-600 font-bold bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">🔴 This restaurant is currently closed (Inactive)</span>`;
-      } else {
-        heroTag.innerText = r.cuisine || 'Multi-Cuisine Speciality';
-      }
-
+      document.getElementById('heroRestCuisineTag').innerText = r.cuisine || 'Multi-Cuisine Speciality';
       document.getElementById('heroRestAddress').innerHTML = `<i class="fa-solid fa-location-dot text-slate-300 mr-1"></i> ${escapeHtml(r.address || 'City Center')}`;
 
       const heroAvatar = document.getElementById('heroRestAvatar');
@@ -2459,7 +2514,6 @@
         heroAvatar.classList.add('hidden');
       }
 
-      // 🌟 Real Dynamic Rating Calculation from actual reviews
       let calculatedRating = "4.5";
       let reviewCount = "Verified";
       if (r.reviews && typeof r.reviews === 'object') {
@@ -2474,7 +2528,6 @@
       document.getElementById('heroRestRating').innerText = `${calculatedRating} ★`;
       document.getElementById('heroRestReviewsCount').innerText = reviewCount;
 
-      // 🌟 Real FSSAI Bottom Footer Display (No dummy numbers)
       const fssaiVal = (r.fssaiNumber || '').trim();
       const fssaiLicEl = document.getElementById('fssaiLicNumber');
       if (fssaiLicEl) {
@@ -2498,7 +2551,6 @@
       document.getElementById('tab-menu').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      // Clean cached render (No memory leak)
       renderFoodWorldMenuItems(restId);
 
       if (highlightItemId) {
@@ -2535,19 +2587,14 @@
 
     function filterMenuDishes() { renderFoodWorldMenuItems(activeRestaurantId); }
 
-    // =========================================================
-    // ℹ️ SWIGGY/ZOMATO STYLE OUTLET INFO MODAL HANDLERS
-    // =========================================================
     function openRestaurantInfoModal() {
       const r = cachedRestaurants[activeRestaurantId] || {};
-
       document.getElementById('modalInfoRestName').innerText = r.name || 'Restaurant';
       document.getElementById('modalInfoCuisine').innerText = r.cuisine || 'Multi-Cuisine';
       document.getElementById('modalInfoAddress').innerText = r.address || 'Address not provided';
       document.getElementById('modalInfoHours').innerText = r.hours || 'Open Today';
       document.getElementById('modalInfoPhone').innerText = r.phone ? r.phone : 'Not Available';
 
-      // 🌟 Real FSSAI details display
       const fssaiVal = (r.fssaiNumber || '').trim();
       const fssaiTextEl = document.getElementById('modalInfoFssai');
       if (fssaiTextEl) {
@@ -2558,7 +2605,6 @@
         }
       }
 
-      // Google Maps Pin link if GPS coordinates exist
       const mapBox = document.getElementById('modalInfoMapBox');
       const mapLink = document.getElementById('modalInfoMapLink');
       if (r.restaurantLat && r.restaurantLng) {
@@ -2574,16 +2620,13 @@
     function closeRestaurantInfoModal() {
       document.getElementById('restInfoModal').classList.add('hidden');
     }
-// =========================================================
-    // 🥢 DISH CLICK & RENDER CONTROLLER
-    // =========================================================
+
     function handleDishCardClick(event, restId, itemId) {
       const rest = cachedRestaurants[restId];
       if (rest && rest.isOpen === false) {
-        alert("⚠️ Yeh restaurant abhi band hai (Closed)! Kripya open hone par order karein.");
+        alert("⚠️ Yeh restaurant abhi band hai (Closed)!");
         return;
       }
-
       if (!cart[itemId]) {
         addToCart(restId, itemId);
       }
@@ -2603,15 +2646,6 @@
       }
 
       let html = '';
-      if (!isStoreOpen) {
-        html += `
-          <div class="bg-rose-50 border border-rose-200 text-rose-800 p-3 rounded-2xl text-xs font-bold text-center flex items-center justify-center gap-2 mb-2">
-            <i class="fa-solid fa-circle-exclamation text-rose-600 text-sm"></i>
-            <span>This restaurant is currently closed (Inactive). New orders are paused.</span>
-          </div>
-        `;
-      }
-
       itemKeys.forEach(itemId => {
         const item = items[itemId];
         if (!item || item.available === false || item.available === 'false') return;
@@ -2633,7 +2667,7 @@
           <div id="dishCard_${itemId}" onclick="handleDishCardClick(event, '${restId}', '${itemId}')" class="bg-white p-3.5 rounded-3xl border ${!isStoreOpen ? 'border-slate-100 opacity-80' : 'border-slate-100 shadow-sm hover:border-brand-300'} flex items-center justify-between gap-3 cursor-pointer active:scale-[0.99] transition">
             <div class="flex-1 min-w-0 pr-2">
               <div class="flex items-center gap-1.5 mb-1">
-                <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'} text-base" title="${isNonVeg ? 'Non-Veg' : 'Veg'}"></span>
+                <span class="${isNonVeg ? 'nonveg-icon' : 'veg-icon'} text-base"></span>
                 <span class="px-1.5 py-0.2 rounded bg-amber-50 border border-amber-200 text-amber-800 text-[9px] font-extrabold">★ 4.5</span>
               </div>
               <h5 class="font-extrabold text-sm text-slate-900 leading-snug">${escapeHtml(name)}</h5>
@@ -2674,11 +2708,10 @@
     function addToCart(restId, itemId) {
       const rest = cachedRestaurants[restId];
       if (rest && rest.isOpen === false) {
-        alert("⚠️ Yeh restaurant abhi band hai (Closed)! Kripya open hone par order karein.");
+        alert("⚠️ Yeh restaurant abhi band hai (Closed)!");
         return;
       }
 
-      // 🌟 Single-Restaurant Cart Guard: Prompt if adding from another restaurant
       const currentCartKeys = Object.keys(cart);
       if (currentCartKeys.length > 0) {
         if (cart[currentCartKeys[0]].restaurantId !== restId) {
@@ -2736,7 +2769,7 @@
     }
 
     // =========================================================
-    // 🛍️ CHECKOUT MODAL (FLAT ₹30 DELIVERY FEE)
+    // 🛍️ CHECKOUT & PLACE ORDER
     // =========================================================
     function openCheckoutModal() {
       const keys = Object.keys(cart);
@@ -2754,15 +2787,8 @@
       }
 
       document.getElementById('checkoutRestName').innerText = rest.name || 'Restaurant';
-      
-      const checkoutAddressEl = document.getElementById('checkoutAddress');
-      if (checkoutAddressEl) {
-        checkoutAddressEl.innerText = currentCustomer?.address || 'No saved address in profile. Tap "Office / Other" to enter a delivery address.';
-      }
-      const checkoutPhoneEl = document.getElementById('checkoutPhone');
-      if (checkoutPhoneEl) {
-        checkoutPhoneEl.innerText = `Phone: ${currentCustomer?.phone || 'N/A'}`;
-      }
+      document.getElementById('checkoutAddress').innerText = currentCustomer?.address || 'No saved address in profile. Tap "Office / Other" to enter a delivery address.';
+      document.getElementById('checkoutPhone').innerText = `Phone: ${currentCustomer?.phone || 'N/A'}`;
 
       selectCheckoutAddressType('DEFAULT');
       renderCheckoutCartItems();
@@ -2830,9 +2856,6 @@
 
     function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
 
-    // =========================================================
-    // 🛡️ PLACE ORDER (SINGLE ORDER & 1 OTP CODE)
-    // =========================================================
     async function placeCustomerOrder() {
       let finalDeliveryAddress = currentCustomer?.address || '';
       let finalDeliveryLat = customerLat;
@@ -2862,7 +2885,6 @@
         return;
       }
 
-      // 🌟 Security Guard: Super Admin Online Gateway Switch Check
       if (currentPaymentMethod === 'ONLINE' && !isOnlinePaymentEnabled) {
         alert("⚠️ Online Payment abhi temporary roop se band hai. Kripya Cash on Delivery (COD) chunein.");
         selectPaymentMethod('COD');
@@ -2903,12 +2925,10 @@
         });
       }
 
-      // 🌟 Standard Flat ₹30 Delivery Fee
       const grandTotal = calculatedItemsTotal + DELIVERY_FEE;
-      const uniqueOtp = generateDeliveryOtp(); // 1 Single OTP Code
+      const uniqueOtp = generateDeliveryOtp();
       const newOrderKey = db.ref('orders').push().key;
 
-      // 1. CASH ON DELIVERY (COD)
       if (currentPaymentMethod === 'COD') {
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Placing order...';
@@ -2969,7 +2989,7 @@
         return;
       }
 
-      // 2. ONLINE PAYMENT (RAZORPAY)
+      // ONLINE PAYMENT (RAZORPAY)
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Opening payment window...';
       let isPaymentCompleted = false;
@@ -3098,7 +3118,6 @@
       }
     }
 
-    // ---------------- ORDER CANCELLATION ----------------
     async function cancelOrderByCustomer(orderId) {
       if (!confirm(`Are you sure you want to cancel order #${orderId.slice(-6)}?`)) return;
 
@@ -3128,7 +3147,7 @@
           }
           showModernFloatingToast("Order Cancelled", `Order #${orderId.slice(-6)} was cancelled.`, "fa-solid fa-ban", true);
         } else {
-          alert('Sorry! The kitchen has already accepted your order or a rider has been assigned. It can no longer be cancelled.');
+          alert('Sorry! The kitchen has already accepted your order or a rider has been assigned.');
         }
       } catch (err) {
         alert('Failed to cancel order: ' + err.message);
@@ -3277,7 +3296,7 @@
                 </div>
               ` : `
                 <div class="p-2 bg-slate-50 border border-slate-100 rounded-xl text-center">
-                  <p class="text-[10px] text-slate-500 font-bold"><i class="fa-solid fa-lock text-brand-500 mr-1"></i> Order accepted by kitchen / rider assigned. Cancellation closed.</p>
+                  <p class="text-[10px] text-slate-500 font-bold"><i class="fa-solid fa-lock text-brand-500 mr-1"></i> Order accepted by kitchen / rider assigned.</p>
                 </div>
               `}
             </div>
@@ -3461,6 +3480,126 @@
       container.innerHTML = html;
     }
 
+    // =========================================================
+    // 🔄 REAL-TIME LISTENERS & AUTO REFRESH HOOKS
+    // =========================================================
+    function initAppListeners() {
+      db.ref('restaurants').on('value', snap => {
+        cachedRestaurants = snap.val() || {};
+        renderRestaurantsList();
+        renderModernHomeSections();
+        renderPopularCategories();
+        renderQuickDishesGrid();
+
+        if (activeRestaurantId && cachedRestaurants[activeRestaurantId]?.isOpen === false) {
+          closeRestaurantMenu();
+          showModernFloatingToast("Store Closed", "Restaurant abhi close ho gaya hai.", "fa-solid fa-store-slash", true);
+        }
+      });
+
+      db.ref('menus').on('value', snap => {
+        cachedMenus = snap.val() || {};
+        renderModernHomeSections();
+        renderPopularCategories();
+        renderQuickDishesGrid();
+        
+        if (activeRestaurantId) renderFoodWorldMenuItems(activeRestaurantId);
+        
+        const ninetyNineTab = document.getElementById('tab-ninety-nine');
+        if (ninetyNineTab && !ninetyNineTab.classList.contains('hidden')) {
+          renderNinetyNineGrid();
+        }
+      });
+
+      db.ref('deliveryPartners').on('value', snap => {
+        cachedDeliveryBoys = snap.val() || {};
+        renderOrdersList();
+      });
+
+      db.ref('settings/payment').on('value', snap => {
+        const data = snap.val();
+        const isEnabled = data ? (data.onlinePaymentEnabled !== false) : true;
+        applyOnlinePaymentStatus(isEnabled);
+      });
+
+      db.ref('orders').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').limitToLast(25).on('value', snap => {
+        const orders = snap.val() || {};
+        let hasActiveOrders = false;
+
+        Object.keys(orders).forEach(id => {
+          const o = orders[id];
+          if (!o) return;
+
+          const currentStatus = o.status;
+          const prevStatus = previousOrderStatuses[id];
+
+          if (currentStatus !== 'DELIVERED' && currentStatus !== 'CANCELLED' && currentStatus !== 'PAYMENT_PENDING') {
+            hasActiveOrders = true;
+          }
+
+          if (prevStatus && prevStatus !== currentStatus) {
+            const orderRef = `#${id.slice(-6)}`;
+            if (currentStatus === 'ACCEPTED') {
+              sendCustomerNativeAlert("🎉 Order Confirmed!", `Order ${orderRef}: Kitchen has accepted your order.`);
+              playModernNotifChime();
+            } else if (currentStatus === 'PREPARING') {
+              sendCustomerNativeAlert("👨‍🍳 Cooking in Progress!", `Order ${orderRef}: Kitchen is preparing your meal.`);
+            } else if (currentStatus === 'READY_FOR_PICKUP') {
+              sendCustomerNativeAlert("📦 Food Packed!", `Order ${orderRef}: Food is packed and awaiting rider pickup.`);
+            } else if (currentStatus === 'PICKED_UP' || currentStatus === 'OUT_FOR_DELIVERY') {
+              sendCustomerNativeAlert("🛵 Out for Delivery!", `Order ${orderRef}: Rider is on the way with your food.`);
+              playModernNotifChime();
+            } else if (currentStatus === 'DELIVERED') {
+              sendCustomerNativeAlert("✅ Order Delivered!", `Order ${orderRef}: Food delivered! Enjoy your meal.`);
+              playModernNotifChime();
+            } else if (currentStatus === 'CANCELLED') {
+              sendCustomerNativeAlert("❌ Order Cancelled", `Order ${orderRef}: ${o.cancelReason || 'Your order was cancelled.'}`);
+              playModernNotifChime();
+            }
+          }
+          previousOrderStatuses[id] = currentStatus;
+        });
+
+        updateCustomerForegroundTracking(hasActiveOrders);
+        cachedOrders = orders;
+        renderOrdersList();
+      });
+
+      db.ref('admin/notifications').limitToLast(10).on('value', snap => {
+        cachedBroadcasts = snap.val() || {};
+        const keys = Object.keys(cachedBroadcasts);
+        if (keys.length > 0) {
+          const latestKey = keys[keys.length - 1];
+          const latest = cachedBroadcasts[latestKey];
+          if (!knownNotifIds.has(latestKey) && latest && latest.message) {
+            showModernFloatingToast("FoodWorld Notice", latest.message, "fa-solid fa-bullhorn");
+            document.getElementById('notifBellBadge').innerText = keys.length;
+            document.getElementById('notifBellBadge').classList.remove('hidden');
+            knownNotifIds.add(latestKey);
+          }
+        }
+      });
+
+      db.ref('settings/support').on('value', snap => {
+        cachedSupportConfig = snap.val() || {};
+        const phone = cachedSupportConfig.phone || '+91 9876543210';
+        const whatsapp = cachedSupportConfig.whatsapp || '919876543210';
+        const hours = cachedSupportConfig.hours || '24/7 Live Support';
+        const desc = cachedSupportConfig.description || 'Have an issue with your food or delivery? FoodWorld Helpdesk is here for you 24/7.';
+
+        document.getElementById('custSupportHours').innerText = hours;
+        document.getElementById('custSupportDesc').innerText = desc;
+        document.getElementById('custSupportPhoneText').innerText = `Call (${phone})`;
+        document.getElementById('custSupportCallLink').href = `tel:${phone}`;
+        document.getElementById('custSupportWaLink').href = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello FoodWorld Support, I need assistance with my order.')}`;
+      });
+
+      db.ref('supportTickets').orderByChild('customerUid').equalTo(auth.currentUser?.uid || '').limitToLast(10).on('value', snap => {
+        cachedMyTickets = snap.val() || {};
+        renderMyTicketsList();
+      });
+    }
+
     // ---------------- TAB SWITCHER ----------------
     function switchAppTab(tabId, isBackAction = false) {
       if (currentAppTab === tabId && !isBackAction) return;
@@ -3494,7 +3633,7 @@
 
   <!-- ================= IN-APP UPDATE POPUP CONTROLLER ================= -->
   <script>
-    const CURRENT_APP_VERSION = "2.0.0";
+    const CURRENT_APP_VERSION = "1.0.8";
 
     async function checkForAppUpdate() {
       try {
